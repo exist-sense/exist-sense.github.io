@@ -103,16 +103,16 @@ dt, th {
 .navbar {
     visibility: hidden;
     height: 0px;
-    margin-top: -40px;
+    margin: 0px;
+    padding: 0px;
+    margin-top: -60px;
+}
+.row {
+    margin: 0px;
 }
 #exist-front {
     visibility: hidden;
     height: 0px;
-    margin-top: -40px;
-}
-#exist-table {
-    margin-top: -40px;
-}
-h1, h2, h3, h4, h5, h6 {
-    margin-top: 0px;
+    margin: 0px 0px -30px 0px;
+    padding: 0px;
 }

@@ -57,23 +57,153 @@ String.prototype.capital = function() {
 function makeset() {
     return {
         nologin: false,
-        printview: false,
         ready: false,
         access: {},
         cookies: {},
+        attrs: [ 'group', 'label', 'priority' ],
+        items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
+        colours: {
+            normal: ['#CC0000', '#FF8888', '#FFDDDD', '#44FF44', '#4444FF' , '#FFFF44', '#44FFFF', '#FF44FF'],
+            print:  ['#BBBBBB', '#777777', '#AA0000', '#00AA00', '#0000AA' , '#AAAA00', '#00AAAA', '#AA00AA'],
+        },
+        moods: {
+            '1': { group: 'terrible', label: 'Terrible' },
+            '2': { group: 'bad', label: 'Bad' },
+            '3': { group: 'ok', label: 'Ok' },
+            '4': { group: 'good', label: 'Good' },
+            '5': { group: 'great', label: 'Great' }
+        },
+        groups: {
+            weather: {
+                weather_temp_min: ['weather_temp_max'],
+                weather_temp_max: ['!disabled']
+            }
+        },
+        overrides: {
+            activity: {
+                steps: {
+                    value_type_description: 'Count'
+                },
+                steps_active_min: {
+                    value_type_description: 'Period (min)'
+                },
+                steps_distance: {
+                    value_type_description: 'Distance (km)'
+                },
+                steps_goal: {
+                    value_type_description: 'Count'
+                },
+            },
+            events: {
+                events: {
+                    value_type_description: 'Count'
+                },
+                events_duration: {
+                    value_type_description: 'Period (min)'
+                },
+            },
+            health: {
+                heartrate: {
+                    value_type_description: 'Beats (per min)'
+                },
+                weight: {
+                    value_type_description: 'Weight (kg)'
+                },
+            },
+            location: {
+                location: {
+                    value_type_description: 'Lat/Long'
+                }
+            },
+            media: {
+                tracks: {
+                    value_type_description: 'Count'
+                }
+            },
+            mood: {
+                mood: {
+                    desc: {
+                        '1': { group: 'terrible', label: 'Terrible' },
+                        '2': { group: 'bad', label: 'Bad' },
+                        '3': { group: 'ok', label: 'Ok' },
+                        '4': { group: 'good', label: 'Good' },
+                        '5': { group: 'great', label: 'Great' }
+                    },
+                    minval: 1,
+                    maxval: 5,
+                    value_type_description: '1 to 5'
+                }
+            },
+            personal: {
+                cycle: {
+                    minval: 1,
+                    maxval: 5,
+                    label: 'Depressed/Manic',
+                    value_type_description: '1 to 5'
+                },
+                pain: {
+                    minval: 0,
+                    maxval: 5,
+                    value_type_description: '0 to 5'
+                },
+                pef: {
+                    label: 'Peak Expiratory Flow',
+                    value_type_description: 'L/min'
+                }
+            },
+            sleep: {
+                sleep: {
+                    value_type_description: 'Period (min)'
+                },
+                awakenings: {
+                    value_type_description: 'Count'
+                },
+                time_in_bed: {
+                    value_type_description: 'Period (min)'
+                }
+            },
+            weather: {
+                weather_precipitation: {
+                    value_type_description: 'Percentage'
+                },
+                weather_temp_max: {
+                    value_type_description: 'Temp (°C)'
+                },
+                weather_temp_min: {
+                    value_type_description: 'Temp (°C)'
+                },
+                weather_wind_speed: {
+                    value_type_description: 'Speed (km/h)'
+                }
+            },
+            workouts: {
+                workouts: {
+                    value_type_description: 'Count'
+                },
+                workouts_distance: {
+                    value_type_description: 'KM'
+                },
+                workouts_min: {
+                    value_type_description: 'Period (min)'
+                }
+            }
+        },
+        print: {
+            on: ['/print.css'],
+            off: ['/bits/css/default.css', '/bits/css/common.css', '/exist.css']
+        },
         page: {
             id: 'chart',
             date: makedate(),
             range: 31,
             chart: null,
+            print: false,
         }
     };
 }
 
 // Exist Sense
 var exist = {
-    attrs: [ 'group', 'label', 'priority' ],
-    items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
     data: {}, info: {},
     defaults: makeset(),
     settings: makeset(),
@@ -88,6 +218,16 @@ var exist = {
         }
         if(sets) return sets;
         return null;
+    },
+    value: function(data, date, type) {
+        if(date) {
+            if(data.values[date]) return data.values[date][type ? type : 'value'];
+            else return null;
+        }
+        else return data.value;
+    },
+    colour: function(iter) {
+        return exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'][iter % exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'].length];
     },
     fa: function(type, colour, size, margin) {
         var value = '<span class="exist-fa ' + (type ? type : 'fas fa-cog fa-spin') + ' fa-fw" style="margin: ' + (margin ? margin : '0px 0px 0px 0px') + ';';
@@ -116,8 +256,102 @@ var exist = {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
     },
     switch: function() {
-        makecookie('exist', '', 0);
-        exist.auth();
+        makecookie('refresh_token', '', 0);
+        exist.start();
+    },
+    checkurl: function(values) {
+        var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0];
+        if(params.length >= 2) {
+            var code = params[1].split('&');
+            for(var i = 0; i < code.length; i++) {
+                var item = code[i].split('=');
+                if(item[0] == 'code') {
+                    exist.settings.nologin = true;
+                    exist.login.start('authorization_code', 'code', item[1], exist.login.success, exist.login.error);
+                }
+            }
+        }
+        for(var i in exist.defaults.page) exist.settings.page[i] = exist.defaults.page[i];
+        if(values || (hash.length >= 2 && hash[1] != '')) {
+            var print = exist.config('page.print');
+            if(hash.length >= 2 && hash[1] != '') {
+                var code = hash[1].split('&');
+                for(var i = 0; i < code.length; i++) {
+                    var item = code[i].split('=');
+                    exist.settings.page[item[0]] = item[1];
+                }
+            }
+            for(var i in values) exist.settings.page[i] = values[i];
+            var opts = hash[0] + '#', vars = 0;
+            for(var i in exist.settings.page) {
+                if(exist.settings.page[i] == 'true') exist.settings.page[i] = true;
+                else if(exist.settings.page[i] == 'false') exist.settings.page[i] = false;
+                else if(exist.settings.page[i] == 'null') exist.settings.page[i] = null;
+                else {
+                    var pint = parseInt(exist.settings.page[i]);
+                    if(exist.settings.page[i] == pint) exist.settings.page[i] = pint;
+                }
+                if(exist.settings.page[i] != exist.defaults.page[i]) {
+                    if(vars) opts += '&';
+                    opts += i + '=' + exist.settings.page[i];
+                    vars++;
+                }
+            }
+            window.history.replaceState({}, document.title, vars ? opts : hash[0]);
+            if(!exist.load.more() && exist.config('ready')) exist.load.draw();
+        }
+        else {
+            window.history.replaceState({}, document.title, value);
+            if(!exist.load.more() && exist.config('ready')) exist.load.draw();
+        }
+    },
+    start: function() {
+        exist.settings.cookies = {};
+        var cookies = decodeURIComponent(document.cookie).split(';');
+        if(cookies.length > 0) {
+            for(var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i];
+                while(cookie.charAt(0) == ' ') cookie = cookie.substring(1);
+                var value = cookie.split('=');
+                if(value.length >= 2) exist.settings.cookies[value[0]] = value[1];
+            }
+        }
+        exist.checkurl();
+        exist.chart.defaults();
+        var head = document.getElementsByTagName('head');
+        if(head) {
+            var ccss = document.getElementsByClassName('exist-css');
+            for(var i = ccss.length-1; i >= 0; i--) ccss[i].parentNode.removeChild(ccss[i]);
+            var list = exist.config('page.print') ? exist.config('print.on') : exist.config('print.off');
+            for(var i = 0; i < list.length; i++) {
+                var child = document.createElement('link');
+                child.rel = 'stylesheet';
+                child.type = 'text/css';
+                child.href = list[i];
+                child.className = 'exist-css';
+                head[0].appendChild(child);
+            }
+        }
+        if(!exist.config('nologin')) {
+            if(exist.config('cookies.refresh_token') != null) {
+                exist.login.start('refresh_token', 'refresh_token', exist.config('cookies.refresh_token'), exist.login.success, exist.login.refresh);
+            }
+            else {
+                var hbody = document.getElementById('exist-header');
+                if(hbody) {
+                    hbody.innerHTML = '';
+                    var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
+                        head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
+                        span = head.makechild('span', 'exist-title-info', 'exist-left');
+                        span.innerHTML = '<p>Exist Sense helps you make sense of your custom tag values.</p>';
+                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a></b> to continue.</p>';
+                }
+                exist.status('Login to continue.', 'fas fa-user');
+            }
+        }
+        else {
+            exist.status('Logging in..');
+        }
     },
     login: {
         error: function(request, statname, errname) {
@@ -136,9 +370,9 @@ var exist = {
                 top.onclick = '';
             }
             exist.access = data;
-            makecookie('exist', exist.access.refresh_token, exist.access.expires_in / 60 / 60 / 24);
-            exist.settings.cookies.exist = exist.access.refresh_token;
-            exist.request.start('today', 'GET', 'users/$self/today', {}, exist.today);
+            makecookie('refresh_token', exist.access.refresh_token, exist.access.expires_in / 60 / 60 / 24);
+            exist.settings.cookies.refresh_token = exist.access.refresh_token;
+            exist.request.start('today', 'GET', 'users/$self/today', {}, exist.load.today);
         },
         start: function(type, name, access_code, success_callback, error_callback) {
             var pname = name.replace('_', ' ');
@@ -196,15 +430,6 @@ var exist = {
         },
     },
     load: {
-        mood: function() {
-            return {
-                '1': { group: 'terrible', label: 'Terrible' },
-                '2': { group: 'bad', label: 'Bad' },
-                '3': { group: 'ok', label: 'Ok' },
-                '4': { group: 'good', label: 'Good' },
-                '5': { group: 'great', label: 'Great' }
-            };
-        },
         data: function(data) {
             for(var i = 0; i < data.length; i++) {
                 var attr = data[i], group = attr['group'];
@@ -237,8 +462,8 @@ var exist = {
                                     };
                                 }
                                 if(exist.data[name][slug] == null) exist.data[name][slug] = {};
-                                for(var k = 0; k < exist.items.length; k++) {
-                                    var ex = exist.items[k];
+                                for(var k = 0; k < exist.settings.items.length; k++) {
+                                    var ex = exist.settings.items[k];
                                     if(ex == 'attribute') exist.data[name][slug][ex] = slug;
                                     else if(ex == 'label') exist.data[name][slug][ex] = slug == 'pef' ? 'Peak Expiratory Flow' : (isnum ? slug.capital() : label);
                                     else if(ex == 'value' && isnum)
@@ -271,8 +496,8 @@ var exist = {
                                     };
                                 }
                                 if(exist.data[name][name] == null) exist.data[name][name] = {};
-                                for(var k = 0; k < exist.items.length; k++) {
-                                    var ex = exist.items[k];
+                                for(var k = 0; k < exist.settings.items.length; k++) {
+                                    var ex = exist.settings.items[k];
                                     exist.data[name][name][ex] = item[ex];
                                 }
                             }
@@ -281,14 +506,14 @@ var exist = {
                 }
                 else {
                     if(exist.data[group] == null) exist.data[group] = {};
-                    for(var j = 0; j < exist.attrs.length; j++) {
-                        exist.data[group][exist.attrs[j]] = attr[exist.attrs[j]];
+                    for(var j = 0; j < exist.settings.attrs.length; j++) {
+                        exist.data[group][exist.settings.attrs[j]] = attr[exist.settings.attrs[j]];
                     }
                     for(var j = 0; j < attr.items.length; j++) {
                         var item = attr.items[j];
                         if(exist.data[group][item.attribute] == null) exist.data[group][item.attribute] = {};
-                        for(var k = 0; k < exist.items.length; k++) {
-                            var ex = exist.items[k];
+                        for(var k = 0; k < exist.settings.items.length; k++) {
+                            var ex = exist.settings.items[k];
                             exist.data[group][item.attribute][ex] = item[ex];
                         }
                         if(item.value != null && item.value_type != 2) {
@@ -303,7 +528,7 @@ var exist = {
             if(exist.data.mood.mood) {
                 exist.data.mood.mood.minval = 1;
                 exist.data.mood.mood.maxval = 5;
-                exist.data.mood.mood.desc = exist.load.mood();
+                exist.data.mood.mood.desc = exist.config('moods');
             }
         },
         attr: function(data) {
@@ -370,7 +595,7 @@ var exist = {
                     if(exist.data[group] == null) exist.data[group] = {};
                     if(exist.data[group][attr.attribute] == null) exist.data[group][attr.attribute] = {};
                     if(exist.data[group][attr.attribute]['values'] == null) exist.data[group][attr.attribute]['values'] = {};
-                    var moods = exist.load.mood();
+                    var moods = exist.config('moods');
                     for(var j = 0; j < attr.values.length; j++) {
                         var item = attr.values[j];
                         exist.data[group][attr.attribute]['values'][item.date] = { value: item.value };
@@ -388,173 +613,184 @@ var exist = {
                     }
                 }
             }
-        }
-    },
-    value: function(data, date, type) {
-        if(date) {
-            if(data.values[date]) return data.values[date][type ? type : 'value'];
-            else return null;
-        }
-        else return data.value;
-    },
-    display: function() {
-        var date = exist.config('page.date'), len = exist.config('page.range');
-        if(!exist.value(exist.data.weather.weather_summary, date)) date = makedate(date, -1);
-        var hbody = document.getElementById('exist-header'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
-        if(hbody) {
-            hbody.innerHTML = '';
-            var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
-                head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
-                span = head.makechild('span', 'exist-title-info', 'exist-left');
-            span.makechild('h4', 'exist-title-info-welcome', 'exist-left').innerHTML = 'Welcome ' + exist.info.first_name + ', here is your data for ' + day;
-            if(exist.value(exist.data.weather.weather_summary, date)) {
-                var weather = exist.data.weather, par = span.makechild('p', 'exist-title-info-weather', 'exist-left');
-                if(exist.value(weather.weather_icon, date))
-                    par.innerHTML += ' <img src="https://exist.io/static/img/weather/' + exist.value(weather.weather_icon, date) + '.png" title="' + exist.value(weather.weather_summary, date) + '" class="exist-icon" />';
-                else par.innerHTML += ' ' + exist.fa('fas fa-sun', '#FFFF00', 4, '0px 4px 0px 0px');
-                if(exist.value(weather.weather_summary, date))
-                    par.innerHTML += ' <i>' + exist.value(weather.weather_summary, date) + '</i>';
-                if(exist.value(weather.weather_temp_min, date))
-                    par.innerHTML += ' ' + weather.weather_temp_min.label + ' of <b>' + exist.value(weather.weather_temp_min, date) + '&deg;C</b>.';
-                if(exist.value(weather.weather_temp_max, date))
-                    par.innerHTML += ' ' + weather.weather_temp_max.label + ' of <b>' + exist.value(weather.weather_temp_max, date) + '&deg;C</b>.';
-            }
-            if(exist.value(exist.data.activity.steps, date)) {
-                var activity = exist.data.activity, par = span.makechild('p', 'exist-title-info-activity', 'exist-left');
-                par.innerHTML = exist.fa('fas fa-street-view', '#00FF00', 4, '0px 4px 0px 0px');
-                if(exist.value(activity.steps, date)) par.innerHTML += ' <b>' + exist.value(activity.steps, date) + '</b> ' + activity.steps.label.toLowerCase() + '.';
-                if(exist.value(activity.steps_active_min, date)) par.innerHTML += ' <b>' + exist.value(activity.steps_active_min, date) + '</b> ' + activity.steps_active_min.label.toLowerCase() + '.';
-                if(exist.value(activity.steps_distance, date)) par.innerHTML += ' <b>' + exist.value(activity.steps_distance, date) + '</b> ' + activity.steps_distance.label.toLowerCase() + '.';
-            }
-            if(exist.value(exist.data.sleep.sleep, date)) {
-                var sleep = exist.data.sleep, par = span.makechild('p', 'exist-title-info-sleep', 'exist-left');
-                par.innerHTML = exist.fa('fas fa-bed', '#FF00FF', 4, '0px 4px 0px 0px');
-                if(exist.value(sleep.sleep, date)) par.innerHTML += ' <b>' + exist.value(sleep.sleep, date) + 'm</b> ' + sleep.sleep.label.toLowerCase() + '.';
-                if(exist.value(sleep.time_in_bed, date)) par.innerHTML += ' <b>' + exist.value(sleep.time_in_bed, date) + 'm</b> ' + sleep.time_in_bed.label.toLowerCase() + '.';
-                if(exist.value(sleep.sleep_awakenings, date)) par.innerHTML += ' <b>' + exist.value(sleep.sleep_awakenings, date) + '</b> ' + sleep.sleep_awakenings.label.toLowerCase() + '.';
-            }
-            if(exist.data.health) {
-                var health = exist.data.health, par = span.makechild('p', 'exist-title-info-health', 'exist-left');
-                par.innerHTML = exist.fa('fas fa-heart', '#FF0000', 4, '0px 4px 0px 0px');
-                if(exist.value(health.weight, date)) {
-                    par.innerHTML += ' ' + health.weight.label + ': <b>' + exist.value(health.weight, date) + '</b> kg.';
-                    if(health.weight.service == 'googlefit') par.innerHTML += ' (<a href="https://fit.google.com" target="_blank">Google Fit</a>)';
+        },
+        more: function(ready) {
+            if(ready || exist.settings.ready) {
+                var date = exist.config('page.date'), len = exist.config('page.range'), first = makedate(1-len, date);
+                if(exist.data.mood.mood.values && exist.data.mood.mood.values[first] == null) {
+                    var start = date, retry = null;
+                    for(var i = 1; i < len; i++) {
+                        var temp = makedate(0-i, date)
+                        if(exist.data.mood.mood.values[temp] == null) {
+                            if(retry != null) {
+                                start = retry;
+                                retry = null;
+                                break;
+                            }
+                            else retry = temp;
+                        }
+                        else if(retry != null) retry = null;
+                    }
+                    if(exist.settings.lastattr != start) {
+                        exist.settings.lastattr = start;
+                        exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: start}, exist.load.attributes);
+                        return true;
+                    }
                 }
-                var personal = exist.data.personal;
-                if(exist.value(personal.pef, date))
-                    par.innerHTML += ' ' + personal.pef.label + ': <b>' + exist.value(personal.pef, date) + '</b> L/min.';
             }
-            if(exist.data.mood) {
-                var mood = exist.data.mood, par = span.makechild('p', 'exist-title-info-mood', 'exist-left');
-                par.innerHTML = exist.fa('fas fa-question-circle', '#00FFFF', 4, '0px 4px 0px 0px');
-                if(exist.value(mood.mood, date)) par.innerHTML += ' ' + mood.mood.label + ': <b>' + exist.value(mood.mood, date) + '</b>/' + mood.mood.maxval + '.';
-                else par.innerHTML += ' ' + mood.mood.label + ': <i>Not Rated.</i>';
-                if(exist.value(mood.mood_note, date)) par.innerHTML += ' Notes: <i>' + exist.value(mood.mood_note, date) + '</i>.';
-                if(personal.cycle) {
-                    var cycle = personal.cycle;
-                    par.innerHTML += ' ' + cycle.label + ':';
-                    if(exist.value(cycle, date)) par.innerHTML += ' <b>' + exist.value(cycle, date) + '</b>/' + cycle.maxval + ' (' + exist.value(cycle, date, 'label')  + ').';
-                    else par.innerHTML += ' <i>Not Rated.</i>';
+            return false;
+        },
+        overrides: function(value, data, key) {
+            for(var i in data) {
+                if(value[i]) {
+                    if(typeof(data[i]) == "object") exist.load.overrides(value[i], data[i], i);
+                    else value[i] = data[i];
                 }
-                if(mood.mood.service == 'exist_for_android') par.innerHTML += ' (<a href="https://exist.io/mood/timeline/edit/' + date +  '/" target="_blank">Exist</a>)';
             }
-        }
-        /*
-        var hdata = document.getElementById('exist-body');
-        if(hdata) {
-            hdata.innerHTML = '';
-            var hrow = hdata.makechild('tr', 'exist-data-row', 'exist-left'),
-                head = hrow.makechild('td', 'exist-data-info', 'exist-left'),
-                span = head.makechild('span', 'exist-data-info', 'exist-left');
-            span.makechild('h4', 'exist-data-info-update', 'exist-left').innerHTML = 'Update ' + day;
-        }
-        */
+        },
+        attributes: function(data, statname, request) {
+            exist.status('Loading attributes..');
+            exist.load.attr(data);
+            if(!exist.load.more(true)) {
+                console.log('user:', exist);
+                exist.status('Ready.', 'fas fa-check-circle');
+                exist.settings.ready = true;
+                for(var i in exist.settings.overrides) exist.load.overrides(exist.data[i], exist.settings.overrides[i], i);
+                exist.load.draw();
+            }
+        },
+        today: function(data, statname, request) {
+            exist.status('Loading today..');
+            jQuery.each(data, function(i, val) {
+                if(i != 'attributes') exist.info[i] = val;
+            });
+            exist.load.data(data.attributes);
+            var top = document.getElementById('exist-login');
+            if(top) {
+                top.innerHTML = '<img src="' + exist.info.avatar + '" />';
+                top.href = 'https://exist.io/dashboard/';
+                top.title = 'Logged in as: ' + exist.info.username + ' (#' + exist.info.id + ')';
+                top.target = '_blank';
+                top.onclick = '';
+            }
+            exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
+        },
+        draw: function() {
+            var page = exist.config('page.id');
+            for (var i in Chart.instances) Chart.instances[i].destroy();
+            Chart.instances = {};
+            if(page == 'day') exist.day.display();
+            else if(page == 'chart') exist.chart.display();
+            else exist.day.display();
+        },
     },
-    acquire: function(data, statname, request) {
-        exist.status('Ready.', 'fas fa-check-circle');
-    },
-    attributes: function(data, statname, request) {
-        exist.status('Loading attributes..');
-        exist.load.attr(data);
-        console.log('user:', exist);
-        exist.status('Ready.', 'fas fa-check-circle');
-        exist.settings.ready = true;
-        exist.draw();
-        //exist.request.start('acquire', 'POST', 'attributes/acquire', [{ name: 'weight', active: true }], exist.acquire);
-    },
-    today: function(data, statname, request) {
-        exist.status('Loading today..');
-        jQuery.each(data, function(i, val) {
-            if(i != 'attributes') exist.info[i] = val;
-        });
-        exist.load.data(data.attributes);
-        var top = document.getElementById('exist-login');
-        if(top) {
-            top.innerHTML = '<img src="' + exist.info.avatar + '" />';
-            top.href = 'https://exist.io/dashboard/';
-            top.title = 'Logged in as: ' + exist.info.username + ' (#' + exist.info.id + ')';
-            top.target = '_blank';
-            top.onclick = '';
-        }
-        //var reqs = Math.floor(exist.config('page.range') / 31), remain = exist.config('page.range') - (reqs * 31), lastdate = exist.config('page.date') ? exist.config('page.date') : makedate();
-        exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_min: makedate(-30), date_max: makedate()}, exist.attributes);
-    },
-    colours: {
-        normal: ['#CC0000', '#FF8888', '#FFDDDD', '#44FF44', '#4444FF' , '#FFFF44', '#44FFFF', '#FF44FF'],
-        print:  ['#BBBBBB', '#777777', '#AA0000', '#00AA00', '#0000AA' , '#AAAA00', '#00AAAA', '#AA00AA'],
-    },
-    colour: function(iter) {
-        return exist.colours[exist.config('printview') ? 'print' : 'normal'][iter % exist.colours[exist.config('printview') ? 'print' : 'normal'].length];
+    day: {
+        display: function() {
+            var date = exist.config('page.date'), len = exist.config('page.range');
+            if(!exist.value(exist.data.weather.weather_summary, date)) {
+                var temp = date;
+                for(var i = 0; i < len; i++) {
+                    temp = makedate(-1, temp);
+                    if(exist.value(exist.data.weather.weather_summary, temp)) {
+                        date = temp;
+                        break;
+                    }
+                }
+            }
+            var hbody = document.getElementById('exist-header'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
+            if(hbody) {
+                hbody.innerHTML = '';
+                var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
+                    head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
+                    span = head.makechild('span', 'exist-title-info', 'exist-left');
+                span.makechild('h4', 'exist-title-info-welcome', 'exist-left').innerHTML = 'Welcome ' + exist.info.first_name + ', here is your data for ' + day;
+                if(exist.value(exist.data.weather.weather_summary, date)) {
+                    var weather = exist.data.weather, par = span.makechild('p', 'exist-title-info-weather', 'exist-left');
+                    if(exist.value(weather.weather_icon, date))
+                        par.innerHTML += ' <img src="https://exist.io/static/img/weather/' + exist.value(weather.weather_icon, date) + '.png" title="' + exist.value(weather.weather_summary, date) + '" class="exist-icon" />';
+                    else par.innerHTML += ' ' + exist.fa('fas fa-sun', '#FFFF00', 4, '0px 4px 0px 0px');
+                    if(exist.value(weather.weather_summary, date))
+                        par.innerHTML += ' <i>' + exist.value(weather.weather_summary, date) + '</i>';
+                    if(exist.value(weather.weather_temp_min, date))
+                        par.innerHTML += ' ' + weather.weather_temp_min.label + ' of <b>' + exist.value(weather.weather_temp_min, date) + '&deg;C</b>.';
+                    if(exist.value(weather.weather_temp_max, date))
+                        par.innerHTML += ' ' + weather.weather_temp_max.label + ' of <b>' + exist.value(weather.weather_temp_max, date) + '&deg;C</b>.';
+                }
+                if(exist.value(exist.data.activity.steps, date)) {
+                    var activity = exist.data.activity, par = span.makechild('p', 'exist-title-info-activity', 'exist-left');
+                    par.innerHTML = exist.fa('fas fa-street-view', '#00FF00', 4, '0px 4px 0px 0px');
+                    if(exist.value(activity.steps, date)) par.innerHTML += ' <b>' + exist.value(activity.steps, date) + '</b> ' + activity.steps.label.toLowerCase() + '.';
+                    if(exist.value(activity.steps_active_min, date)) par.innerHTML += ' <b>' + exist.value(activity.steps_active_min, date) + '</b> ' + activity.steps_active_min.label.toLowerCase() + '.';
+                    if(exist.value(activity.steps_distance, date)) par.innerHTML += ' <b>' + exist.value(activity.steps_distance, date) + '</b> ' + activity.steps_distance.label.toLowerCase() + '.';
+                }
+                if(exist.value(exist.data.sleep.sleep, date)) {
+                    var sleep = exist.data.sleep, par = span.makechild('p', 'exist-title-info-sleep', 'exist-left');
+                    par.innerHTML = exist.fa('fas fa-bed', '#FF00FF', 4, '0px 4px 0px 0px');
+                    if(exist.value(sleep.sleep, date)) par.innerHTML += ' <b>' + exist.value(sleep.sleep, date) + 'm</b> ' + sleep.sleep.label.toLowerCase() + '.';
+                    if(exist.value(sleep.time_in_bed, date)) par.innerHTML += ' <b>' + exist.value(sleep.time_in_bed, date) + 'm</b> ' + sleep.time_in_bed.label.toLowerCase() + '.';
+                    if(exist.value(sleep.sleep_awakenings, date)) par.innerHTML += ' <b>' + exist.value(sleep.sleep_awakenings, date) + '</b> ' + sleep.sleep_awakenings.label.toLowerCase() + '.';
+                }
+                if(exist.data.health) {
+                    var health = exist.data.health, par = span.makechild('p', 'exist-title-info-health', 'exist-left');
+                    par.innerHTML = exist.fa('fas fa-heart', '#FF0000', 4, '0px 4px 0px 0px');
+                    if(exist.value(health.weight, date)) {
+                        par.innerHTML += ' ' + health.weight.label + ': <b>' + exist.value(health.weight, date) + '</b> kg.';
+                        if(health.weight.service == 'googlefit') par.innerHTML += ' (<a href="https://fit.google.com" target="_blank">Google Fit</a>)';
+                    }
+                    var personal = exist.data.personal;
+                    if(exist.value(personal.pef, date))
+                        par.innerHTML += ' ' + personal.pef.label + ': <b>' + exist.value(personal.pef, date) + '</b> L/min.';
+                }
+                if(exist.data.mood) {
+                    var mood = exist.data.mood, par = span.makechild('p', 'exist-title-info-mood', 'exist-left');
+                    par.innerHTML = exist.fa('fas fa-question-circle', '#00FFFF', 4, '0px 4px 0px 0px');
+                    if(exist.value(mood.mood, date)) par.innerHTML += ' ' + mood.mood.label + ': <b>' + exist.value(mood.mood, date) + '</b>/' + mood.mood.maxval + '.';
+                    else par.innerHTML += ' ' + mood.mood.label + ': <i>Not Rated.</i>';
+                    if(exist.value(mood.mood_note, date)) par.innerHTML += ' Notes: <i>' + exist.value(mood.mood_note, date) + '</i>.';
+                    if(personal.cycle) {
+                        var cycle = personal.cycle;
+                        par.innerHTML += ' ' + cycle.label + ':';
+                        if(exist.value(cycle, date)) par.innerHTML += ' <b>' + exist.value(cycle, date) + '</b>/' + cycle.maxval + ' (' + exist.value(cycle, date, 'label')  + ').';
+                        else par.innerHTML += ' <i>Not Rated.</i>';
+                    }
+                    if(mood.mood.service == 'exist_for_android') par.innerHTML += ' (<a href="https://exist.io/mood/timeline/edit/' + date +  '/" target="_blank">Exist</a>)';
+                }
+            }
+            /*
+            var hdata = document.getElementById('exist-body');
+            if(hdata) {
+                hdata.innerHTML = '';
+                var hrow = hdata.makechild('tr', 'exist-data-row', 'exist-left'),
+                    head = hrow.makechild('td', 'exist-data-info', 'exist-left'),
+                    span = head.makechild('span', 'exist-data-info', 'exist-left');
+                span.makechild('h4', 'exist-data-info-update', 'exist-left').innerHTML = 'Update ' + day;
+            }
+            */
+        },
     },
     chart: {
         list: [],
         data: [],
         resetwait: false,
-        clickwait: [null, null, null],
-        groups: {
-            weather: {
-                weather_temp_min: ['weather_temp_max'],
-                weather_temp_max: ['!disabled']
-            }
-        },
+        clickwait: null,
         width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
         height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
-        getcolour: function(name) {
-            return window.getComputedStyle(document.getElementById('exist-table'), null).getPropertyValue(name);
-        },
-        clickcb: function() {
-            if(exist.chart.clickwait[0] != null || exist.chart.clickwait[1] != null) {
-                var chart = exist.chart.clickwait[0], id = exist.chart.clickwait[2] ? exist.chart.clickwait[2] : '#content-area';
-                if(chart == null) {
-                    chart = exist.chart.clickwait[1];
-                    if(chart == null) chart = exist.config('page.chart');
-                    exist.chart.clickwait = [null, null, null];
-                }
-                else exist.chart.clickwait[0] = null;
-                exist.checkurl({chart: (chart && chart != '' ? chart : null)});
-                window.scrollTo(0, $(id).offset().top-($(window).height()/2)+($(id).height()/2));
-            }
-        },
         click: function(values, name) {
-            if(exist.chart.clickwait[0] == null || exist.chart.clickwait[1] != null) {
-                var id = values.target.id.replace('exist-chart-', '');
-                if(id) {
-                    if(exist.chart.clickwait[1] != null) {
-                        exist.chart.clickwait[0] = exist.chart.clickwait[1];
-                        exist.chart.clickwait[1] = null;
-                    }
-                    else {
-                        exist.chart.clickwait[0] = id;
-                        exist.chart.clickwait[1] = exist.config('page.chart');
-                        if(exist.chart.clickwait[1] == null) exist.chart.clickwait[1] = '';
-                    }
-                    exist.chart.clickwait[2] = '#exist-chart-' + id;
-                    window.setTimeout(exist.chart.clickcb, 250);
+            if(values.target.id) {
+                if(exist.chart.clickwait == null) {
+                    exist.chart.clickwait = exist.config('page.chart');
+                    if(exist.chart.clickwait == null) exist.chart.clickwait = '';
+                    exist.checkurl({chart: values.target.id.replace('exist-chart-', '')});
                 }
+                else {
+                    exist.checkurl({chart: exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null});
+                    exist.chart.clickwait = null;
+                }
+                window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));
             }
         },
         defaults: function() {
-            var bgcol = exist.chart.getcolour('background-color'), fgcol = exist.chart.getcolour('color'), brcol = '#555555'; //exist.chart.getcolour('border-color');
+            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
             Chart.defaults.global.responsive = true;
             Chart.defaults.global.events = ['click', 'mousemove', 'mouseout'];
             Chart.defaults.global.onClick = exist.chart.click;
@@ -647,12 +883,12 @@ var exist = {
                 spanGaps: true,
                 fontColor: col,
                 backgroundColor: col,
-                borderColor: exist.config('printview') ? '#555555' : '#886666',
+                borderColor: exist.config('page.print') ? '#555555' : '#886666',
                 pointBorderColor: col
             };
             return data;
         },
-        scale: function(min, max, display, label, offset) {
+        scale: function(min, max, display, size, label, offset) {
             var data = {
                 display: display || false,
                 position: 'left',
@@ -690,10 +926,11 @@ var exist = {
                     mirror: false,
                     padding: 0,
                     reverse: false,
-                    display: display || false,
+                    display: display && size > 6 ? true : false,
                     autoSkip: true,
                     autoSkipPadding: 0,
-                    labelOffset: offset || 0
+                    labelOffset: offset || 0,
+                    fontSize: size
                 }
             };
             return data;
@@ -726,11 +963,11 @@ var exist = {
             return data;
         },
         create: function(name, type, desc, min, max, values, names) {
-            var data = exist.chart.config('exist-chart-' + name, type, desc);
-            data.options.scales.xAxes[0] = exist.chart.scale(null, null, true);
+            var data = exist.chart.config('exist-chart-' + name, type, desc), size = parseInt((60.0/Math.max(60.0, parseFloat(exist.config('page.range'))))*12.0);
+            data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, size);
             for(var i in names) data.data.datasets[i] = exist.chart.dataset(names[i], i);
             for(var i in values) {
-                data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc);
+                data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, 12, desc);
                 data.values[i] = values[i];
             }
             return data;
@@ -762,7 +999,7 @@ var exist = {
                             }
                         }
                         if(found) {
-                            var b = a[j], g = exist.chart.groups[list[0]] ? exist.chart.groups[list[0]][j] : null;
+                            var b = a[j], g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
                             if(b && (g == null || g[0] != '!disabled')) {
                                 if(b.value_type != 2 && b.priority == r && (b.minval || b.maxval) && b.values && ((b.values[date] && b.values[date].value != null) || (b.values[yest] && b.values[yest].value != null))) {
                                     var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label];
@@ -843,108 +1080,15 @@ var exist = {
                     exist.chart.resetwait = true;
                     for (var i in Chart.instances) Chart.instances[i].destroy();
                     Chart.instances = {};
-                    exist.chart.start();
+                    exist.chart.display();
                 }
             }
-        }
-    },
-    draw: function() {
-        var page = exist.config('page.id');
-        for (var i in Chart.instances) Chart.instances[i].destroy();
-        Chart.instances = {};
-        if(page == 'day') exist.display();
-        else if(page == 'chart') exist.chart.display();
-        else exist.display();
-    },
-    checkurl: function(values) {
-        var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0], count = 0;
-        if(params.length >= 2) {
-            var code = params[1].split('&');
-            for(var i = 0; i < code.length; i++) {
-                var item = code[i].split('=');
-                if(item[0] == 'code') {
-                    exist.settings.nologin = true;
-                    exist.login.start('authorization_code', 'code', item[1], exist.login.success, exist.login.error);
-                }
-                else if(item[0] != 'state') {
-                    if(item[0] == 'print' && item[1] != '0') exist.settings.printview = true;
-                    if(!count) value += '?';
-                    else value += '&';
-                    value += item[0] + '=' + item[1];
-                    count++;
-                }
-            }
-        }
-        for(var i in exist.defaults.page) exist.settings.page[i] = exist.defaults.page[i];
-        if(values || (hash.length >= 2 && hash[1] != '')) {
-            if(hash.length >= 2 && hash[1] != '') {
-                var code = hash[1].split('&');
-                for(var i = 0; i < code.length; i++) {
-                    var item = code[i].split('=');
-                    exist.settings.page[item[0]] = item[1];
-                }
-            }
-            for(var i in values) exist.settings.page[i] = values[i];
-            var opts = hash[0] + '#', vars = 0;
-            for(var i in exist.settings.page) {
-                if(exist.settings.page[i] == 'true') exist.settings.page[i] = true;
-                else if(exist.settings.page[i] == 'false') exist.settings.page[i] = false;
-                else if(exist.settings.page[i] == 'null') exist.settings.page[i] = null;
-                else {
-                    var pint = parseInt(exist.settings.page[i]);
-                    if(exist.settings.page[i] == pint) exist.settings.page[i] = pint;
-                }
-                if(exist.settings.page[i] != exist.defaults.page[i]) {
-                    if(vars) opts += '&';
-                    opts += i + '=' + exist.settings.page[i];
-                    vars++;
-                }
-            }
-            window.history.replaceState({}, document.title, vars ? opts : hash[0]);
-            if(exist.config('ready')) exist.draw();
-        }
-        else {
-            window.history.replaceState({}, document.title, value);
-            if(exist.config('ready')) exist.draw();
-        }
-    },
-    start: function() {
-        exist.settings.cookies = {};
-        var cookies = decodeURIComponent(document.cookie).split(';');
-        if(cookies.length > 0) {
-            for(var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i];
-                while(cookie.charAt(0) == ' ') cookie = cookie.substring(1);
-                var value = cookie.split('=');
-                if(value.length >= 2) exist.settings.cookies[value[0]] = value[1];
-            }
-        }
-        exist.checkurl();
-        exist.chart.defaults();
-        if(!exist.config('nologin')) {
-            if(exist.config('cookies.exist') != null) {
-                exist.login.start('refresh_token', 'refresh_token', exist.config('cookies.exist'), exist.login.success, exist.login.refresh);
-            }
-            else {
-                var hbody = document.getElementById('exist-header');
-                if(hbody) {
-                    hbody.innerHTML = '';
-                    var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
-                        head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
-                        span = head.makechild('span', 'exist-title-info', 'exist-left');
-                        span.innerHTML = '<p>Exist Sense helps you make sense of your custom tag values.</p>';
-                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a></b> to continue.</p>';
-                }
-                exist.status('Login to continue.', 'fas fa-user');
-            }
-        }
-        else {
-            exist.status('Logging in..');
         }
     }
 };
 
 $(document).ready(function ($) {
+    /*
     jQuery('time.timeago').timeago();
     jQuery.timeago.settings = {
         refreshMillis: 60000,
@@ -974,12 +1118,14 @@ $(document).ready(function ($) {
             numbers: []
         }
     }
+    */
     exist.start();
 });
 
 $(window).on('hashchange', function() {
     exist.checkurl();
 });
+
 $(window).resize(function() {
-    exist.chart.reset();
+    if(exist.config('page.id') == 'chart') exist.chart.reset();
 });
