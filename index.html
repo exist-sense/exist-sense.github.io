@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <title>Exist Sense</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="msapplication-TileColor" content="#440000" />
+        <meta name="msapplication-TileImage" content="/bits/icons/mstile-144x144.png" />
+        <meta name="msapplication-navbutton-color" content="#440000" />
+        <meta name="msapplication-config" content="/bits/browserconfig.xml" />
+        <meta name="theme-color" content="#440000" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link rel="manifest" href="/bits/manifest.json" />
+        <link rel="apple-touch-icon" type="image/png" sizes="57x57" href="/bits/icons/apple-touch-icon-57x57.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="60x60" href="/bits/icons/apple-touch-icon-60x60.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="72x72" href="/bits/icons/apple-touch-icon-72x72.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="76x76" href="/bits/icons/apple-touch-icon-76x76.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="114x114" href="/bits/icons/apple-touch-icon-114x114.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="120x120" href="/bits/icons/apple-touch-icon-120x120.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="144x144" href="/bits/icons/apple-touch-icon-144x144.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="152x152" href="/bits/icons/apple-touch-icon-152x152.png" />
+        <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="/bits/icons/apple-touch-icon-180x180.png" />
+        <link rel="icon" type="image/png" href="/bits/icons/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="/bits/icons/favicon-194x194.png" sizes="194x194" />
+        <link rel="icon" type="image/png" href="/bits/icons/favicon-96x96.png" sizes="96x96" />
+        <link rel="icon" type="image/png" href="/bits/icons/android-chrome-192x192.png" sizes="192x192" />
+        <link rel="icon" type="image/png" href="/bits/icons/favicon-16x16.png" sizes="16x16" />
+        <link rel="stylesheet" type="text/css" href="/bits/css/orbitron.css" />
+        <script type="text/javascript" src="/bits/js/fontawesome-5.0.2.js"></script>
+        <script type="text/javascript" src="/bits/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="/bits/js/bootstrap.min.js"></script>
+        <script type="text/javascript" src="/bits/js/ekko-lightbox.min.js"></script>
+        <script type="text/javascript" src="/bits/js/chart.bundle.min.js"></script>
+        <script type="text/javascript" src="/bits/js/jquery.timeago.js"></script>
+        <script type="text/javascript" src="/exist/exist.js"></script>
+        <link rel="stylesheet" type="text/css" href="/bits/css/normalize.css" />
+        <link rel="stylesheet" type="text/css" href="/bits/css/bootstrap.min.css" />
+        <link rel="stylesheet" type="text/css" href="/bits/css/rouge-base16-dark.css" />
+        <link rel="stylesheet" type="text/css" href="/bits/css/ekko-lightbox.min.css" />
+        <link rel="stylesheet" type="text/css" href="/bits/css/default.css" />
+        <link rel="stylesheet" type="text/css" href="/bits/css/common.css" />
+        <link rel="stylesheet" type="text/css" href="/exist/exist.css" />
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-static-top">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-sm" aria-expanded="false" aria-controls="navbar">
+                        <span class="sr-only">Toggle Navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="/"><img src="/bits/exist-sense.png" alt="Exist Sense" /></a>
+                </div>
+                <div id="navbar-sm" class="navbar-collapse collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="navitem"><a href="mailto:exist-sense@redeclipse.net" title="Contact Us"><span class="fas fa-at fa-fw" aria-hidden="true"></span><div class="navtext">Contact Us</div></a></li>
+                        <li class="navitem"><a href="https://redeclipse.net/" title="Red Eclipse"><span class="fas fa-external-link-alt fa-fw" aria-hidden="true"></span><div class="navtext">Check Out Red Eclipse</div></a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div class="container pagecontent">
+            <div id="content-area" class="main pagecontainer">
+                <h1>Exist Sense</h1>
+                <table id="exist-front" class="exist-left">
+                    <thead id="exist-link" class="exist-left">
+                        <tr id="exist-l-row" class="exist-left">
+                            <th id="exist-l-data" class="exist-left">
+                                <a id="exist-index" class="exist-left" href="#"><span class="fas fa-book fa-fw"></span>Index</a>
+                                &nbsp;<a id="exist-logout" class="exist-left" href="#" onclick="exist.switch();"><span class="fas fa-user-times fa-fw"></span>Logout</a>
+                                &nbsp;<a id="exist-print" class="exist-left" href="?print=1"><span class="fas fa-print fa-fw"></span>Print</a>
+                                &nbsp;<a id="exist-print" class="exist-left" href="#id=day"><span class="fas fa-sun fa-fw"></span>Day</a>
+                                &nbsp;<a id="exist-print" class="exist-left" href="#id=chart"><span class="fas fa-chart-area fa-fw"></span>Chart</a>
+                            </th>
+                            <th id="exist-l-login" class="exist-right">
+                                <a id="exist-login" class="exist-left" href="#" onclick="exist.auth();"><img src="https://exist.io/static/favicon.png" title="Login with Exist.io" /></a>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody id="exist-load" class="exist-left">
+                        <tr id="exist-h-load" class="exist-left">
+                            <th id="exist-h-data" class="exist-left" colspan="2">
+                                <span id="exist-status"><span class="fas fa-cog fa-spin fa-fw"></span> Loading..</span>
+                            </th>
+                        </tr>
+                    </tbody>
+                    <tfoot id="exist-extra" class="exist-left"></tbody>
+                </table>
+                <table id="exist-table" class="exist-left">
+                    <thead id="exist-header" class="exist-left"></thead>
+                    <tbody id="exist-body" class="exist-left"></tbody>
+                    <tfoot id="exist-post" class="exist-left"></tbody>
+                </table>
+            </div>
+            <div class="row footer">
+                <p><b>Exist Sense <span class="fas fa-copyright" aria-hidden="true"></span> 2018 Quinton Reeves</b></p>
+                <p>Website by <a href="https://remiclouet.com">Rémi Clouet d'Orval</a> and <a href="https://fb.me/qreeves">Quinton Reeves</a></p>
+            </div>
+        </div>
+    </body>
+</html>

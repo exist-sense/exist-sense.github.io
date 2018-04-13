@@ -1,0 +1,118 @@
+@charset "utf-8";
+.exist-bg1, #exist-h-row, #exist-title-row {
+    background-color: rgba(255, 255, 255, 0.25);
+}
+.exist-bg2, #exist-data-info, #exist-attr-row, #exist-l-row, #exist-h-load, #exist-t-load, #exist-h-more, #exist-data-xtra {
+    background-color: rgba(255, 255, 255, 0.75);
+}
+.exist-center {
+    text-align: center;
+}
+.exist-left {
+    text-align: left;
+}
+.exist-right {
+    text-align: right;
+}
+.exist-label {
+    margin: 0;
+    padding: 0px 4px 2px 4px;
+    font-size: 75%;
+    white-space: nowrap;
+    border: none;
+    vertical-align: top;
+}
+.exist-icon {
+    height: 18px;
+    width: 22px;
+    vertical-align: middle;
+    margin: 0px 1px 0px -2px;
+    padding: 0;
+}
+canvas {
+    vertical-align: middle;
+    -webkit-filter: drop-shadow(-1px -1px 2px rgba(0, 0, 0, 0.25));
+    filter: drop-shadow(-1px -1px 2px rgba(0, 0, 0, 0.25));
+}
+#exist-front, #exist-table, #exist-view, #exist-more {
+    width: 100%;
+    max-width: 100%;
+    border: none;
+    vertical-align: middle;
+    margin-bottom: 16px;
+}
+#exist-view {
+    table-layout: fixed;
+}
+#exist-table time {
+    white-space: nowrap;
+}
+#exist-t-row {
+    height: 40px;
+}
+#exist-t-title, #exist-attr-row, #exist-h-load, #exist-t-load {
+    color: rgb(0, 0, 0);
+    text-shadow: -1px -1px 5px rgb(0, 0, 0);
+}
+#exist-data-avatar {
+    float: right;
+    clear: both;
+}
+#exist-data-xtra-labels span {
+    font-size: 80%;
+}
+#exist-data-avatar img, #exist-login img {
+    width: 20px;
+    height: 20px;
+    border: none;
+}
+#exist-data-span p {
+    display: inline;
+}
+#exist-reload, #exist-getmore {
+    cursor: pointer;
+    text-decoration: none;
+}
+#exist-t-numurl, #exist-t-url {
+    color: rgb(0, 0, 0);
+    font-weight: 600;
+}
+.exist-nomargins p {
+    margin: 0px;
+}
+#exist-h-row, #exist-data-info, #exist-data-row, #exist-data-xtra,
+  #exist-data-info, #exist-data-avatar, #exist-data-span {
+    vertical-align: middle;
+}
+#exist-status {
+    color: rgb(0, 0, 0);
+}
+
+table {
+    border-collapse: collapse;
+}
+th, td {
+    text-align: left;
+    padding: 5px 10px;
+    border: none;
+}
+dt, th {
+    color: rgb(0, 0, 0);
+    font-weight: 600;
+}
+.navbar {
+    visibility: hidden;
+    height: 0px;
+    margin-top: -40px;
+}
+#exist-front {
+    visibility: hidden;
+    height: 0px;
+    margin-top: -40px;
+}
+#exist-table {
+    margin-top: -40px;
+}
+h1, h2, h3, h4, h5, h6 {
+    margin-top: 0px;
+}
