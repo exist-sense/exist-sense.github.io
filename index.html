@@ -32,14 +32,14 @@
         <script type="text/javascript" src="/bits/js/ekko-lightbox.min.js"></script>
         <script type="text/javascript" src="/bits/js/chart.bundle.min.js"></script>
         <script type="text/javascript" src="/bits/js/jquery.timeago.js"></script>
-        <script type="text/javascript" src="/exist/exist.js"></script>
+        <script type="text/javascript" src="/exist.js"></script>
         <link rel="stylesheet" type="text/css" href="/bits/css/normalize.css" />
         <link rel="stylesheet" type="text/css" href="/bits/css/bootstrap.min.css" />
         <link rel="stylesheet" type="text/css" href="/bits/css/rouge-base16-dark.css" />
         <link rel="stylesheet" type="text/css" href="/bits/css/ekko-lightbox.min.css" />
         <link rel="stylesheet" type="text/css" href="/bits/css/default.css" />
         <link rel="stylesheet" type="text/css" href="/bits/css/common.css" />
-        <link rel="stylesheet" type="text/css" href="/exist/exist.css" />
+        <link rel="stylesheet" type="text/css" href="/exist.css" />
     </head>
     <body>
         <nav class="navbar navbar-inverse navbar-static-top">
@@ -56,36 +56,27 @@
                 <div id="navbar-sm" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav navbar-right">
                         <li class="navitem"><a href="mailto:exist-sense@redeclipse.net" title="Contact Us"><span class="fas fa-at fa-fw" aria-hidden="true"></span><div class="navtext">Contact Us</div></a></li>
-                        <li class="navitem"><a href="https://redeclipse.net/" title="Red Eclipse"><span class="fas fa-external-link-alt fa-fw" aria-hidden="true"></span><div class="navtext">Check Out Red Eclipse</div></a></li>
+                        <li class="navitem"><a  href="#id=day" title="Day View"><span class="fas fa-calendar-alt fa-fw" aria-hidden="true"></span><div class="navtext">Day View</div></a></li>
+                        <li class="navitem"><a  href="#id=chart" title="Charts View"><span class="fas fa-chart-line fa-fw" aria-hidden="true"></span><div class="navtext">Chart View</div></a></li>
+                        <li class="navitem"><a  href="#" onclick="exist.switch();" title="Logout"><span class="fas fa-user-times fa-fw" aria-hidden="true"></span><div class="navtext">Logout</div></a></li>
                     </ul>
                 </div>
             </div>
         </nav>
         <div class="container pagecontent">
             <div id="content-area" class="main pagecontainer">
-                <h1>Exist Sense</h1>
                 <table id="exist-front" class="exist-left">
                     <thead id="exist-link" class="exist-left">
                         <tr id="exist-l-row" class="exist-left">
                             <th id="exist-l-data" class="exist-left">
-                                <a id="exist-index" class="exist-left" href="#"><span class="fas fa-book fa-fw"></span>Index</a>
-                                &nbsp;<a id="exist-logout" class="exist-left" href="#" onclick="exist.switch();"><span class="fas fa-user-times fa-fw"></span>Logout</a>
-                                &nbsp;<a id="exist-print" class="exist-left" href="?print=1"><span class="fas fa-print fa-fw"></span>Print</a>
-                                &nbsp;<a id="exist-print" class="exist-left" href="#id=day"><span class="fas fa-sun fa-fw"></span>Day</a>
-                                &nbsp;<a id="exist-print" class="exist-left" href="#id=chart"><span class="fas fa-chart-area fa-fw"></span>Chart</a>
+                                <span id="exist-status"><span class="fas fa-cog fa-spin fa-fw"></span> Loading..</span>
                             </th>
                             <th id="exist-l-login" class="exist-right">
                                 <a id="exist-login" class="exist-left" href="#" onclick="exist.auth();"><img src="https://exist.io/static/favicon.png" title="Login with Exist.io" /></a>
                             </th>
                         </tr>
                     </thead>
-                    <tbody id="exist-load" class="exist-left">
-                        <tr id="exist-h-load" class="exist-left">
-                            <th id="exist-h-data" class="exist-left" colspan="2">
-                                <span id="exist-status"><span class="fas fa-cog fa-spin fa-fw"></span> Loading..</span>
-                            </th>
-                        </tr>
-                    </tbody>
+                    <tbody id="exist-load" class="exist-left"></tbody>
                     <tfoot id="exist-extra" class="exist-left"></tbody>
                 </table>
                 <table id="exist-table" class="exist-left">

@@ -113,7 +113,7 @@ var exist = {
         }
     },
     auth: function() {
-        window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fhq.redeclipse.net%2Fexist%2F&scope=read+write';
+        window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
     },
     switch: function() {
         makecookie('exist', '', 0);
@@ -145,7 +145,7 @@ var exist = {
             exist.status('Logging in with ' + pname + '..');
             var reqdata = {
                 method: 'POST',
-                url: 'https://hq.redeclipse.net/exist/oauth/access_token',
+                url: 'https://exist.redeclipse.net/oauth/access_token',
                 data: {
                     grant_type: type,
                     client_id: '124d5b5764184a4d81c2',
@@ -174,7 +174,7 @@ var exist = {
             exist.status('Requesting ' + name + '..');
             var reqdata = {
                 method: method,
-                url: 'https://hq.redeclipse.net/exist/api/1/' + uri + '/',
+                url: 'https://exist.redeclipse.net/api/1/' + uri + '/',
                 data: method != 'POST' ? data : JSON.stringify(data),
                 dataType: method != 'POST' ? null : 'json',
                 contentType: method != 'POST' ? 'application/x-www-form-urlencoded' : 'application/json',
@@ -491,7 +491,7 @@ var exist = {
         var top = document.getElementById('exist-login');
         if(top) {
             top.innerHTML = '<img src="' + exist.info.avatar + '" />';
-            top.href = 'https://exist.io/';
+            top.href = 'https://exist.io/dashboard/';
             top.title = 'Logged in as: ' + exist.info.username + ' (#' + exist.info.id + ')';
             top.target = '_blank';
             top.onclick = '';
@@ -524,14 +524,14 @@ var exist = {
         },
         clickcb: function() {
             if(exist.chart.clickwait[0] != null || exist.chart.clickwait[1] != null) {
-                var chart = exist.chart.clickwait[0], id = exist.chart.clickwait[3] ? exist.chart.clickwait[3] : '#content-area';
+                var chart = exist.chart.clickwait[0], id = exist.chart.clickwait[2] ? exist.chart.clickwait[2] : '#content-area';
                 if(chart == null) {
                     chart = exist.chart.clickwait[1];
                     if(chart == null) chart = exist.config('page.chart');
                     exist.chart.clickwait = [null, null, null];
                 }
                 else exist.chart.clickwait[0] = null;
-                exist.checkurl({chart: chart});
+                exist.checkurl({chart: (chart && chart != '' ? chart : null)});
                 window.scrollTo(0, $(id).offset().top-($(window).height()/2)+($(id).height()/2));
             }
         },
@@ -546,9 +546,10 @@ var exist = {
                     else {
                         exist.chart.clickwait[0] = id;
                         exist.chart.clickwait[1] = exist.config('page.chart');
+                        if(exist.chart.clickwait[1] == null) exist.chart.clickwait[1] = '';
                     }
-                    exist.chart.clickwait[3] = '#exist-chart-' + id;
-                    window.setTimeout(exist.chart.clickcb, 100);
+                    exist.chart.clickwait[2] = '#exist-chart-' + id;
+                    window.setTimeout(exist.chart.clickcb, 250);
                 }
             }
         },
@@ -746,7 +747,6 @@ var exist = {
         },
         make: function(head, date, size, data, q) {
             var list = data.split('-'), a = exist.data[list[0]], yest = makedate(-1, date);
-            console.log('make', list, q, a);
             if(a && (q == null || a.priority == q)) {
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
