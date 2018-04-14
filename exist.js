@@ -50,6 +50,11 @@ function makedate(offset, date) {
     return d.getFullYear() + '-' + (d.getMonth() + 1).zeropad() + '-' + d.getDate().zeropad();
 }
 
+function offdate(date) {
+    var d = new Date(date);
+    return d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1).zeropad() + '-' + d.getUTCDate().zeropad();
+}
+
 String.prototype.capital = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
@@ -474,8 +479,14 @@ var exist = {
                                             exist.data[name][slug]['maxval'] = pint;
                                         if(item.value) exist.data[name][slug][ex] = pint;
                                     }
-                                    else if(ex == 'value_type' && !isnum) exist.data[name][slug][ex] = 2;
-                                    else if(ex == 'value_type_description' && !isnum) exist.data[name][slug][ex] = 'String';
+                                    else if(ex == 'value' && !isnum)
+                                    {
+                                        exist.data[name][slug][ex] = item.value != null ? item.value : 0;
+                                        exist.data[name][slug]['minval'] = 0;
+                                        exist.data[name][slug]['maxval'] = 1;
+                                    }
+                                    else if(ex == 'value_type' && !isnum) exist.data[name][slug][ex] = 0;
+                                    else if(ex == 'value_type_description' && !isnum) exist.data[name][slug][ex] = 'Boolean';
                                     else exist.data[name][slug][ex] = item[ex];
                                 }
                                 if(grp) {
@@ -572,6 +583,7 @@ var exist = {
                                     if(exist.data[name][slug]['maxval'] == null || exist.data[name][slug]['maxval'] < pint)
                                         exist.data[name][slug]['maxval'] = pint;
                                 }
+                                else if(item.value == null) exist.data[name][slug]['values'][item.date]['value'] = 0;
                                 if(grp) {
                                     var desc = isnum ? values[1] : slug;
                                     if(exist.data[name][slug]['values'][item.date]['group'] == null)
@@ -888,7 +900,7 @@ var exist = {
             };
             return data;
         },
-        scale: function(min, max, display, size, label, offset) {
+        scale: function(min, max, display, label, offset) {
             var data = {
                 display: display || false,
                 position: 'left',
@@ -920,17 +932,17 @@ var exist = {
                 },
                 ticks: {
                     minRotation: 0,
-                    maxRotation: 90,
+                    maxRotation: 80,
                     suggestedMin: min,
                     suggestedMax: max,
                     mirror: false,
                     padding: 0,
                     reverse: false,
-                    display: display && size > 6 ? true : false,
+                    display: display || false,
                     autoSkip: true,
                     autoSkipPadding: 0,
                     labelOffset: offset || 0,
-                    fontSize: size
+                    fontSize: 12
                 }
             };
             return data;
@@ -963,24 +975,24 @@ var exist = {
             return data;
         },
         create: function(name, type, desc, min, max, values, names) {
-            var data = exist.chart.config('exist-chart-' + name, type, desc), size = parseInt((60.0/Math.max(60.0, parseFloat(exist.config('page.range'))))*12.0);
-            data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, size);
+            var data = exist.chart.config('exist-chart-' + name, type, desc);
+            data.options.scales.xAxes[0] = exist.chart.scale(null, null, true);
+            data.options.scales.xAxes[0]['type'] = 'time';
+            //data.options.scales.xAxes[0]['distribution'] = 'series';
+            data.options.scales.xAxes[0]['time'] = {
+                unit: 'day',
+                minUnit: 'day',
+                tooltipFormat: 'LL',
+                displayFormats: {
+                    day: exist.config('page.range') > 31 ? 'MM-DD' : 'DD'
+                }
+            };
             for(var i in names) data.data.datasets[i] = exist.chart.dataset(names[i], i);
             for(var i in values) {
-                data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, 12, desc);
+                data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc);
                 data.values[i] = values[i];
             }
             return data;
-        },
-        check: function(group, label) {
-            if(exist.config('page.chart')) {
-                var chart = exist.config('page.chart').split(','), name = group + '.' + label;
-                for(var id in chart) {
-                    if(strncmp(chart[id], name, chart[id].length)) return true;
-                }
-                return false;
-            }
-            return true;
         },
         make: function(head, date, size, data, q) {
             var list = data.split('-'), a = exist.data[list[0]], yest = makedate(-1, date);
@@ -1000,8 +1012,20 @@ var exist = {
                         }
                         if(found) {
                             var b = a[j], g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
-                            if(b && (g == null || g[0] != '!disabled')) {
-                                if(b.value_type != 2 && b.priority == r && (b.minval || b.maxval) && b.values && ((b.values[date] && b.values[date].value != null) || (b.values[yest] && b.values[yest].value != null))) {
+                            if(b && (g == null || g[0] != '!disabled') && b.value_type != 2 && b.priority == r && (b.minval || b.maxval) && b.values && ((b.values[date] && b.values[date].value != null) || (b.values[yest] && b.values[yest].value != null))) {
+                                var proceed = true;
+                                if(b.value_type_description == 'Boolean') {
+                                    var count = 0;
+                                    proceed = false;
+                                    for(var z in b.values) {
+                                        if(b.values[z].value == 1) count++;
+                                        if(count >= 2) {
+                                            proceed = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if(proceed) {
                                     var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label];
                                     if(g && g[0] != '!disabled') {
                                         var k = j.split('_');
@@ -1016,7 +1040,7 @@ var exist = {
                                             }
                                         }
                                     }
-                                    head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + size + 'px"></canvas><br />';
+                                    head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (b.value_type_description == 'Boolean' ? size/2 : size) + 'px"></canvas><br />';
                                     exist.chart.data[exist.chart.data.length] = exist.chart.create(
                                         n, 'line', b.value_type_description, minval, maxval,
                                         values,
@@ -1046,7 +1070,7 @@ var exist = {
             for(var n = 0; n < len; n++) {
                 var ndate = makedate(n - (len - 1), date);
                 for(var m = 0; m < exist.chart.data.length; m++) {
-                    exist.chart.data[m].data.labels[n] = ndate.split('-')[2];
+                    exist.chart.data[m].data.labels[n] = offdate(ndate);
                     for(var q = 0; q < exist.chart.data[m].values.length; q++) {
                         exist.chart.data[m].data.datasets[q].data[n] = exist.chart.data[m].values[q][ndate] ? exist.chart.data[m].values[q][ndate].value : null;
                     }
