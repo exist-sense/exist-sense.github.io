@@ -82,6 +82,9 @@ function makeset() {
             weather: {
                 weather_temp_min: ['weather_temp_max'],
                 weather_temp_max: ['!disabled']
+            },
+            sleep: {
+                sleep_goal: ['!disabled']
             }
         },
         overrides: {
@@ -154,6 +157,11 @@ function makeset() {
                 pef: {
                     label: 'Peak Expiratory Flow',
                     value_type_description: 'L/min'
+                }
+            },
+            productivity: {
+                distracting_min: {
+                    label: 'Leisure time'
                 }
             },
             sleep: {
@@ -456,7 +464,7 @@ var exist = {
                                     if(grp == null) grp = values[n];
                                     else grp += '_' + values[n];
                                     if(label == null) label = values[n].capital();
-                                    else label += ' ' + values[n];
+                                    else label += ' ' + values[n].capital();
                                 }
                                 if(!isnum && grp) slug = grp;
                                 if(exist.data[name] == null) {
@@ -1014,7 +1022,7 @@ var exist = {
                         if(found) {
                             var b = a[j], g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
                             if(b && (g == null || g[0] != '!disabled') && b.value_type != 2 && b.priority == r && (b.minval || b.maxval) && b.values && ((b.values[date] && b.values[date].value != null) || (b.values[yest] && b.values[yest].value != null))) {
-                                var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label];
+                                var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.value_type_description == 'Boolean' ? (a.label + ': ' + b.label) : b.label];
                                 if(g && g[0] != '!disabled') {
                                     var k = j.split('_');
                                     n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
@@ -1022,13 +1030,16 @@ var exist = {
                                         var c = a[g[x]];
                                         if(c && c.value_type != 2 && (c.minval || c.maxval) && c.values && ((c.values[date] && c.values[date].value != null) || (c.values[yest] && c.values[yest].value != null))) {
                                             values[values.length] = c.values;
-                                            labels[labels.length] = c.label;
+                                            labels[labels.length] = c.value_type_description == 'Boolean' ? (a.label + ': ' + c.label) : c.label;
                                             if(c.minval < minval) minval = c.minval;
                                             if(c.maxval > maxval) maxval = c.maxval;
                                         }
                                     }
                                 }
-                                head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (b.value_type_description == 'Boolean' ? size/2 : size) + 'px"></canvas><br />';
+                                var sz = size;
+                                if(b.value_type_description == 'Boolean') sz = sz/2;
+                                else if((maxval-minval) >= 10) sz = sz*3/2;
+                                head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas><br />';
                                 exist.chart.data[exist.chart.data.length] = exist.chart.create(
                                     n, (b.value_type_description == 'Boolean' ? 'bar' : 'line'), b.value_type_description, minval, maxval,
                                     values,
