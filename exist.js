@@ -896,7 +896,8 @@ var exist = {
                 fontColor: col,
                 backgroundColor: col,
                 borderColor: exist.config('page.print') ? '#555555' : '#886666',
-                pointBorderColor: col
+                pointBorderColor: col,
+                borderWidth: 1.5,
             };
             return data;
         },
@@ -1042,7 +1043,7 @@ var exist = {
                                     }
                                     head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (b.value_type_description == 'Boolean' ? size/2 : size) + 'px"></canvas><br />';
                                     exist.chart.data[exist.chart.data.length] = exist.chart.create(
-                                        n, 'line', b.value_type_description, minval, maxval,
+                                        n, (b.value_type_description == 'Boolean' ? 'bar' : 'line'), b.value_type_description, minval, maxval,
                                         values,
                                         labels
                                     );
