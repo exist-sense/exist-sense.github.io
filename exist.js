@@ -1014,40 +1014,26 @@ var exist = {
                         if(found) {
                             var b = a[j], g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
                             if(b && (g == null || g[0] != '!disabled') && b.value_type != 2 && b.priority == r && (b.minval || b.maxval) && b.values && ((b.values[date] && b.values[date].value != null) || (b.values[yest] && b.values[yest].value != null))) {
-                                var proceed = true;
-                                if(b.value_type_description == 'Boolean') {
-                                    var count = 0;
-                                    proceed = false;
-                                    for(var z in b.values) {
-                                        if(b.values[z].value == 1) count++;
-                                        if(count >= 2) {
-                                            proceed = true;
-                                            break;
+                                var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label];
+                                if(g && g[0] != '!disabled') {
+                                    var k = j.split('_');
+                                    n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
+                                    for(var x = 0; x < g.length; x++) {
+                                        var c = a[g[x]];
+                                        if(c && c.value_type != 2 && (c.minval || c.maxval) && c.values && ((c.values[date] && c.values[date].value != null) || (c.values[yest] && c.values[yest].value != null))) {
+                                            values[values.length] = c.values;
+                                            labels[labels.length] = c.label;
+                                            if(c.minval < minval) minval = c.minval;
+                                            if(c.maxval > maxval) maxval = c.maxval;
                                         }
                                     }
                                 }
-                                if(proceed) {
-                                    var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label];
-                                    if(g && g[0] != '!disabled') {
-                                        var k = j.split('_');
-                                        n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
-                                        for(var x = 0; x < g.length; x++) {
-                                            var c = a[g[x]];
-                                            if(c && c.value_type != 2 && (c.minval || c.maxval) && c.values && ((c.values[date] && c.values[date].value != null) || (c.values[yest] && c.values[yest].value != null))) {
-                                                values[values.length] = c.values;
-                                                labels[labels.length] = c.label;
-                                                if(c.minval < minval) minval = c.minval;
-                                                if(c.maxval > maxval) maxval = c.maxval;
-                                            }
-                                        }
-                                    }
-                                    head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (b.value_type_description == 'Boolean' ? size/2 : size) + 'px"></canvas><br />';
-                                    exist.chart.data[exist.chart.data.length] = exist.chart.create(
-                                        n, (b.value_type_description == 'Boolean' ? 'bar' : 'line'), b.value_type_description, minval, maxval,
-                                        values,
-                                        labels
-                                    );
-                                }
+                                head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (b.value_type_description == 'Boolean' ? size/2 : size) + 'px"></canvas><br />';
+                                exist.chart.data[exist.chart.data.length] = exist.chart.create(
+                                    n, (b.value_type_description == 'Boolean' ? 'bar' : 'line'), b.value_type_description, minval, maxval,
+                                    values,
+                                    labels
+                                );
                             }
                         }
                     }
