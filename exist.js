@@ -68,8 +68,8 @@ function makeset() {
         attrs: [ 'group', 'label', 'priority' ],
         items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
         colours: {
-            normal: ['#CC0000', '#FF8888', '#FFDDDD', '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'],
-            print:  ['#BBBBBB', '#888888', '#555555', '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'],
+            normal: ['#CC0000', '#FF8888', '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'],
+            print:  ['#BBBBBB', '#888888'],
         },
         moods: {
             '1': { group: 'terrible', label: 'Terrible' },
@@ -239,9 +239,8 @@ var exist = {
         }
         else return data.value;
     },
-    colour: function(iter, count) {
-        var start = count > 3 ? 3 : 0;
-        return exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'][start + (iter % exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'].length)];
+    colour: function(iter) {
+        return exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'][(iter % exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'].length)];
     },
     fa: function(type, colour, size, margin) {
         var value = '<span class="exist-fa ' + (type ? type : 'fas fa-cog fa-spin') + ' fa-fw" style="margin: ' + (margin ? margin : '0px 0px 0px 0px') + ';';
@@ -834,8 +833,8 @@ var exist = {
                 window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));
             }
         },
-        dataset: function(label, iter, count, isbool) {
-            var col = exist.colour(iter, count);
+        dataset: function(label, iter, isbool, bools) {
+            var col = exist.colour(isbool && bools.length ? (exist.config('page.print') ? (bools.length-1)%2 : 1+bools.length) : iter);
             var data = {
                 label: label,
                 data: [],
@@ -1031,7 +1030,7 @@ var exist = {
             }
             return data;
         },
-        create: function(name, type, desc, min, max, values, labels, isbool) {
+        create: function(name, type, desc, min, max, values, labels, isbool, bools) {
             var data = exist.chart.config('exist-chart-' + name, type, desc, isbool);
             data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, null, isbool);
             data.options.scales.xAxes[0]['type'] = 'time';
@@ -1043,15 +1042,13 @@ var exist = {
                     day: exist.config('page.range') > 31 ? 'MM-DD' : 'DD'
                 }
             };
-            var count = 0;
             for(var i in values) {
                 data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc, isbool);
                 data.values[i] = values[i];
-                count++;
             }
             var num = 0;
             for(var i in labels) {
-                data.data.datasets[i] = exist.chart.dataset(labels[i], num, count, isbool);
+                data.data.datasets[i] = exist.chart.dataset(labels[i], num, isbool, bools);
                 num++;
             }
             return data;
@@ -1067,7 +1064,7 @@ var exist = {
             }
             return false;
         },
-        make: function(head, len, date, size, data, q) {
+        make: function(head, len, date, size, data, q, bools) {
             var list = data.split('-'), a = exist.data[list[0]], yest = makedate(-1, date);
             if(a && (q <= 0 || a.priority == q)) {
                 for(var r = 1; r <= 10; r++) {
@@ -1093,8 +1090,8 @@ var exist = {
                         }
                         if(extra.length > 0) {
                             for(var x = 0; x < extra.length; x++) {
-                                var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false, cg = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][x] : null;
-                                if(!exist.chart.maketest(c, cbool, cg, 0, date, yest)) continue;
+                                var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false;
+                                if(!exist.chart.maketest(c, cbool, null, 0, date, yest, len)) continue;
                                 values[values.length] = c.values;
                                 labels[labels.length] = c.label;
                                 if(c.minval < minval) minval = c.minval;
@@ -1105,28 +1102,32 @@ var exist = {
                         if(isbool) {
                             sz = sz*3/10;
                             o = a.label + ': ' + b.label;
+                            bools[bools.length] = n;
                         }
-                        else if((maxval-minval) >= 10) sz = sz*7/6;
+                        else {
+                            bools = [];
+                            if((maxval-minval) >= 10) sz = sz*7/6;
+                        }
                         head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
-                            n, isbool ? 'bar' : 'line', o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, isbool
+                            n, isbool ? 'bar' : 'line', o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, isbool, isbool ? bools : null,
                         );
                     }
                 }
             }
         },
         draw: function(head, indate, inlen) {
-            var date = indate ? indate : makedate(), len = inlen || 31, count = 0,
+            var date = indate ? indate : makedate(), len = inlen || 31, count = 0, bools = [],
                 size = exist.chart.width > 1280 ? 75 : 110, c = exist.config('page.chart');
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
                 if(d.length == 1) size *= 2;
-                for(var q = 0; q < d.length; q++) exist.chart.make(head, len, date, size, d[q], 0);
+                for(var q = 0; q < d.length; q++) exist.chart.make(head, len, date, size, d[q], 0, bools);
             }
             else {
                 for(var q = 1; q <= 10; q++) {
-                    for(var i in exist.data) exist.chart.make(head, len, date, size, i, q);
+                    for(var i in exist.data) exist.chart.make(head, len, date, size, i, q, bools);
                 }
             }
             for(var n = 0; n < len; n++) {
