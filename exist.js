@@ -353,25 +353,11 @@ var exist = {
         Chart.defaults.global.defaultFontStyle = 'bold';
         Chart.defaults.global.showLines = true;
         if(!exist.config('nologin')) {
-            if(exist.config('cookies.refresh_token') != null) {
+            if(exist.config('cookies.refresh_token') != null)
                 exist.login.start('refresh_token', 'refresh_token', exist.config('cookies.refresh_token'), exist.login.success, exist.login.refresh);
-            }
-            else {
-                var hbody = document.getElementById('exist-header');
-                if(hbody) {
-                    hbody.innerHTML = '';
-                    var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
-                        head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
-                        span = head.makechild('span', 'exist-title-info', 'exist-left');
-                        span.innerHTML = '<p>Exist Sense helps you make sense of your custom tag values.</p>';
-                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a></b> to continue.</p>';
-                }
-                exist.status('Login to continue.', 'fas fa-user');
-            }
+            else exist.load.draw();
         }
-        else {
-            exist.status('Logging in..');
-        }
+        else exist.status('Logging in..');
     },
     login: {
         error: function(request, statname, errname) {
@@ -703,12 +689,44 @@ var exist = {
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
         },
         draw: function() {
-            var page = exist.config('page.id');
-            for (var i in Chart.instances) Chart.instances[i].destroy();
-            Chart.instances = {};
-            if(page == 'day') exist.day.display();
-            else if(page == 'chart') exist.chart.display();
-            else exist.day.display();
+            if(exist.info.id) {
+                var page = exist.config('page.id');
+                for (var i in Chart.instances) Chart.instances[i].destroy();
+                Chart.instances = {};
+                if(page == 'day') exist.day.display();
+                else if(page == 'chart') exist.chart.display();
+                else exist.day.display();
+            }
+            else {
+                var hbody = document.getElementById('exist-header');
+                if(hbody) {
+                    hbody.innerHTML = '';
+                    var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
+                        head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
+                        span = head.makechild('span', 'exist-title-info', 'exist-left');
+                        span.innerHTML += '<h4>About Exist Sense</h4>';
+                        span.innerHTML += '<p>Exist Sense is a work in progress web app which aims to provide an interface to all Exist data along with converting custom tags into usable values. My main goal was to generate charts for my doctor, so all the app really does at the moment at the moment is spit out charts (because that was the point), but basically, it can detect custom tags which specify numeric values, and group together string values.</p>';
+                        span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 31), and a chart selector (<tt>#chart=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&chart=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
+                        span.innerHTML += '<p>The format for custom tags is: <tt>&lt;tag&gt; &lt;value&gt; [label]</tt></p>';
+                        span.innerHTML += '<p>Some examples of tags I use:<ul>';
+                        span.innerHTML += '<li><b>pef 500</b> = numeric value ‘500’ for ‘pef’ (Peak Expiratory Flow)</li>';
+                        span.innerHTML += '<li><b>pain 3 high</b> = numeric value ‘3’ for ‘pain’ labelled ‘high’</li>';
+                        span.innerHTML += '<li><b>symptom insomnia</b> = string value for ‘symptom’ labelled ‘insomnia’</li>';
+                        span.innerHTML += '<li><b>event all nighter</b> = string value for ‘event’ labelled ‘all nighter’</li>';
+                        span.innerHTML += '</ul></p>';
+                        span.innerHTML += '<h4>Demonstration</h4>';
+                        span.innerHTML += '<p>See if you can spot the correlation I saw.</p>';
+                        span.innerHTML += '<p><img src="/bits/exist-sense-demo.png" title="Demo Image" alt="Demo Image" style="padding-bottom: 12px" /></p>';
+                        span.innerHTML += '<h4>Information</h4>';
+                        span.innerHTML += '<p>At the moment, I’m just using the Exist app to update my tags according to this format, though once I get to writing the editor there will be a proper interface to rate a day in a more traditional fashion. Feel free to play around with it, watch the repo for updates, or submit an issue on GitHub to make feature requests. If there’s enough interest I’ll look at expanding this further as needed.</p>';
+                        span.innerHTML += '<p>Links:<ul>';
+                        span.innerHTML += '<li>Custom tracking: <a href="https://exist.io/blog/custom-tracking/">https://exist.io/blog/custom-tracking/</a></li>';
+                        span.innerHTML += '<li>GitHub: <a href="https://github.com/exist-sense/core">https://github.com/exist-sense/core</a></li>';
+                        span.innerHTML += '</ul></p>';
+                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a></b> to continue.</p>';
+                }
+                exist.status('<a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a> to continue', 'fas fa-user');
+            }
         },
     },
     day: {
