@@ -68,8 +68,8 @@ function makeset() {
         attrs: [ 'group', 'label', 'priority' ],
         items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
         colours: {
-            normal: ['#CC0000', '#FF8888', '#FFDDDD', '#44FF44', '#4444FF' , '#FFFF44', '#44FFFF', '#FF44FF'],
-            print:  ['#BBBBBB', '#777777', '#AA0000', '#00AA00', '#0000AA' , '#AAAA00', '#00AAAA', '#AA00AA'],
+            normal: ['#CC0000', '#FF8888', '#FFDDDD', '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'],
+            print:  ['#BBBBBB', '#888888', '#555555', '#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'],
         },
         moods: {
             '1': { group: 'terrible', label: 'Terrible' },
@@ -239,8 +239,9 @@ var exist = {
         }
         else return data.value;
     },
-    colour: function(iter) {
-        return exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'][iter % exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'].length];
+    colour: function(iter, count) {
+        var start = count > 3 ? 3 : 0;
+        return exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'][start + (iter % exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'].length)];
     },
     fa: function(type, colour, size, margin) {
         var value = '<span class="exist-fa ' + (type ? type : 'fas fa-cog fa-spin') + ' fa-fw" style="margin: ' + (margin ? margin : '0px 0px 0px 0px') + ';';
@@ -330,7 +331,6 @@ var exist = {
             }
         }
         exist.checkurl();
-        exist.chart.defaults();
         var head = document.getElementsByTagName('head');
         if(head) {
             var ccss = document.getElementsByClassName('exist-css');
@@ -345,6 +345,13 @@ var exist = {
                 head[0].appendChild(child);
             }
         }
+        var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
+        Chart.defaults.global.defaultColor = fgcol;
+        Chart.defaults.global.defaultFontColor = fgcol;
+        Chart.defaults.global.defaultFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
+        Chart.defaults.global.defaultFontSize = 10;
+        Chart.defaults.global.defaultFontStyle = 'bold';
+        Chart.defaults.global.showLines = true;
         if(!exist.config('nologin')) {
             if(exist.config('cookies.refresh_token') != null) {
                 exist.login.start('refresh_token', 'refresh_token', exist.config('cookies.refresh_token'), exist.login.success, exist.login.refresh);
@@ -809,111 +816,31 @@ var exist = {
                 window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));
             }
         },
-        defaults: function() {
-            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
-            Chart.defaults.global.responsive = true;
-            Chart.defaults.global.events = ['click', 'mousemove', 'mouseout'];
-            Chart.defaults.global.onClick = exist.chart.click;
-            Chart.defaults.global.responsiveAnimationDuration = 0;
-            Chart.defaults.global.maintainAspectRatio = true;
-            Chart.defaults.global.defaultColor = fgcol;
-            Chart.defaults.global.defaultFontColor = fgcol;
-            Chart.defaults.global.defaultFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
-            Chart.defaults.global.defaultFontSize = 12;
-            Chart.defaults.global.defaultFontStyle = 'bold';
-            Chart.defaults.global.showLines = true;
-            Chart.defaults.global.elements.arc.backgroundColor = bgcol;
-            Chart.defaults.global.elements.arc.borderColor = brcol;
-            Chart.defaults.global.elements.arc.borderWidth = 2;
-            Chart.defaults.global.elements.line.tension = 0.2;
-            Chart.defaults.global.elements.line.backgroundColor = bgcol;
-            Chart.defaults.global.elements.line.borderWidth = 1.5;
-            Chart.defaults.global.elements.line.borderColor = brcol;
-            Chart.defaults.global.elements.line.borderCapStyle = 'round';
-            Chart.defaults.global.elements.line.borderDashOffset = 0;
-            Chart.defaults.global.elements.line.borderJoinStyle = 'miter';
-            Chart.defaults.global.elements.line.capBezierPoints = true;
-            //Chart.defaults.global.elements.line.cubicInterpolationMode = 'monotone';
-            Chart.defaults.global.elements.line.fill = true;
-            Chart.defaults.global.elements.point.radius = 0;
-            Chart.defaults.global.elements.point.pointStyle = 'circle';
-            Chart.defaults.global.elements.point.backgroundColor = brcol;
-            Chart.defaults.global.elements.point.borderColor = brcol;
-            Chart.defaults.global.elements.point.borderWidth = 1;
-            Chart.defaults.global.elements.point.hitRadius = 2;
-            Chart.defaults.global.elements.point.hoverRadius = 3;
-            Chart.defaults.global.elements.point.hoverBorderWidth = 1;
-            Chart.defaults.global.elements.rectangle.backgroundColor = bgcol;
-            Chart.defaults.global.elements.rectangle.borderColor = brcol;
-            Chart.defaults.global.elements.rectangle.borderSkipped = 'bottom';
-            Chart.defaults.global.elements.rectangle.borderWidth = 0;
-            Chart.defaults.global.layout.padding.top = 10;
-            Chart.defaults.global.layout.padding.right = 10;
-            Chart.defaults.global.layout.padding.bottom = 10;
-            Chart.defaults.global.layout.padding.left = 10;
-            Chart.defaults.global.animation.duration = 1000;
-            Chart.defaults.global.animation.easing = 'easeOutQuart';
-            Chart.defaults.global.tooltips.enabled = true;
-            Chart.defaults.global.tooltips.mode = 'nearest';
-            Chart.defaults.global.tooltips.position = 'average';
-            Chart.defaults.global.tooltips.intersect = true;
-            Chart.defaults.global.tooltips.backgroundColor = '#000000';
-            Chart.defaults.global.tooltips.titleFontStyle = 'bold';
-            Chart.defaults.global.tooltips.titleSpacing = 0;
-            Chart.defaults.global.tooltips.titleMarginBottom = 2;
-            Chart.defaults.global.tooltips.titleFontColor = '#FFFFFF';
-            Chart.defaults.global.tooltips.titleAlign = 'left';
-            Chart.defaults.global.tooltips.bodySpacing = 2;
-            Chart.defaults.global.tooltips.bodyFontColor = '#FFFFFF';
-            Chart.defaults.global.tooltips.bodyAlign = 'left';
-            Chart.defaults.global.tooltips.footerFontStyle = 'normal';
-            Chart.defaults.global.tooltips.footerSpacing = 8;
-            Chart.defaults.global.tooltips.footerMarginTop = 0;
-            Chart.defaults.global.tooltips.footerFontColor = '#FFFFFF';
-            Chart.defaults.global.tooltips.footerAlign = 'left';
-            Chart.defaults.global.tooltips.yPadding = 6;
-            Chart.defaults.global.tooltips.xPadding = 6;
-            Chart.defaults.global.tooltips.caretPadding = 4;
-            Chart.defaults.global.tooltips.caretSize = 6;
-            Chart.defaults.global.tooltips.cornerRadius = 4;
-            Chart.defaults.global.tooltips.multiKeyBackground = '#000000';
-            Chart.defaults.global.tooltips.displayColors = false;
-            Chart.defaults.global.tooltips.borderColor = '#FFFFFF';
-            Chart.defaults.global.tooltips.borderWidth = 1;
-            Chart.defaults.global.legend.display = true;
-            Chart.defaults.global.legend.position = 'top';
-            Chart.defaults.global.legend.fullWidth = true;
-            Chart.defaults.global.legend.reverse = false;
-            Chart.defaults.global.legend.weight = 1000;
-            Chart.defaults.global.legend.labels.boxWidth = 16;
-            Chart.defaults.global.legend.labels.padding = 10;
-            Chart.defaults.global.title.display = false;
-            Chart.defaults.global.title.fontStyle = 'bold';
-            Chart.defaults.global.title.fullWidth = true;
-            Chart.defaults.global.title.lineHeight = 1.2;
-            Chart.defaults.global.title.padding = 10;
-            Chart.defaults.global.title.position = 'top';
-            Chart.defaults.global.title.weight = 2000;
-        },
-        dataset: function(name, iter) {
-            var col = exist.colour(iter);
+        dataset: function(label, iter, count, isbool) {
+            var col = exist.colour(iter, count);
             var data = {
-                label: name,
+                label: label,
                 data: [],
                 spanGaps: true,
                 fontColor: col,
+                fontSize: 10,
+                fontStyle: 'bold',
                 backgroundColor: col,
-                borderColor: exist.config('page.print') ? '#555555' : '#886666',
+                borderColor: exist.config('page.print') ? '#666666' : '#886666',
                 pointBorderColor: col,
                 borderWidth: 1.5,
             };
             return data;
         },
-        scale: function(min, max, display, label, offset) {
+        scale: function(min, max, display, label, isbool) {
+            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
             var data = {
                 display: display || false,
                 position: 'left',
                 offset: true,
+                fontColor: fgcol,
+                fontSize: 10,
+                fontStyle: 'bold',
                 gridLines: {
                     display: display || false,
                     color: '#333333',
@@ -921,7 +848,7 @@ var exist = {
                     drawBorder: display || false,
                     drawOnChartArea: display || false,
                     drawTicks: display || false,
-                    tickMarkLength: 10,
+                    tickMarkLength: 5,
                     zeroLineWidth: 0,
                     zeroLineColor: '#333333',
                     zeroLineBorderDash: [],
@@ -932,8 +859,11 @@ var exist = {
                 },
                 scaleLabel: {
                     display: label ? true : false,
-                    labelString: label,
-                    lineHeight: 1.2,
+                    fontColor: fgcol,
+                    fontSize: 10,
+                    fontStyle: 'bold',
+                    labelString: isbool ? 'Bool' : label,
+                    lineHeight: 1,
                     padding: {
                         top: 4,
                         bottom: 4
@@ -950,28 +880,128 @@ var exist = {
                     display: display || false,
                     autoSkip: true,
                     autoSkipPadding: 0,
-                    labelOffset: offset || 0,
-                    fontSize: 12
+                    labelOffset: 0,
+                    fontColor: fgcol,
+                    fontSize: 10,
+                    fontStyle: 'bold',
                 }
             };
             return data;
         },
-        config: function(id, type, name) {
+        config: function(id, type, name, isbool) {
+            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
             var data = {
                 id: id,
                 type: type,
-                label: name,
+                labels: name,
                 values: [],
                 data: {
                     labels: [],
                     datasets: []
                 },
                 options: {
+                    responsive: true,
+                    events: ['click', 'mousemove', 'mouseout'],
+                    onClick: exist.chart.click,
+                    responsiveAnimationDuration: 0,
+                    maintainAspectRatio: true,
+                    showLines: true,
+                    elements: {
+                        arc: {
+                            backgroundColor: bgcol,
+                            borderColor: brcol,
+                            borderWidth: 2
+                        },
+                        line: {
+                            tension: 0.2,
+                            backgroundColor: bgcol,
+                            borderWidth: 1.5,
+                            borderColor: brcol,
+                            borderCapStyle: 'round',
+                            borderDashOffset: 0,
+                            borderJoinStyle: 'miter',
+                            capBezierPoints: true,
+                            fill: true
+                        },
+                        point: {
+                            radius: 0,
+                            pointStyle: 'circle',
+                            backgroundColor: brcol,
+                            borderColor: brcol,
+                            borderWidth: 1,
+                            hitRadius: 2,
+                            hoverRadius: 3,
+                            hoverBorderWidth: 1
+                        },
+                        rectangle: {
+                            backgroundColor: bgcol,
+                            borderColor: brcol,
+                            borderSkipped: 'bottom',
+                            borderWidth: 0
+                        },
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    },
+                    tooltips: {
+                        enabled: isbool ? false : true,
+                        mode: 'nearest',
+                        position: 'average',
+                        intersect: true,
+                        backgroundColor: '#000000',
+                        titleFontStyle: 'bold',
+                        titleSpacing: 0,
+                        titleMarginBottom: 4,
+                        titleFontColor: '#FFFFFF',
+                        titleAlign: 'left',
+                        bodySpacing: 2,
+                        bodyFontColor: '#FFFFFF',
+                        bodyAlign: 'left',
+                        footerFontStyle: 'normal',
+                        footerSpacing: 8,
+                        footerMarginTop: 0,
+                        footerFontColor: '#FFFFFF',
+                        footerAlign: 'left',
+                        yPadding: 6,
+                        xPadding: 6,
+                        caretPadding: 4,
+                        caretSize: 6,
+                        cornerRadius: 4,
+                        multiKeyBackground: '#000000',
+                        displayColors: false,
+                        borderColor: '#FFFFFF',
+                        borderWidth: 1
+                    },
+                    legend: {
+                        display: isbool ? false : true,
+                        position: 'top',
+                        fontColor: fgcol,
+                        fontSize: 10,
+                        fontStyle: 'bold',
+                        fullWidth: false,
+                        reverse: false,
+                        weight: 1000,
+                        boxWidth: 8,
+                        padding: 0
+                    },
+                    title: {
+                        display: isbool ? true : false,
+                        fontColor: fgcol,
+                        fontSize: 10,
+                        fontStyle: 'bold',
+                        fullWidth: true,
+                        lineHeight: 1.2,
+                        padding: 4,
+                        position: 'top',
+                        weight: 2000,
+                        text: name,
+                    },
                     layout: {
                         padding: {
                             left: 0,
                             right: 0,
-                            top: 8,
+                            top: 0,
                             bottom: 0
                         }
                     },
@@ -983,11 +1013,10 @@ var exist = {
             }
             return data;
         },
-        create: function(name, type, desc, min, max, values, names) {
-            var data = exist.chart.config('exist-chart-' + name, type, desc);
-            data.options.scales.xAxes[0] = exist.chart.scale(null, null, true);
+        create: function(name, type, desc, min, max, values, labels, isbool) {
+            var data = exist.chart.config('exist-chart-' + name, type, desc, isbool);
+            data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, null, isbool);
             data.options.scales.xAxes[0]['type'] = 'time';
-            //data.options.scales.xAxes[0]['distribution'] = 'series';
             data.options.scales.xAxes[0]['time'] = {
                 unit: 'day',
                 minUnit: 'day',
@@ -996,21 +1025,39 @@ var exist = {
                     day: exist.config('page.range') > 31 ? 'MM-DD' : 'DD'
                 }
             };
-            for(var i in names) data.data.datasets[i] = exist.chart.dataset(names[i], i);
+            var count = 0;
             for(var i in values) {
-                data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc);
+                data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc, isbool);
                 data.values[i] = values[i];
+                count++;
+            }
+            var num = 0;
+            for(var i in labels) {
+                data.data.datasets[i] = exist.chart.dataset(labels[i], num, count, isbool);
+                num++;
             }
             return data;
         },
-        make: function(head, date, size, data, q) {
+        maketest: function(b, isbool, g, r, date, yest, len) {
+            if(b == null) return false;
+            if(b.value_type == 2 || (r > 0 && b.priority != r) || (!isbool && !b.minval && !b.maxval)) return false;
+            if(b.values == null || ((b.values[date] == null || b.values[date].value == null) & (b.values[yest] == null || b.values[yest].value == null))) return false;
+            if(g != null && g[0] == '!disabled') return false;
+            for(var x = 0; x < len; x++) {
+                var test = makedate(0-x, date);
+                if(b.values[test] != null || b.values[test] != 0) return true;
+            }
+            return true;
+        },
+        make: function(head, len, date, size, data, q) {
             var list = data.split('-'), a = exist.data[list[0]], yest = makedate(-1, date);
-            if(a && (q == null || a.priority == q)) {
+            if(a && (q <= 0 || a.priority == q)) {
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
-                        var found = false;
-                        if(list.length < 2) found = true;
-                        else {
+                        var b = a[j], isbool = b.value_type_description == 'Boolean' ? true : false, g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
+                        if(!exist.chart.maketest(b, isbool, g, r, date, yest, len)) continue;
+                        if(list.length >= 2) {
+                            var found = false;
                             for(var x = 1; x < list.length; x++) {
                                 var k = j.split('_'), val = (k.length >= 2 ? k[1] : k[0]);
                                 if(list[x] == j || list[x] == val) {
@@ -1018,51 +1065,50 @@ var exist = {
                                     break;
                                 }
                             }
+                            if(!found) continue;
                         }
-                        if(found) {
-                            var b = a[j], g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
-                            if(b && (g == null || g[0] != '!disabled') && b.value_type != 2 && b.priority == r && (b.minval || b.maxval) && b.values && ((b.values[date] && b.values[date].value != null) || (b.values[yest] && b.values[yest].value != null))) {
-                                var n = list[0] + '-' + j, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.value_type_description == 'Boolean' ? (a.label + ': ' + b.label) : b.label];
-                                if(g && g[0] != '!disabled') {
-                                    var k = j.split('_');
-                                    n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
-                                    for(var x = 0; x < g.length; x++) {
-                                        var c = a[g[x]];
-                                        if(c && c.value_type != 2 && (c.minval || c.maxval) && c.values && ((c.values[date] && c.values[date].value != null) || (c.values[yest] && c.values[yest].value != null))) {
-                                            values[values.length] = c.values;
-                                            labels[labels.length] = c.value_type_description == 'Boolean' ? (a.label + ': ' + c.label) : c.label;
-                                            if(c.minval < minval) minval = c.minval;
-                                            if(c.maxval > maxval) maxval = c.maxval;
-                                        }
-                                    }
-                                }
-                                var sz = size;
-                                if(b.value_type_description == 'Boolean') sz = sz/2;
-                                else if((maxval-minval) >= 10) sz = sz*3/2;
-                                head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas><br />';
-                                exist.chart.data[exist.chart.data.length] = exist.chart.create(
-                                    n, (b.value_type_description == 'Boolean' ? 'bar' : 'line'), b.value_type_description, minval, maxval,
-                                    values,
-                                    labels
-                                );
+                        var n = list[0] + '-' + j, o = b.value_type_description, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label], extra = [];
+                        if(g != null && g.length > 0) {
+                            var k = j.split('_');
+                            n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
+                            for(var x = 0; x < g.length; x++) extra[extra.length] = g[x];
+                        }
+                        if(extra.length > 0) {
+                            for(var x = 0; x < extra.length; x++) {
+                                var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false, cg = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][x] : null;
+                                if(!exist.chart.maketest(c, cbool, cg, 0, date, yest)) continue;
+                                values[values.length] = c.values;
+                                labels[labels.length] = c.label;
+                                if(c.minval < minval) minval = c.minval;
+                                if(c.maxval > maxval) maxval = c.maxval;
                             }
                         }
+                        var sz = size;
+                        if(isbool) {
+                            sz = sz*3/10;
+                            o = a.label + ': ' + b.label;
+                        }
+                        else if((maxval-minval) >= 10) sz = sz*7/6;
+                        head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas>';
+                        exist.chart.data[exist.chart.data.length] = exist.chart.create(
+                            n, isbool ? 'bar' : 'line', o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, isbool
+                        );
                     }
                 }
             }
         },
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = 0,
-                size = exist.chart.width > 1280 ? 75 : 150, c = exist.config('page.chart');
+                size = exist.chart.width > 1280 ? 75 : 110, c = exist.config('page.chart');
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
                 if(d.length == 1) size *= 2;
-                for(var q = 0; q < d.length; q++) exist.chart.make(head, date, size, d[q]);
+                for(var q = 0; q < d.length; q++) exist.chart.make(head, len, date, size, d[q], 0);
             }
             else {
                 for(var q = 1; q <= 10; q++) {
-                    for(var i in exist.data) exist.chart.make(head, date, size, i, q);
+                    for(var i in exist.data) exist.chart.make(head, len, date, size, i, q);
                 }
             }
             for(var n = 0; n < len; n++) {
