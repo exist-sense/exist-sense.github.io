@@ -1078,9 +1078,8 @@ var exist = {
             return data;
         },
         maketest: function(b, isbool, g, r, date, yest, len) {
-            if(b == null) return false;
+            if(b == null || b.values == null) return false;
             if(b.value_type == 2 || (r > 0 && b.priority != r) || (!isbool && !b.minval && !b.maxval)) return false;
-            if(b.values == null || ((b.values[date] == null || b.values[date].value == null) & (b.values[yest] == null || b.values[yest].value == null))) return false;
             if(g != null && g[0] == '!disabled') return false;
             for(var x = 0; x < len; x++) {
                 var test = makedate(0-x, date);
