@@ -1063,9 +1063,9 @@ var exist = {
             if(g != null && g[0] == '!disabled') return false;
             for(var x = 0; x < len; x++) {
                 var test = makedate(0-x, date);
-                if(b.values[test] != null || b.values[test] != 0) return true;
+                if(b.values[test] != null && b.values[test].value != 0) return true;
             }
-            return true;
+            return false;
         },
         make: function(head, len, date, size, data, q) {
             var list = data.split('-'), a = exist.data[list[0]], yest = makedate(-1, date);
