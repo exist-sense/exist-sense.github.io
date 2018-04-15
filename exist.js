@@ -6,6 +6,20 @@ Number.prototype.zeropad = function(len) {
     return s;
 }
 
+String.prototype.spacepad = function(len) {
+    var s = String(this), c = ' ';
+    len = len || 2;
+    while(s.length < len) s = c + s;
+    return s;
+}
+
+Number.prototype.spacepad = function(len) {
+    var s = String(this), c = ' ';
+    len = len || 2;
+    while(s.length < len) s = c + s;
+    return s;
+}
+
 Element.prototype.remove = function() {
     this.parentElement.removeChild(this);
 }
@@ -131,7 +145,7 @@ function makeset() {
             mood: {
                 mood: {
                     desc: {
-                        '1': { group: 'terrible', label: 'Terrible' },
+                        '1': { group: 'awful', label: 'Awful' },
                         '2': { group: 'bad', label: 'Bad' },
                         '3': { group: 'ok', label: 'Ok' },
                         '4': { group: 'good', label: 'Good' },
@@ -146,7 +160,7 @@ function makeset() {
                 cycle: {
                     minval: 1,
                     maxval: 5,
-                    label: 'Depressed/Manic',
+                    label: 'Bipolar Cycle',
                     value_type_description: '1 to 5'
                 },
                 pain: {
@@ -157,6 +171,10 @@ function makeset() {
                 pef: {
                     label: 'Peak Expiratory Flow',
                     value_type_description: 'L/min'
+                },
+                sq: {
+                    label: 'Sleep Quality',
+                    value_type_description: '0 to 5'
                 }
             },
             productivity: {
@@ -344,11 +362,11 @@ var exist = {
                 head[0].appendChild(child);
             }
         }
-        var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
+        var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
         Chart.defaults.global.defaultColor = fgcol;
         Chart.defaults.global.defaultFontColor = fgcol;
-        Chart.defaults.global.defaultFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
-        Chart.defaults.global.defaultFontSize = 10;
+        Chart.defaults.global.defaultFontFamily = 'monospace';
+        Chart.defaults.global.defaultFontSize = 12;
         Chart.defaults.global.defaultFontStyle = 'bold';
         Chart.defaults.global.showLines = true;
         if(!exist.config('nologin')) {
@@ -840,23 +858,23 @@ var exist = {
                 data: [],
                 spanGaps: true,
                 fontColor: col,
-                fontSize: 10,
+                fontSize: 12,
                 fontStyle: 'bold',
                 backgroundColor: col,
                 borderColor: exist.config('page.print') ? '#666666' : '#886666',
                 pointBorderColor: col,
-                borderWidth: 1.5,
+                borderWidth: isbool ? 0 : 1.5,
             };
             return data;
         },
         scale: function(min, max, display, label, isbool) {
-            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
+            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
             var data = {
                 display: display || false,
                 position: 'left',
                 offset: true,
                 fontColor: fgcol,
-                fontSize: 10,
+                fontSize: 12,
                 fontStyle: 'bold',
                 gridLines: {
                     display: display || false,
@@ -870,43 +888,44 @@ var exist = {
                     zeroLineColor: '#333333',
                     zeroLineBorderDash: [],
                     zeroLineBorderDashOffset: 0,
-                    offsetGridLines: false,
+                    offsetGridLines: isbool && min == null ? true : false,
                     borderDash: [],
                     borderDashOffset: 0
                 },
                 scaleLabel: {
-                    display: label ? true : false,
-                    fontColor: fgcol,
-                    fontSize: 10,
+                    display: min != null ? true : false,
+                    fontColor: brcol,
+                    fontSize: 12,
                     fontStyle: 'bold',
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
                     padding: {
-                        top: 4,
-                        bottom: 4
+                        top: 1,
+                        bottom: 1
                     }
                 },
                 ticks: {
                     minRotation: 0,
-                    maxRotation: 80,
+                    maxRotation: 90,
                     suggestedMin: min,
                     suggestedMax: max,
                     mirror: false,
-                    padding: 0,
+                    padding: 1,
                     reverse: false,
                     display: display || false,
                     autoSkip: true,
                     autoSkipPadding: 0,
                     labelOffset: 0,
-                    fontColor: fgcol,
+                    fontColor: brcol,
                     fontSize: 10,
                     fontStyle: 'bold',
-                }
+                    fontFamily: 'monospace'
+                },
             };
             return data;
         },
         config: function(id, type, name, isbool) {
-            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = '#555555';
+            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
             var data = {
                 id: id,
                 type: type,
@@ -930,7 +949,7 @@ var exist = {
                             borderWidth: 2
                         },
                         line: {
-                            tension: 0.2,
+                            tension: 0,
                             backgroundColor: bgcol,
                             borderWidth: 1.5,
                             borderColor: brcol,
@@ -994,7 +1013,7 @@ var exist = {
                         display: isbool ? false : true,
                         position: 'top',
                         fontColor: fgcol,
-                        fontSize: 10,
+                        fontSize: 12,
                         fontStyle: 'bold',
                         fullWidth: false,
                         reverse: false,
@@ -1005,14 +1024,14 @@ var exist = {
                     title: {
                         display: isbool ? true : false,
                         fontColor: fgcol,
-                        fontSize: 10,
+                        fontSize: 12,
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 1.2,
+                        lineHeight: 1.5,
                         padding: 4,
                         position: 'top',
                         weight: 2000,
-                        text: name,
+                        text: '         ' + name,
                     },
                     layout: {
                         padding: {
@@ -1030,20 +1049,25 @@ var exist = {
             }
             return data;
         },
-        create: function(name, type, desc, min, max, values, labels, isbool, bools) {
+        create: function(name, type, desc, min, max, values, labels, descs, isbool, bools) {
             var data = exist.chart.config('exist-chart-' + name, type, desc, isbool);
             data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, null, isbool);
             data.options.scales.xAxes[0]['type'] = 'time';
             data.options.scales.xAxes[0]['time'] = {
                 unit: 'day',
                 minUnit: 'day',
-                tooltipFormat: 'LL',
+                tooltipFormat: 'LL YYYY',
                 displayFormats: {
-                    day: exist.config('page.range') > 31 ? 'MM-DD' : 'DD'
+                    day: 'DD'
                 }
             };
             for(var i in values) {
                 data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc, isbool);
+                data.options.scales.yAxes[i].ticks.callback = (function(value, index, list) {
+                    if(isbool) return '       ';
+                    if(descs != null && descs[value] != null) return descs[value].label.substring(0, 7).spacepad(7);
+                    return value.spacepad(7);
+                });
                 data.values[i] = values[i];
             }
             var num = 0;
@@ -1100,7 +1124,7 @@ var exist = {
                         }
                         var sz = size;
                         if(isbool) {
-                            sz = sz*3/10;
+                            sz = sz*3/9;
                             o = a.label + ': ' + b.label;
                             bools[bools.length] = n;
                         }
@@ -1108,9 +1132,10 @@ var exist = {
                             bools = [];
                             if((maxval-minval) >= 10) sz = sz*7/6;
                         }
+                        if(o == 'Integer') o = 'Count';
                         head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
-                            n, isbool ? 'bar' : 'line', o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, isbool, isbool ? bools : null,
+                            n, isbool ? 'bar' : 'line', o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, isbool ? bools : null,
                         );
                     }
                 }

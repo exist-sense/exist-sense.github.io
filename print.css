@@ -31,8 +31,6 @@
 }
 canvas {
     vertical-align: middle;
-    -webkit-filter: drop-shadow(-1px -1px 2px rgba(0, 0, 0, 0.25));
-    filter: drop-shadow(-1px -1px 2px rgba(0, 0, 0, 0.25));
 }
 #exist-front, #exist-table, #exist-view, #exist-more {
     width: 100%;
@@ -52,7 +50,6 @@ canvas {
 }
 #exist-t-title, #exist-attr-row, #exist-h-load, #exist-t-load {
     color: rgb(0, 0, 0);
-    text-shadow: -1px -1px 5px rgb(0, 0, 0);
 }
 #exist-data-avatar {
     float: right;
