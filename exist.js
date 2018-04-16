@@ -198,9 +198,11 @@ function makeset() {
                     value_type_description: 'Percentage'
                 },
                 weather_temp_max: {
+                    label: 'Temperature Min/Max',
                     value_type_description: 'Temp (°C)'
                 },
                 weather_temp_min: {
+                    label: 'Temperature, Min/Max',
                     value_type_description: 'Temp (°C)'
                 },
                 weather_wind_speed: {
@@ -898,7 +900,7 @@ var exist = {
                 fontSize: 12,
                 fontStyle: 'bold',
                 backgroundColor: col,
-                borderColor: exist.config('page.print') ? '#666666' : '#888888',
+                borderColor: '#666666',
                 pointBorderColor: col,
                 borderWidth: isbool ? 0 : 1.5,
             };
@@ -920,7 +922,7 @@ var exist = {
                     drawBorder: display || false,
                     drawOnChartArea: display || false,
                     drawTicks: display || false,
-                    tickMarkLength: 5,
+                    tickMarkLength: 4,
                     zeroLineWidth: 0,
                     zeroLineColor: '#333333',
                     zeroLineBorderDash: [],
@@ -932,8 +934,8 @@ var exist = {
                 scaleLabel: {
                     display: min != null ? true : false,
                     fontColor: brcol,
-                    fontSize: 12,
-                    fontStyle: 'normal',
+                    fontSize: 10,
+                    fontStyle: 'bold',
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
                     padding: {
@@ -961,7 +963,7 @@ var exist = {
             };
             return data;
         },
-        config: function(id, type, name, isbool) {
+        config: function(id, type, title, name, isbool) {
             var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
             var data = {
                 id: id,
@@ -1047,7 +1049,7 @@ var exist = {
                         borderWidth: 1
                     },
                     legend: {
-                        display: isbool ? false : true,
+                        display: title != null ? false : true,
                         position: 'top',
                         fontColor: fgcol,
                         fontSize: 12,
@@ -1059,16 +1061,16 @@ var exist = {
                         padding: 0
                     },
                     title: {
-                        display: isbool ? true : false,
+                        display: title != null ? true : false,
                         fontColor: fgcol,
                         fontSize: 12,
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 1.5,
-                        padding: 4,
+                        lineHeight: 1.2,
+                        padding: 1,
                         position: 'top',
                         weight: 2000,
-                        text: '       ' + name,
+                        text: title,
                     },
                     layout: {
                         padding: {
@@ -1086,8 +1088,8 @@ var exist = {
             }
             return data;
         },
-        create: function(name, type, desc, min, max, values, labels, descs, isbool, count) {
-            var data = exist.chart.config('exist-chart-' + name, type, desc, isbool);
+        create: function(name, type, title, desc, min, max, values, labels, descs, isbool, count) {
+            var data = exist.chart.config('exist-chart-' + name, type, title, desc, isbool);
             data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, null, isbool);
             data.options.scales.xAxes[0]['type'] = 'time';
             data.options.scales.xAxes[0]['time'] = {
@@ -1107,10 +1109,8 @@ var exist = {
                 });
                 data.values[i] = values[i];
             }
-            for(var i in labels) {
-                data.data.datasets[i] = exist.chart.dataset(labels[i], isbool, count);
-                count[count.length] = i;
-            }
+            for(var i in labels) data.data.datasets[i] = exist.chart.dataset(labels[i], isbool, count);
+            count[count.length] = name;
             return data;
         },
         maketest: function(b, isbool, g, r, date, len) {
@@ -1141,7 +1141,7 @@ var exist = {
                             }
                             if(!found) continue;
                         }
-                        var n = list[0] + '-' + j, o = b.value_type_description, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label], extra = [];
+                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label], extra = [];
                         if(g != null && g.length > 0) {
                             var k = j.split('_');
                             n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
@@ -1159,15 +1159,15 @@ var exist = {
                         }
                         var sz = size;
                         if(isbool) {
-                            sz = exist.chart.width > 1280 ? 22 : 40;
+                            sz = exist.chart.width > 1280 ? 18 : 30;
                             if(exist.config('page.range') > 31) sz = sz*7/6;
-                            o = a.label + ': ' + b.label;
+                            t = a.label + ': ' + b.label;
                         }
                         else if((maxval-minval) >= 10) sz = sz*7/6;
                         if(o == 'Integer') o = 'Count';
                         head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
-                            n, isbool ? 'bar' : 'line', o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, count
+                            n, isbool ? 'bar' : 'line', t, o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, count
                         );
                     }
                 }
@@ -1175,7 +1175,7 @@ var exist = {
         },
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = [],
-                size = exist.chart.width > 1280 ? 75 : 110, c = exist.config('page.chart');
+                size = exist.chart.width > 1280 ? 68 : 96, c = exist.config('page.chart');
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');

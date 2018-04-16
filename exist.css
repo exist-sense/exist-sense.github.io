@@ -29,13 +29,11 @@
     vertical-align: middle;
     margin: 0px 1px 0px -2px;
     padding: 0;
-    -webkit-filter: drop-shadow(-1px -1px 3px rgba(255, 200, 200, 0.5));
-    filter: drop-shadow(-1px -1px 3px rgba(255, 200, 200, 0.5));
 }
 canvas {
     vertical-align: middle;
-    -webkit-filter: drop-shadow(-1px -1px 3px rgba(255, 255, 255, 0.5));
-    filter: drop-shadow(-1px -1px 3px rgba(255, 255, 255, 0.5));
+    margin: 0px;
+    padding: 0px;
 }
 #exist-front, #exist-table, #exist-view, #exist-more {
     width: 100%;
