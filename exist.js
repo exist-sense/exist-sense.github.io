@@ -1114,7 +1114,7 @@ var exist = {
             }
             return data;
         },
-        maketest: function(b, isbool, g, r, date, yest, len) {
+        maketest: function(b, isbool, g, r, date, len) {
             if(b == null || b.values == null) return false;
             if(b.value_type == 2 || (r > 0 && b.priority != r) || (!isbool && !b.minval && !b.maxval)) return false;
             if(g != null && g[0] == '!disabled') return false;
@@ -1125,12 +1125,12 @@ var exist = {
             return false;
         },
         make: function(head, len, date, size, data, q, bools) {
-            var list = data.split('-'), a = exist.data[list[0]], yest = makedate(-1, date);
+            var list = data.split('-'), a = exist.data[list[0]];
             if(a && (q <= 0 || a.priority == q)) {
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
                         var b = a[j], isbool = b.value_type_description == 'Boolean' ? true : false, g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
-                        if(!exist.chart.maketest(b, isbool, g, r, date, yest, len)) continue;
+                        if(!exist.chart.maketest(b, isbool, g, r, date, len)) continue;
                         if(list.length >= 2) {
                             var found = false;
                             for(var x = 1; x < list.length; x++) {
@@ -1151,7 +1151,7 @@ var exist = {
                         if(extra.length > 0) {
                             for(var x = 0; x < extra.length; x++) {
                                 var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false;
-                                if(!exist.chart.maketest(c, cbool, null, 0, date, yest, len)) continue;
+                                if(!exist.chart.maketest(c, cbool, null, 0, date, len)) continue;
                                 values[values.length] = c.values;
                                 labels[labels.length] = c.label;
                                 if(c.minval < minval) minval = c.minval;
@@ -1276,7 +1276,6 @@ $(document).ready(function ($) {
     }
     */
     window.addEventListener('popstate', function (event) {
-        console.log('popstate', event);
         exist.checkurl();
     });
     exist.start();
