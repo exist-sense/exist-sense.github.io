@@ -981,7 +981,7 @@ var exist = {
                             borderWidth: 2
                         },
                         line: {
-                            tension: 0,
+                            tension: 0.2,
                             backgroundColor: bgcol,
                             borderWidth: 1.5,
                             borderColor: brcol,
@@ -1156,6 +1156,7 @@ var exist = {
                         var sz = size;
                         if(isbool) {
                             sz = exist.chart.width > 1280 ? 22 : 40;
+                            if(exist.config('page.range') > 31) sz = sz*7/6;
                             o = a.label + ': ' + b.label;
                             bools[bools.length] = n;
                         }
@@ -1211,8 +1212,15 @@ var exist = {
                 hbody.innerHTML = '';
                 var hrow = hbody.makechild('tr', 'exist-chart-row', 'exist-left'),
                     head = hrow.makechild('td', 'exist-chart-info', 'exist-left'),
-                    range = exist.config('page.range');
-                head.innerHTML = '<h4 id="exist-chart-pre" class="exist-left">Last ' + range + ' days for ' + exist.info.first_name + '</h4>';
+                    range = exist.config('page.range'), nav = 'Range: ';
+                if(!exist.config('page.print')) {
+                    nav += '<a href="#" onclick="exist.checkurl({range: 31}); return false;">31</a>';
+                    nav += ' | <a href="#" onclick="exist.checkurl({range: 60}); return false;">60</a>';
+                    nav += ' | <a href="#" onclick="exist.checkurl({range: 90}); return false;">90</a>';
+                    nav += ' | <a href="#" onclick="exist.checkurl({range: 120}); return false;">120</a>';
+                    head.innerHTML += '<div id="exist-range" style="float: right; clear: both; text-align: right; margin-top: 4px">' + nav + '</div>';
+                }
+                head.innerHTML += '<h4 id="exist-chart-pre" class="exist-left">Last ' + range + ' days for ' + exist.info.first_name + '</h4>';
                 exist.chart.draw(head, exist.config('page.date'), range);
             }
         },
