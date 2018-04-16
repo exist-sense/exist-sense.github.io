@@ -296,7 +296,7 @@ var exist = {
         exist.start();
     },
     checkurl: function(values) {
-        var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0];
+        var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0], print = exist.config('page.print');
         if(params.length >= 2) {
             var code = params[1].split('&');
             for(var i = 0; i < code.length; i++) {
@@ -309,7 +309,6 @@ var exist = {
         }
         for(var i in exist.defaults.page) exist.settings.page[i] = exist.defaults.page[i];
         if(values || (hash.length >= 2 && hash[1] != '')) {
-            var print = exist.config('page.print');
             if(hash.length >= 2 && hash[1] != '') {
                 var code = hash[1].split('&');
                 for(var i = 0; i < code.length; i++) {
@@ -333,11 +332,37 @@ var exist = {
                     vars++;
                 }
             }
-            window.history.replaceState({}, document.title, vars ? opts : hash[0]);
-            if(!exist.load.more() && exist.config('ready')) exist.load.draw();
+            value = vars ? opts : hash[0];
         }
-        else {
-            window.history.replaceState({}, document.title, value);
+        if(!exist.config('ready') || exist.config('page.print') != print) {
+            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
+            var hbody = document.getElementById('exist-header');
+            if(hbody) hbody.innerHTML = '';
+            Chart.defaults.global.defaultColor = fgcol;
+            Chart.defaults.global.defaultFontColor = fgcol;
+            Chart.defaults.global.defaultFontFamily = 'monospace';
+            Chart.defaults.global.defaultFontSize = 12;
+            Chart.defaults.global.defaultFontStyle = 'bold';
+            Chart.defaults.global.showLines = true;
+            var head = document.getElementsByTagName('head');
+            if(head) {
+                var ccss = document.getElementsByClassName('exist-css');
+                for(var i = ccss.length-1; i >= 0; i--) ccss[i].parentNode.removeChild(ccss[i]);
+                var list = exist.config('page.print') ? exist.config('print.on') : exist.config('print.off');
+                for(var i = 0; i < list.length; i++) {
+                    var child = document.createElement('link');
+                    child.rel = 'stylesheet';
+                    child.type = 'text/css';
+                    child.href = list[i];
+                    child.className = 'exist-css';
+                    head[0].appendChild(child);
+                }
+            }
+            window.history.pushState({}, document.title, value);
+            if(!exist.load.more() && exist.config('ready')) window.setTimeout(exist.load.draw, 100);
+        }
+        else if(value != window.location.href) {
+            window.history.pushState({}, document.title, value);
             if(!exist.load.more() && exist.config('ready')) exist.load.draw();
         }
     },
@@ -353,27 +378,6 @@ var exist = {
             }
         }
         exist.checkurl();
-        var head = document.getElementsByTagName('head');
-        if(head) {
-            var ccss = document.getElementsByClassName('exist-css');
-            for(var i = ccss.length-1; i >= 0; i--) ccss[i].parentNode.removeChild(ccss[i]);
-            var list = exist.config('page.print') ? exist.config('print.on') : exist.config('print.off');
-            for(var i = 0; i < list.length; i++) {
-                var child = document.createElement('link');
-                child.rel = 'stylesheet';
-                child.type = 'text/css';
-                child.href = list[i];
-                child.className = 'exist-css';
-                head[0].appendChild(child);
-            }
-        }
-        var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
-        Chart.defaults.global.defaultColor = fgcol;
-        Chart.defaults.global.defaultFontColor = fgcol;
-        Chart.defaults.global.defaultFontFamily = 'monospace';
-        Chart.defaults.global.defaultFontSize = 12;
-        Chart.defaults.global.defaultFontStyle = 'bold';
-        Chart.defaults.global.showLines = true;
         if(!exist.config('nologin')) {
             if(exist.settings.cookies.access_token != null)
                 exist.login.draw({ token_type: exist.settings.cookies.token_type, access_token: exist.settings.cookies.access_token, refresh_token: exist.settings.cookies.refresh_token });
@@ -736,16 +740,17 @@ var exist = {
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
         },
         draw: function() {
+            var hbody = document.getElementById('exist-header');
             if(exist.info.id) {
                 var page = exist.config('page.id');
                 for (var i in Chart.instances) Chart.instances[i].destroy();
                 Chart.instances = {};
+                if(hbody) hbody.innerHTML = '';
                 if(page == 'day') exist.day.display();
                 else if(page == 'chart') exist.chart.display();
                 else exist.day.display();
             }
             else {
-                var hbody = document.getElementById('exist-header');
                 if(hbody) {
                     hbody.innerHTML = '';
                     var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
@@ -1270,6 +1275,10 @@ $(document).ready(function ($) {
         }
     }
     */
+    window.addEventListener('popstate', function (event) {
+        console.log('popstate', event);
+        exist.checkurl();
+    });
     exist.start();
 });
 
