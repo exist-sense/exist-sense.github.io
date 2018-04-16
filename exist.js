@@ -287,7 +287,12 @@ var exist = {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
     },
     switch: function() {
+        makecookie('access_token', '', 0);
+        exist.settings.cookies.access_token = null;
         makecookie('refresh_token', '', 0);
+        exist.settings.cookies.refresh_token = null;
+        makecookie('token_type', '', 0);
+        exist.settings.cookies.token_type = null;
         exist.start();
     },
     checkurl: function(values) {
@@ -370,21 +375,32 @@ var exist = {
         Chart.defaults.global.defaultFontStyle = 'bold';
         Chart.defaults.global.showLines = true;
         if(!exist.config('nologin')) {
-            if(exist.config('cookies.refresh_token') != null)
-                exist.login.start('refresh_token', 'refresh_token', exist.config('cookies.refresh_token'), exist.login.success, exist.login.refresh);
+            if(exist.settings.cookies.access_token != null)
+                exist.login.draw({ token_type: exist.settings.cookies.token_type, access_token: exist.settings.cookies.access_token, refresh_token: exist.settings.cookies.refresh_token });
+            else if(exist.settings.cookies.refresh_token != null)
+                exist.login.start('refresh_token', 'refresh_token', exist.settings.cookies.refresh_token, exist.login.success, exist.login.refresh);
             else exist.load.draw();
         }
         else exist.status('Logging in..');
     },
+    response: function(request, statname, data) {
+        if(request.status == 403) {
+            makecookie('access_token', '', 0);
+            exist.settings.cookies.access_token = null;
+            if(exist.settings.cookies.refresh_token != null)
+                exist.login.start('refresh_token', 'refresh_token', exist.settings.cookies.refresh_token, exist.login.success, exist.login.refresh);
+            else exist.auth();
+        }
+    },
     login: {
-        error: function(request, statname, errname) {
-            exist.status('Authorisation ' + statname + ': ' + errname + ' ' + request.responseJSON.error, 'fas fa-exclamation-circle');
+        error: function(request, statname, data) {
+            exist.status('Authorisation ' + statname + ': ' + data + ' ' + request.responseJSON.error, 'fas fa-exclamation-circle');
         },
-        refresh: function(request, statname, errname) {
-            exist.status('Refresh ' + statname + ': ' +  errname + ' ' + request.responseJSON.error, 'fas fa-exclamation-circle');
+        refresh: function(request, statname, data) {
+            exist.status('Refresh ' + statname + ': ' +  data + ' ' + request.responseJSON.error, 'fas fa-exclamation-circle');
             exist.auth();
         },
-        success: function(data, statname, request) {
+        draw: function(data) {
             exist.status('Logged in!', 'fas fa-check-circle');
             var top = document.getElementById('exist-login');
             if(top) {
@@ -393,9 +409,21 @@ var exist = {
                 top.onclick = '';
             }
             exist.access = data;
-            makecookie('refresh_token', exist.access.refresh_token, exist.access.expires_in / 60 / 60 / 24);
-            exist.settings.cookies.refresh_token = exist.access.refresh_token;
-            exist.request.start('today', 'GET', 'users/$self/today', {}, exist.load.today);
+            exist.request.start('today', 'GET', 'users/$self/today', {}, exist.load.today, exist.load.error);
+        },
+        success: function(request, statname, data) {
+            if(request.token_type != null && request.refresh_token != null) {
+                makecookie('token_type', request.token_type, request.expires_in / 60 / 60 / 24);
+                exist.settings.cookies.token_type = request.token_type;
+                if(request.access_token != null) {
+                    makecookie('access_token', request.access_token, request.expires_in / 60 / 60 / 24);
+                    exist.settings.cookies.access_token = data.access_token;
+                }
+                makecookie('refresh_token', request.refresh_token, request.expires_in / 60 / 60 / 24);
+                exist.settings.cookies.refresh_token = request.refresh_token;
+                exist.login.draw(request);
+            }
+            else exist.status('Login provided no refresh token details.', 'fas fa-exclamation-circle');
         },
         start: function(type, name, access_code, success_callback, error_callback) {
             var pname = name.replace('_', ' ');
@@ -409,13 +437,14 @@ var exist = {
                     client_secret: 'c2fa36b0daa451bb6fd5a89ee5856eaadf17b2aa',
                     redirect_uri: window.location.href
                 },
-                success: function(data, statname, request) {
-                    console.log(type + ':', statname, request, data);
-                    if(success_callback) success_callback(data, statname, request);
+                success: function(request, statname, data) {
+                    console.log(type + ':', request, statname, data);
+                    if(success_callback) success_callback(request, statname, data);
                 },
-                error: function(request, statname, errname) {
-                    console.log(type + ':', statname, errname, request);
-                    if(error_callback) error_callback(request, statname, errname);
+                error: function(request, statname, data) {
+                    console.log(type + ':', request, statname, data);
+                    if(error_callback) error_callback(request, statname, data);
+                    exist.response(request, statname, data);
                 }
             }
             reqdata.data[name] = access_code;
@@ -424,8 +453,8 @@ var exist = {
         },
     },
     request: {
-        error: function(request, statname, errname, name) {
-            exist.status('Loading ' + name + ' - ' + statname + ': ' + errname, 'fas fa-exclamation-circle');
+        error: function(request, statname, data, name) {
+            exist.status('Loading ' + name + ' - ' + statname + ': ' + data, 'fas fa-exclamation-circle');
         },
         start: function(name, method, uri, data, success_callback, error_callback) {
             exist.status('Requesting ' + name + '..');
@@ -438,14 +467,15 @@ var exist = {
                 headers: {
                     Authorization: exist.access.token_type + ' ' + exist.access.access_token
                 },
-                success: function(data, statname, request) {
-                    console.log('request (' + name + '):', statname, request, data);
-                    if(success_callback) success_callback(data, statname, request);
+                success: function(request, statname, data) {
+                    console.log('request (' + name + '):', request, statname, data);
+                    if(success_callback) success_callback(request, statname, data);
                 },
-                error: function(request, statname, errname) {
-                    console.log('request (' + name + '):', statname, errname, request);
-                    if(error_callback) error_callback(request, statname, errname, name);
-                    else exist.request.error(request, statname, errname, name)
+                error: function(request, statname, data) {
+                    console.log('request (' + name + '):', request, statname, data);
+                    if(error_callback) error_callback(request, statname, data, name);
+                    else exist.request.error(request, statname, data, name)
+                    exist.response(request, statname, data);
                 }
             }
             console.log('request (' + name + '): start', uri, reqdata);
@@ -678,9 +708,9 @@ var exist = {
                 }
             }
         },
-        attributes: function(data, statname, request) {
+        attributes: function(request, statname, data) {
             exist.status('Loading attributes..');
-            exist.load.attr(data);
+            exist.load.attr(request);
             if(!exist.load.more(true)) {
                 console.log('user:', exist);
                 exist.status('Ready.', 'fas fa-check-circle');
@@ -689,12 +719,12 @@ var exist = {
                 exist.load.draw();
             }
         },
-        today: function(data, statname, request) {
+        today: function(request, statname, data) {
             exist.status('Loading today..');
-            jQuery.each(data, function(i, val) {
+            jQuery.each(request, function(i, val) {
                 if(i != 'attributes') exist.info[i] = val;
             });
-            exist.load.data(data.attributes);
+            exist.load.data(request.attributes);
             var top = document.getElementById('exist-login');
             if(top) {
                 top.innerHTML = '<img src="' + exist.info.avatar + '" />';
@@ -842,7 +872,9 @@ var exist = {
                 if(exist.chart.clickwait == null) {
                     exist.chart.clickwait = exist.config('page.chart');
                     if(exist.chart.clickwait == null) exist.chart.clickwait = '';
-                    exist.checkurl({chart: values.target.id.replace('exist-chart-', '')});
+                    var label = values.target.id.replace('exist-chart-', ''), bits = label.split('-');
+                    if(bits.length >= 2 && exist.data[bits[0]] && exist.data[bits[0]][bits[1]] && exist.data[bits[0]][bits[1]].value_type_description == 'Boolean') label = bits[0];
+                    exist.checkurl({chart: label});
                 }
                 else {
                     exist.checkurl({chart: exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null});
@@ -1031,7 +1063,7 @@ var exist = {
                         padding: 4,
                         position: 'top',
                         weight: 2000,
-                        text: '         ' + name,
+                        text: '       ' + name,
                     },
                     layout: {
                         padding: {
@@ -1123,7 +1155,7 @@ var exist = {
                         }
                         var sz = size;
                         if(isbool) {
-                            sz = sz*3/9;
+                            sz = exist.chart.width > 1280 ? 22 : 40;
                             o = a.label + ': ' + b.label;
                             bools[bools.length] = n;
                         }
