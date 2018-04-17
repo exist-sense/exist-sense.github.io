@@ -273,7 +273,6 @@ var exist = {
             r = Math.floor(Math.min(xr * v, 255)),
             g = Math.floor(Math.min(xg * v, 255)),
             b = Math.floor(Math.min(xb * v, 255));
-        console.log('rgba', xr, xg, xb, a, value, ':', r, g, b, a, v);
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
     },
     makecol: function(alpha, value) {
@@ -284,21 +283,19 @@ var exist = {
             exist.makergba(200, 128, 32,  a, value),
             exist.makergba(200, 32,  200, a, value),
             exist.makergba(128, 200, 255, a, value),
-            exist.makergba(64,  255, 255, a, value),
             exist.makergba(255, 255, 64,  a, value),
-            exist.makergba(255, 128, 255, a, value),
             exist.makergba(255, 32,  32,  a, value),
             exist.makergba(64,  128, 255, a, value),
             exist.makergba(42,  42,  192, a, value),
             exist.makergba(32,  255, 64,  a, value),
             exist.makergba(255, 255, 32,  a, value),
+            exist.makergba(255, 128, 255, a, value),
             exist.makergba(255, 128, 64,  a, value),
             exist.makergba(64,  64,  255, a, value),
         ];
     },
     colour: function(iter, alpha, value) {
         var colours = exist.makecol(alpha, value);
-        console.log('colour', iter, alpha, value, colours ? colours[iter%colours.length] : null);
         if(colours != null) return colours[iter%colours.length];
         return exist.makergba(128, 128, 128, alpha, value);
     },
@@ -1101,7 +1098,7 @@ var exist = {
                         reverse: false,
                         weight: 1000,
                         boxWidth: 8,
-                        padding: 2
+                        padding: 1
                     },
                     title: {
                         display: len <= 1 ? true : false,
@@ -1109,8 +1106,8 @@ var exist = {
                         fontSize: 11,
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 1.3,
-                        padding: 2,
+                        lineHeight: 1.4,
+                        padding: 1,
                         position: 'top',
                         weight: 2000,
                         text: title,
@@ -1215,7 +1212,7 @@ var exist = {
                             if(exist.config('page.range') > 31) sz = sz*7/6;
                             t = a.label + ': ' + b.label;
                         }
-                        else if((maxval-minval) >= 10) sz = sz*7/6;
+                        else if((maxval-minval) >= 10) sz = sz*7/4;
                         if(o == 'Integer') o = 'Count';
                         head.innerHTML += '<div class="exist-chart-container"><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
@@ -1227,7 +1224,8 @@ var exist = {
         },
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = [],
-                size = 68, c = exist.config('page.chart');
+                c = exist.config('page.chart'), sq = 1920.0/exist.chart.width,
+                size = 52*(sq > 1.0 ? 1.0+((sq-1.0)*0.5) : 1.0);
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
