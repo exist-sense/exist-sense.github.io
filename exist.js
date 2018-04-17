@@ -69,6 +69,10 @@ function offdate(date) {
     return d.getUTCFullYear() + '-' + (d.getUTCMonth() + 1).zeropad() + '-' + d.getUTCDate().zeropad();
 }
 
+function isfunc(object) {
+    return typeof(object) == 'function';
+}
+
 String.prototype.capital = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 }
@@ -202,7 +206,7 @@ function makeset() {
                     value_type_description: 'Temp (°C)'
                 },
                 weather_temp_min: {
-                    label: 'Temperature, Min/Max',
+                    label: 'Temperature Min/Max',
                     value_type_description: 'Temp (°C)'
                 },
                 weather_wind_speed: {
@@ -297,7 +301,7 @@ var exist = {
         exist.settings.cookies.token_type = null;
         exist.start();
     },
-    checkurl: function(values) {
+    checkurl: function(values, chg) {
         var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0], print = exist.config('page.print');
         if(params.length >= 2) {
             var code = params[1].split('&');
@@ -309,7 +313,7 @@ var exist = {
                 }
             }
         }
-        for(var i in exist.defaults.page) exist.settings.page[i] = exist.defaults.page[i];
+        for(var i in exist.defaults.page) if(!isfunc(exist.defaults.page[i])) exist.settings.page[i] = exist.defaults.page[i];
         if(values || (hash.length >= 2 && hash[1] != '')) {
             if(hash.length >= 2 && hash[1] != '') {
                 var code = hash[1].split('&');
@@ -318,9 +322,10 @@ var exist = {
                     exist.settings.page[item[0]] = item[1];
                 }
             }
-            for(var i in values) exist.settings.page[i] = values[i];
+            for(var i in values) if(!isfunc(values[i])) exist.settings.page[i] = values[i];
             var opts = hash[0] + '#', vars = 0;
             for(var i in exist.settings.page) {
+                if(isfunc(exist.settings.page[i])) continue;
                 if(exist.settings.page[i] == 'true') exist.settings.page[i] = true;
                 else if(exist.settings.page[i] == 'false') exist.settings.page[i] = false;
                 else if(exist.settings.page[i] == 'null') exist.settings.page[i] = null;
@@ -360,11 +365,13 @@ var exist = {
                     head[0].appendChild(child);
                 }
             }
-            window.history.pushState({}, document.title, value);
-            if(!exist.load.more() && exist.config('ready')) window.setTimeout(exist.load.draw, 100);
+            if(chg && chg != null) window.history.replaceState({}, document.title, value);
+            else window.history.pushState({}, document.title, value);
+            if(!exist.load.more() && exist.config('ready')) window.setTimeout(exist.load.draw, 50);
         }
-        else if(value != window.location.href) {
-            window.history.replaceState({}, document.title, value);
+        else if(chg || value != window.location.href) {
+            if(chg && chg != null) window.history.replaceState({}, document.title, value);
+            else window.history.pushState({}, document.title, value);
             if(!exist.load.more() && exist.config('ready')) exist.load.draw();
         }
     },
@@ -708,10 +715,9 @@ var exist = {
         },
         overrides: function(value, data, key) {
             for(var i in data) {
-                if(value[i]) {
-                    if(typeof(data[i]) == "object") exist.load.overrides(value[i], data[i], i);
-                    else value[i] = data[i];
-                }
+                if(!value[i] || isfunc(value[i])) continue;
+                if(typeof(data[i]) == "object") exist.load.overrides(value[i], data[i], i);
+                else value[i] = data[i];
             }
         },
         attributes: function(request, statname, data) {
@@ -721,7 +727,7 @@ var exist = {
                 console.log('user:', exist);
                 exist.status('Ready.', 'fas fa-check-circle');
                 exist.settings.ready = true;
-                for(var i in exist.settings.overrides) exist.load.overrides(exist.data[i], exist.settings.overrides[i], i);
+                for(var i in exist.settings.overrides) if(!isfunc(exist.settings.overrides[i])) exist.load.overrides(exist.data[i], exist.settings.overrides[i], i);
                 exist.load.draw();
             }
         },
@@ -745,7 +751,7 @@ var exist = {
             var hbody = document.getElementById('exist-header');
             if(exist.info.id) {
                 var page = exist.config('page.id');
-                for (var i in Chart.instances) Chart.instances[i].destroy();
+                for (var i in Chart.instances) if(!isfunc(Chart.instances[i])) Chart.instances[i].destroy();
                 Chart.instances = {};
                 if(hbody) hbody.innerHTML = '';
                 if(page == 'day') exist.day.display();
@@ -1101,6 +1107,7 @@ var exist = {
                 }
             };
             for(var i in values) {
+                if(isfunc(values[i])) continue;
                 data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc, isbool);
                 data.options.scales.yAxes[i].ticks.callback = (function(value, index, list) {
                     if(isbool) return '       ';
@@ -1109,8 +1116,11 @@ var exist = {
                 });
                 data.values[i] = values[i];
             }
-            for(var i in labels) data.data.datasets[i] = exist.chart.dataset(labels[i], isbool, count);
-            count[count.length] = name;
+            for(var i in labels) {
+                if(isfunc(labels[i])) continue;
+                data.data.datasets[i] = exist.chart.dataset(labels[i], isbool, count);
+                count[count.length] = name;
+            }
             return data;
         },
         maketest: function(b, isbool, g, r, date, len) {
@@ -1128,6 +1138,7 @@ var exist = {
             if(a && (q <= 0 || a.priority == q)) {
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
+                        if(isfunc(a[j])) continue;
                         var b = a[j], isbool = b.value_type_description == 'Boolean' ? true : false, g = exist.settings.groups[list[0]] ? exist.settings.groups[list[0]][j] : null;
                         if(!exist.chart.maketest(b, isbool, g, r, date, len)) continue;
                         if(list.length >= 2) {
@@ -1184,7 +1195,7 @@ var exist = {
             }
             else {
                 for(var q = 1; q <= 10; q++) {
-                    for(var i in exist.data) exist.chart.make(head, len, date, size, i, q, count);
+                    for(var i in exist.data) if(!isfunc(exist.data[i])) exist.chart.make(head, len, date, size, i, q, count);
                 }
             }
             for(var n = 0; n < len; n++) {
@@ -1232,7 +1243,7 @@ var exist = {
                 var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
                 if(width != exist.chart.width) {
                     exist.chart.resetwait = true;
-                    for (var i in Chart.instances) Chart.instances[i].destroy();
+                    for (var i in Chart.instances) if(!isfunc(Chart.instances[i])) Chart.instances[i].destroy();
                     Chart.instances = {};
                     exist.chart.display();
                 }
@@ -1273,16 +1284,12 @@ $(document).ready(function ($) {
         }
     }
     */
-    window.addEventListener('popstate', function (event) {
-        exist.chart.clickwait = null;
-        exist.checkurl();
-    });
     exist.start();
 });
 
 $(window).on('hashchange', function() {
     exist.chart.clickwait = null;
-    exist.checkurl();
+    exist.checkurl(null, true);
 });
 
 $(window).resize(function() {
