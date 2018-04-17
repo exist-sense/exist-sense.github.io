@@ -348,7 +348,7 @@ var exist = {
             Chart.defaults.global.defaultColor = fgcol;
             Chart.defaults.global.defaultFontColor = fgcol;
             Chart.defaults.global.defaultFontFamily = 'monospace';
-            Chart.defaults.global.defaultFontSize = 12;
+            Chart.defaults.global.defaultFontSize = 11;
             Chart.defaults.global.defaultFontStyle = 'bold';
             Chart.defaults.global.showLines = true;
             var head = document.getElementsByTagName('head');
@@ -902,7 +902,7 @@ var exist = {
                 data: [],
                 spanGaps: true,
                 fontColor: col,
-                fontSize: 12,
+                fontSize: 11,
                 fontStyle: 'bold',
                 backgroundColor: col,
                 borderColor: '#666666',
@@ -918,7 +918,7 @@ var exist = {
                 position: 'left',
                 offset: true,
                 fontColor: fgcol,
-                fontSize: 12,
+                fontSize: 11,
                 fontStyle: 'bold',
                 gridLines: {
                     display: display || false,
@@ -1021,9 +1021,10 @@ var exist = {
                         },
                     },
                     animation: {
-                        duration: 1000,
+                        duration: 0,
                         easing: 'easeOutQuart'
                     },
+                    hover: { animationDuration: 0 },
                     tooltips: {
                         enabled: isbool ? false : true,
                         mode: 'nearest',
@@ -1057,7 +1058,7 @@ var exist = {
                         display: title != null ? false : true,
                         position: 'top',
                         fontColor: fgcol,
-                        fontSize: 12,
+                        fontSize: 11,
                         fontStyle: 'bold',
                         fullWidth: false,
                         reverse: false,
@@ -1068,7 +1069,7 @@ var exist = {
                     title: {
                         display: title != null ? true : false,
                         fontColor: fgcol,
-                        fontSize: 12,
+                        fontSize: 11,
                         fontStyle: 'bold',
                         fullWidth: true,
                         lineHeight: 1.2,
@@ -1169,13 +1170,15 @@ var exist = {
                         }
                         var sz = size;
                         if(isbool) {
-                            sz = exist.chart.width > 1280 ? 18 : 30;
+                            var sq = 1920.0/exist.chart.width;
+                            if(sq > 1.0) sq = 1.0+((sq-1.0)*0.5);
+                            sz = 18*sq;
                             if(exist.config('page.range') > 31) sz = sz*7/6;
                             t = a.label + ': ' + b.label;
                         }
                         else if((maxval-minval) >= 10) sz = sz*7/6;
                         if(o == 'Integer') o = 'Count';
-                        head.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas>';
+                        head.innerHTML += '<div class="exist-chart-container"><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
                             n, isbool ? 'bar' : 'line', t, o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, count
                         );
@@ -1185,7 +1188,7 @@ var exist = {
         },
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = [],
-                size = exist.chart.width > 1280 ? 68 : 96, c = exist.config('page.chart');
+                size = 68, c = exist.config('page.chart');
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
