@@ -367,13 +367,12 @@ var exist = {
             }
             if(chg && chg != null) window.history.replaceState({}, document.title, value);
             else window.history.pushState({}, document.title, value);
-            if(!exist.load.more() && exist.config('ready')) window.setTimeout(exist.load.draw, 50);
         }
         else if(chg || value != window.location.href) {
             if(chg && chg != null) window.history.replaceState({}, document.title, value);
             else window.history.pushState({}, document.title, value);
-            if(!exist.load.more() && exist.config('ready')) exist.load.draw();
         }
+        if(!exist.load.more() && exist.config('ready')) window.setTimeout(exist.load.draw, 50);
     },
     start: function() {
         exist.settings.cookies = {};
