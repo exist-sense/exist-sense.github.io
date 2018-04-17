@@ -85,10 +85,6 @@ function makeset() {
         cookies: {},
         attrs: [ 'group', 'label', 'priority' ],
         items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
-        colours: {
-            normal: ['#3366CC', '#DC3912', '#FF9900', '#109618', '#990099', '#3B3EAC', '#0099C6', '#DD4477', '#66AA00', '#B82E2E', '#316395', '#994499', '#22AA99', '#AAAA11', '#6633CC', '#E67300', '#8B0707', '#329262', '#5574A6', '#3B3EAC'],
-            print:  ['#BBBBBB', '#888888'],
-        },
         moods: {
             '1': { group: 'terrible', label: 'Terrible' },
             '2': { group: 'bad', label: 'Bad' },
@@ -97,6 +93,14 @@ function makeset() {
             '5': { group: 'great', label: 'Great' }
         },
         groups: {
+            productivity: {
+                productive_min: ['neutral_min', 'distracting_min'],
+                distracting_min: ['!disabled'],
+                neutral_min: ['!disabled'],
+                commits: ['emails_received', 'emails_sent'],
+                emails_received: ['!disabled'],
+                emails_sent: ['!disabled']
+            },
             weather: {
                 weather_temp_min: ['weather_temp_max'],
                 weather_temp_max: ['!disabled']
@@ -164,7 +168,7 @@ function makeset() {
                 cycle: {
                     minval: 1,
                     maxval: 5,
-                    label: 'Bipolar Cycle',
+                    label: 'Bipolar cycle',
                     value_type_description: '1 to 5'
                 },
                 pain: {
@@ -173,17 +177,20 @@ function makeset() {
                     value_type_description: '0 to 5'
                 },
                 pef: {
-                    label: 'Peak Expiratory Flow',
+                    label: 'Peak expiratory flow',
                     value_type_description: 'L/min'
                 },
                 sq: {
-                    label: 'Sleep Quality',
+                    label: 'Sleep quality',
                     value_type_description: '0 to 5'
                 }
             },
             productivity: {
                 distracting_min: {
-                    label: 'Leisure time'
+                    label: 'Entertainment time'
+                },
+                productive_min: {
+                    label: 'Working time'
                 }
             },
             sleep: {
@@ -202,11 +209,9 @@ function makeset() {
                     value_type_description: 'Percentage'
                 },
                 weather_temp_max: {
-                    label: 'Temperature Min/Max',
                     value_type_description: 'Temp (°C)'
                 },
                 weather_temp_min: {
-                    label: 'Temperature Min/Max',
                     value_type_description: 'Temp (°C)'
                 },
                 weather_wind_speed: {
@@ -263,8 +268,39 @@ var exist = {
         }
         else return data.value;
     },
-    colour: function(iter) {
-        return exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'][(iter % exist.settings.colours[exist.config('page.print') ? 'print' : 'normal'].length)];
+    makergba: function(xr, xg, xb, a, value) {
+        var v = value || 1.0,
+            r = Math.floor(Math.min(xr * v, 255)),
+            g = Math.floor(Math.min(xg * v, 255)),
+            b = Math.floor(Math.min(xb * v, 255));
+        console.log('rgba', xr, xg, xb, a, value, ':', r, g, b, a, v);
+        return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
+    },
+    makecol: function(alpha, value) {
+        var a = alpha || 1.0;
+        return [
+            exist.makergba(32,  255, 32,  a, value),
+            exist.makergba(200, 32,  32,  a, value),
+            exist.makergba(200, 128, 32,  a, value),
+            exist.makergba(200, 32,  200, a, value),
+            exist.makergba(128, 200, 255, a, value),
+            exist.makergba(64,  255, 255, a, value),
+            exist.makergba(255, 255, 64,  a, value),
+            exist.makergba(255, 128, 255, a, value),
+            exist.makergba(255, 32,  32,  a, value),
+            exist.makergba(64,  128, 255, a, value),
+            exist.makergba(42,  42,  192, a, value),
+            exist.makergba(32,  255, 64,  a, value),
+            exist.makergba(255, 255, 32,  a, value),
+            exist.makergba(255, 128, 64,  a, value),
+            exist.makergba(64,  64,  255, a, value),
+        ];
+    },
+    colour: function(iter, alpha, value) {
+        var colours = exist.makecol(alpha, value);
+        console.log('colour', iter, alpha, value, colours ? colours[iter%colours.length] : null);
+        if(colours != null) return colours[iter%colours.length];
+        return exist.makergba(128, 128, 128, alpha, value);
     },
     fa: function(type, colour, size, margin) {
         var value = '<span class="exist-fa ' + (type ? type : 'fas fa-cog fa-spin') + ' fa-fw" style="margin: ' + (margin ? margin : '0px 0px 0px 0px') + ';';
@@ -892,11 +928,12 @@ var exist = {
                     exist.checkurl({chart: exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null});
                     exist.chart.clickwait = null;
                 }
-                window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));
+                window.setTimeout(function(){window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));}, 200);
             }
         },
-        dataset: function(label, isbool, count) {
-            var col = exist.colour(count.length);
+        dataset: function(label, isbool, count, len) {
+            var alpha = isbool ? 0.8 : (len > 1 ? 0.5+(1.0/len*0.25) : 0.75), col = exist.colour(count.length, alpha);
+            console.log('dataset', label, isbool, count, len, alpha, col);
             var data = {
                 label: label,
                 data: [],
@@ -905,9 +942,9 @@ var exist = {
                 fontSize: 11,
                 fontStyle: 'bold',
                 backgroundColor: col,
-                borderColor: '#666666',
+                borderColor: exist.colour(count.length, 1.0, exist.config('page.print') ? 0.5 : 1.5),
                 pointBorderColor: col,
-                borderWidth: isbool ? 0 : 1.5,
+                borderWidth: 1.5,
             };
             return data;
         },
@@ -968,7 +1005,7 @@ var exist = {
             };
             return data;
         },
-        config: function(id, type, title, name, isbool) {
+        config: function(id, type, title, name, isbool, len) {
             var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
             var data = {
                 id: id,
@@ -1055,7 +1092,7 @@ var exist = {
                         borderWidth: 1
                     },
                     legend: {
-                        display: title != null ? false : true,
+                        display: len > 1 ? true : false,
                         position: 'top',
                         fontColor: fgcol,
                         fontSize: 11,
@@ -1064,10 +1101,10 @@ var exist = {
                         reverse: false,
                         weight: 1000,
                         boxWidth: 8,
-                        padding: 0
+                        padding: 2
                     },
                     title: {
-                        display: title != null ? true : false,
+                        display: len <= 1 ? true : false,
                         fontColor: fgcol,
                         fontSize: 11,
                         fontStyle: 'bold',
@@ -1095,7 +1132,9 @@ var exist = {
             return data;
         },
         create: function(name, type, title, desc, min, max, values, labels, descs, isbool, count) {
-            var data = exist.chart.config('exist-chart-' + name, type, title, desc, isbool);
+            var len = 0;
+            for(var i in values) if(!isfunc(values[i])) len++;
+            var data = exist.chart.config('exist-chart-' + name, type, title, desc, isbool, len);
             data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, null, isbool);
             data.options.scales.xAxes[0]['type'] = 'time';
             data.options.scales.xAxes[0]['time'] = {
@@ -1118,7 +1157,7 @@ var exist = {
             }
             for(var i in labels) {
                 if(isfunc(labels[i])) continue;
-                data.data.datasets[i] = exist.chart.dataset(labels[i], isbool, count);
+                data.data.datasets[i] = exist.chart.dataset(labels[i], isbool, count, len);
                 count[count.length] = name;
             }
             return data;
