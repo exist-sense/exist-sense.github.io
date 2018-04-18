@@ -1123,7 +1123,7 @@ var exist = {
                                         if(unit != null) label += ' ' + unit;
                                     }
                                 }
-                                return (data.datasets[item.datasetIndex].label ? data.datasets[item.datasetIndex].label : '') + label;
+                                return (data.datasets[item.datasetIndex].label ? (data.datasets[item.datasetIndex].label + ': ') : '') + label;
                             }
                         }
                     },
@@ -1184,11 +1184,11 @@ var exist = {
             for(var i in values) {
                 if(isfunc(values[i])) continue;
                 data.options.scales.yAxes[i] = exist.chart.scale(min, max, i == 0 ? true : false, desc, isbool);
-                data.options.scales.yAxes[i].ticks.callback = (function(value, index, list) {
+                data.options.scales.yAxes[i].ticks.callback = function(value, index, list) {
                     if(isbool) return '       ';
                     if(descs != null && descs[value] != null) return descs[value].label.substring(0, 7).spacepad(7);
                     return value.spacepad(7);
-                });
+                };
                 data.values[i] = values[i];
             }
             for(var i in labels) {
