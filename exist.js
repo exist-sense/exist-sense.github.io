@@ -223,7 +223,7 @@ function makeset() {
                     value_type_description: 'Count'
                 },
                 workouts_distance: {
-                    value_type_description: 'KM'
+                    value_type_description: 'Distance (km)'
                 },
                 workouts_min: {
                     value_type_description: 'Period (min)'
@@ -321,6 +321,13 @@ var exist = {
                 load.visibility = 'hidden';
             }
         }
+    },
+    setrange: function(data) {
+        exist.checkurl({range: data});
+        return false;
+    },
+    rangeanc: function(range, len) {
+        return ' | <a href="#" onclick="return exist.setrange(' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
     },
     auth: function() {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
@@ -841,7 +848,7 @@ var exist = {
     },
     day: {
         maketest: function(b, isbool, r, date) {
-            if(b == null || b.values == null || (r > 0 && b.priority != r)) return false;
+            if(b == null || (r > 0 && b.priority != r)) return false;
             return true;
         },
         make: function(table, date, data, q) {
@@ -867,10 +874,11 @@ var exist = {
                             }
                             if(!found) continue;
                         }
-                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval;
+                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval,
+                            value = b.values[date] != null && b.values[date].value != null ? b.values[date].value : '<i>n/a</i>';
                         if(o == 'Integer') o = 'Count';
                         var irow = table.makechild('tr', 'exist-day-' + n, 'exist-left');
-                        irow.innerHTML += '<td><b>' + t + '</b></td><td>' + o + '</td><td>' + (b.value || '<i>n/a</i>') + '</td><td>' + (minval || 0) + '/' + (maxval || 0) + '</td>';
+                        irow.innerHTML += '<td><b>' + t + '</b></td><td>' + o + '</td><td>' + value + '</td><td>' + (minval || 0) + '/' + (maxval || 0) + '</td>';
                     }
                 }
             }
@@ -1026,10 +1034,10 @@ var exist = {
             };
             return data;
         },
-        config: function(id, type, title, name, isbool, len) {
+        config: function(id, type, title, name, isbool, len, descs) {
             var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
             var data = {
-                id: id,
+                id: 'exist-chart-' + id,
                 type: type,
                 labels: name,
                 values: [],
@@ -1084,33 +1092,45 @@ var exist = {
                     },
                     hover: { animationDuration: 0 },
                     tooltips: {
-                        enabled: isbool ? false : true,
+                        enabled: true,
                         mode: 'nearest',
-                        position: 'average',
+                        position: 'nearest',
                         intersect: true,
-                        backgroundColor: '#000000',
-                        titleFontStyle: 'bold',
+                        backgroundColor: bgcol,
+                        fontSize: 10,
+                        titleFontStyle: 'normal',
                         titleSpacing: 0,
-                        titleMarginBottom: 4,
-                        titleFontColor: '#FFFFFF',
+                        titleMarginBottom: 0,
+                        titleFontSize: 10,
+                        titleFontColor: fgcol,
                         titleAlign: 'left',
-                        bodySpacing: 2,
-                        bodyFontColor: '#FFFFFF',
+                        bodySpacing: 0,
+                        bodyFontColor: fgcol,
+                        bodyFontStyle: 'normal',
+                        bodyFontSize: isbool ? 0 : 10,
                         bodyAlign: 'left',
                         footerFontStyle: 'normal',
-                        footerSpacing: 8,
+                        footerSpacing: 0,
                         footerMarginTop: 0,
-                        footerFontColor: '#FFFFFF',
+                        footerFontColor: fgcol,
+                        footerFontSize: isbool ? 0 : 10,
                         footerAlign: 'left',
-                        yPadding: 6,
-                        xPadding: 6,
-                        caretPadding: 4,
-                        caretSize: 6,
+                        yPadding: 3,
+                        xPadding: 4,
+                        caretPadding: 2,
+                        caretSize: 4,
                         cornerRadius: 4,
-                        multiKeyBackground: '#000000',
+                        multiKeyBackground: bgcol,
                         displayColors: false,
-                        borderColor: '#FFFFFF',
-                        borderWidth: 1
+                        borderColor: fgcol,
+                        borderWidth: 1.25,
+                        callbacks: {
+                            label: function(item, data) {
+                                var label = (data.datasets[item.datasetIndex].label || '') + ': ' + item.yLabel;
+                                if(descs != null && descs[item.yLabel] != null) label += ' (' + descs[item.yLabel].label + ')';
+                                return label;
+                            }
+                        }
                     },
                     legend: {
                         display: len > 1 ? true : false,
@@ -1155,7 +1175,7 @@ var exist = {
         create: function(name, type, title, desc, min, max, values, labels, descs, isbool, count) {
             var len = 0;
             for(var i in values) if(!isfunc(values[i])) len++;
-            var data = exist.chart.config('exist-chart-' + name, type, title, desc, isbool, len);
+            var data = exist.chart.config(name, type, title, desc, isbool, len, descs);
             data.options.scales.xAxes[0] = exist.chart.scale(null, null, true, null, isbool);
             data.options.scales.xAxes[0]['type'] = 'time';
             data.options.scales.xAxes[0]['time'] = {
@@ -1240,18 +1260,20 @@ var exist = {
                         }
                         var sz = size;
                         if(isbool) {
-                            var sq = 1920.0/exist.chart.width;
-                            if(sq > 1.0) sq = 1.0+((sq-1.0)*0.5);
-                            sz = 21.0*sq;
-                            if(exist.config('page.range') > 31) sz = sz*((exist.config('page.range')-30)/31.0);
+                            var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
+                            if(sq > 1.0) sq = 1.0+((sq-1.0)*0.55);
+                            sz = 20.0*sq;
+                            if(range > 31) sz += sz*((range-31)/31.0)*0.0625;
                             t = a.label + ': ' + b.label;
                         }
                         else {
                             maxval = minval;
-                            for(var y in descs) {
-                                if(isfunc(descs[y])) continue;
-                                var z = parseInt(y);
-                                if(y == z && z > maxval) maxval = z;
+                            for(var x = 0; x < descs.length; x++) {
+                                for(var y in descs[x]) {
+                                    if(isfunc(descs[x][y])) continue;
+                                    var z = parseInt(y);
+                                    if(y == z && z > maxval) maxval = z;
+                                }
                             }
                             for(var x = 0; x < values.length; x++) {
                                 if(values[x] == null) continue;
@@ -1311,15 +1333,15 @@ var exist = {
                 head.innerHTML = '';
                 var hrow = head.makechild('tr', 'exist-chart-row', 'exist-left'),
                     head = hrow.makechild('td', 'exist-chart-info', 'exist-left'),
-                    range = exist.config('page.range'), nav = 'Range: ';
+                    range = exist.config('page.range'), nav = 'Range';
                 if(!exist.config('page.print')) {
-                    nav += '<a href="#" onclick="exist.checkurl({range: 7}); return false;">7</a>';
-                    nav += ' | <a href="#" onclick="exist.checkurl({range: 14}); return false;">14</a>';
-                    nav += ' | <a href="#" onclick="exist.checkurl({range: 28}); return false;">28</a>';
-                    nav += ' | <a href="#" onclick="exist.checkurl({range: 31}); return false;">31</a>';
-                    nav += ' | <a href="#" onclick="exist.checkurl({range: 60}); return false;">60</a>';
-                    nav += ' | <a href="#" onclick="exist.checkurl({range: 90}); return false;">90</a>';
-                    nav += ' | <a href="#" onclick="exist.checkurl({range: 120}); return false;">120</a>';
+                    nav += exist.rangeanc(range, 7);
+                    nav += exist.rangeanc(range, 14);
+                    nav += exist.rangeanc(range, 28);
+                    nav += exist.rangeanc(range, 31);
+                    nav += exist.rangeanc(range, 60);
+                    nav += exist.rangeanc(range, 90);
+                    nav += exist.rangeanc(range, 120);
                     head.innerHTML += '<div id="exist-range" style="float: right; clear: both; text-align: right; margin-top: 4px">' + nav + '</div>';
                 }
                 head.innerHTML += '<h4 id="exist-chart-pre" class="exist-left">Last ' + range + ' days for ' + exist.info.first_name + '</h4>';
