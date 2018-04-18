@@ -238,8 +238,7 @@ function makeset() {
             id: 'chart',
             date: makedate(),
             range: 31,
-            chart: null,
-            day: null,
+            values: null,
             print: false,
         }
     };
@@ -906,8 +905,9 @@ var exist = {
                     if(exist.value(weather.weather_temp_max, date))
                         par.innerHTML += ' ' + weather.weather_temp_max.label + ' of <b>' + exist.value(weather.weather_temp_max, date) + '&deg;C</b>.';
                 }
-                var table = hdr.makechild('table', 'exist-inner', 'exist-left'), c = exist.config('page.day');
+                var table = hdr.makechild('table', 'exist-inner', 'exist-left'), c = exist.config('page.values');
                 if(c) {
+                    var d = c.split(',');
                     for(var q = 0; q < d.length; q++) exist.day.make(table, date, d[q], 0);
                 }
                 else {
@@ -938,14 +938,14 @@ var exist = {
         click: function(values, name) {
             if(values.target.id) {
                 if(exist.chart.clickwait == null) {
-                    exist.chart.clickwait = exist.config('page.chart');
+                    exist.chart.clickwait = exist.config('page.values');
                     if(exist.chart.clickwait == null) exist.chart.clickwait = '';
                     var label = values.target.id.replace('exist-chart-', ''), bits = label.split('-');
                     if(bits.length >= 2 && exist.data[bits[0]] && exist.data[bits[0]][bits[1]] && exist.data[bits[0]][bits[1]].value_type_description == 'Boolean') label = bits[0];
-                    exist.checkurl({chart: label});
+                    exist.checkurl({values: label});
                 }
                 else {
-                    exist.checkurl({chart: exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null});
+                    exist.checkurl({values: exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null});
                     exist.chart.clickwait = null;
                 }
                 window.setTimeout(function(){window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));}, 200);
@@ -1128,8 +1128,8 @@ var exist = {
                         fontSize: 11,
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 1.4,
-                        padding: 1,
+                        lineHeight: 1.2,
+                        padding: 4,
                         position: 'top',
                         weight: 2000,
                         text: title,
@@ -1240,7 +1240,7 @@ var exist = {
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width;
                             if(sq > 1.0) sq = 1.0+((sq-1.0)*0.5);
-                            sz = 18*sq;
+                            sz = 20*sq;
                             if(exist.config('page.range') > 31) sz = sz*7/6;
                             t = a.label + ': ' + b.label;
                         }
@@ -1271,7 +1271,7 @@ var exist = {
         },
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = [],
-                c = exist.config('page.chart'), sq = 1920.0/exist.chart.width,
+                c = exist.config('page.values'), sq = 1920.0/exist.chart.width,
                 size = 52*(sq > 1.0 ? 1.0+((sq-1.0)*0.5) : 1.0);
             exist.chart.data = [];
             if(c) {
