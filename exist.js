@@ -501,12 +501,12 @@ var exist = {
         error: function(request, statname, data, name) {
             exist.status('Loading ' + name + ' - ' + statname + ': ' + data, 'fas fa-exclamation-circle');
         },
-        start: function(name, method, uri, data, success_callback, error_callback) {
+        start: function(name, method, uri, values, success_callback, error_callback) {
             exist.status('Requesting ' + name + '..');
             var reqdata = {
                 method: method,
                 url: 'https://exist.io/api/1/' + uri + '/',
-                data: method != 'POST' ? data : JSON.stringify(data),
+                data: method != 'POST' ? values : JSON.stringify(values),
                 dataType: method != 'POST' ? null : 'json',
                 contentType: method != 'POST' ? 'application/x-www-form-urlencoded' : 'application/json',
                 headers: {
@@ -545,17 +545,18 @@ var exist = {
                                     isnum = true;
                                     start = 2;
                                 }
-                                var quot = false, off = false;
+                                var quot = 0, off = false;
                                 for(var n = start; n < values.length; n++) {
                                     if(values[n] == 'zq') {
-                                        quot = true;
                                         label = label + ' (';
+                                        quot++;
                                     }
                                     else if(values[n] == 'zn') off = true;
                                     else {
                                         var v = quot ? values[n] : values[n].capital();
-                                        label = label != null ? (label + ' ' + v) : v;
+                                        label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
                                         grp = grp != null ? (grp + '_' + values[n]) : values[n];
+                                        if(quot) quot++;
                                     }
                                 }
                                 if(quot) label += ')';
@@ -815,7 +816,7 @@ var exist = {
                         span = hdr.makechild('span', 'exist-title-info', 'exist-left');
                         span.innerHTML += '<h4>About Exist Sense</h4>';
                         span.innerHTML += '<p>Exist Sense is a work in progress web app which aims to provide an interface to all Exist data along with converting custom tags into usable values. My main goal was to generate charts for my doctor, so all the app really does at the moment at the moment is spit out charts (because that was the point), but basically, it can detect custom tags which specify numeric values, and group together string values.</p>';
-                        span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 31), and a chart selector (<tt>#chart=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&chart=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
+                        span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 31), and a value selector (<tt>#values=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&values=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
                         span.innerHTML += '<p>The format for custom tags is: <tt>&lt;tag&gt; &lt;value&gt; [label]</tt></p>';
                         span.innerHTML += '<p>Some examples of tags I use:<ul>';
                         span.innerHTML += '<li><b>pef 500</b> = numeric value ‘500’ for ‘pef’ (Peak Expiratory Flow)</li>';
@@ -952,7 +953,8 @@ var exist = {
             }
         },
         dataset: function(label, isbool, count, len) {
-            var alpha = isbool ? 0.8 : (len > 1 ? 0.5+(1.0/len*0.25) : 0.75), col = exist.colour(count.length, alpha);
+            var print = exist.config('page.print'), alpha = isbool ? (print ? 0.9 : 0.6) : (len > 1 ? 0.225+(1.0/len*0.75) : 0.6),
+                col = exist.colour(count.length, alpha), brcol = exist.colour(count.length, 1.0, (print ? (isbool ? 0.25 : 0.5) : 1.65));
             var data = {
                 label: label,
                 data: [],
@@ -961,8 +963,8 @@ var exist = {
                 fontSize: 11,
                 fontStyle: 'bold',
                 backgroundColor: col,
-                borderColor: exist.colour(count.length, 1.0, (exist.config('page.print') ? (isbool ? 0.25 : 0.5) : 1.5)),
-                pointBorderColor: col,
+                borderColor: brcol,
+                pointBorderColor: brcol,
                 borderWidth: 1.5,
             };
             return data;
@@ -1060,14 +1062,14 @@ var exist = {
                             fill: true
                         },
                         point: {
-                            radius: 0,
+                            radius: 1,
                             pointStyle: 'circle',
                             backgroundColor: brcol,
-                            borderColor: brcol,
+                            borderColor: bgcol,
                             borderWidth: 1,
-                            hitRadius: 2,
-                            hoverRadius: 3,
-                            hoverBorderWidth: 1
+                            hitRadius: 4,
+                            hoverRadius: 2,
+                            hoverBorderWidth: 8
                         },
                         rectangle: {
                             backgroundColor: bgcol,
