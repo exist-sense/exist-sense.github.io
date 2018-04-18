@@ -239,6 +239,7 @@ function makeset() {
             date: makedate(),
             range: 31,
             chart: null,
+            day: null,
             print: false,
         }
     };
@@ -376,16 +377,16 @@ var exist = {
         }
         if(!exist.config('ready') || exist.config('page.print') != print) {
             var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
-            var hbody = document.getElementById('exist-header');
-            if(hbody) hbody.innerHTML = '';
+            var head = document.getElementById('exist-header');
+            if(head) head.innerHTML = '';
             Chart.defaults.global.defaultColor = fgcol;
             Chart.defaults.global.defaultFontColor = fgcol;
             Chart.defaults.global.defaultFontFamily = 'monospace';
             Chart.defaults.global.defaultFontSize = 11;
             Chart.defaults.global.defaultFontStyle = 'bold';
             Chart.defaults.global.showLines = true;
-            var head = document.getElementsByTagName('head');
-            if(head) {
+            var hdr = document.getElementsByTagName('head');
+            if(hdr) {
                 var ccss = document.getElementsByClassName('exist-css');
                 for(var i = ccss.length-1; i >= 0; i--) ccss[i].parentNode.removeChild(ccss[i]);
                 var list = exist.config('page.print') ? exist.config('print.on') : exist.config('print.off');
@@ -395,7 +396,7 @@ var exist = {
                     child.type = 'text/css';
                     child.href = list[i];
                     child.className = 'exist-css';
-                    head[0].appendChild(child);
+                    hdr[0].appendChild(child);
                 }
             }
             if(chg && chg != null) window.history.replaceState({}, document.title, value);
@@ -797,22 +798,22 @@ var exist = {
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
         },
         draw: function() {
-            var hbody = document.getElementById('exist-header');
+            var head = document.getElementById('exist-header');
             if(exist.info.id) {
                 var page = exist.config('page.id');
                 for (var i in Chart.instances) if(!isfunc(Chart.instances[i])) Chart.instances[i].destroy();
                 Chart.instances = {};
-                if(hbody) hbody.innerHTML = '';
+                if(head) head.innerHTML = '';
                 if(page == 'day') exist.day.display();
                 else if(page == 'chart') exist.chart.display();
                 else exist.day.display();
             }
             else {
-                if(hbody) {
-                    hbody.innerHTML = '';
-                    var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
-                        head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
-                        span = head.makechild('span', 'exist-title-info', 'exist-left');
+                if(head) {
+                    head.innerHTML = '';
+                    var hrow = head.makechild('tr', 'exist-title-row', 'exist-left'),
+                        hdr = hrow.makechild('td', 'exist-title-info', 'exist-left'),
+                        span = hdr.makechild('span', 'exist-title-info', 'exist-left');
                         span.innerHTML += '<h4>About Exist Sense</h4>';
                         span.innerHTML += '<p>Exist Sense is a work in progress web app which aims to provide an interface to all Exist data along with converting custom tags into usable values. My main goal was to generate charts for my doctor, so all the app really does at the moment at the moment is spit out charts (because that was the point), but basically, it can detect custom tags which specify numeric values, and group together string values.</p>';
                         span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 31), and a chart selector (<tt>#chart=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&chart=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
@@ -839,6 +840,41 @@ var exist = {
         },
     },
     day: {
+        maketest: function(b, isbool, r, date) {
+            if(b == null || b.values == null || (r > 0 && b.priority != r)) return false;
+            return true;
+        },
+        make: function(table, date, data, q) {
+            var list = data.split('-'), a = exist.data[list[0]];
+            if(a && (q <= 0 || a.priority == q)) {
+                var thead = table.makechild('thead', 'exist-inner-head', 'exist-left'),
+                    trow = thead.makechild('tr', 'exist-inner-row', 'exist-left'),
+                    tbody = table.makechild('tbody', 'exist-inner-body', 'exist-left');
+                trow.innerHTML += '<th colspan="4">' + a.label + '</th>';
+                for(var r = 1; r <= 10; r++) {
+                    for(var j in a) {
+                        if(isfunc(a[j])) continue;
+                        var b = a[j], isbool = b.value_type_description == 'Boolean' ? true : false;
+                        if(!exist.day.maketest(b, isbool, r, date)) continue;
+                        if(list.length >= 2) {
+                            var found = false;
+                            for(var x = 1; x < list.length; x++) {
+                                var k = j.split('_'), val = (k.length >= 2 ? k[1] : k[0]);
+                                if(list[x] == j || list[x] == val) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            if(!found) continue;
+                        }
+                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval;
+                        if(o == 'Integer') o = 'Count';
+                        var irow = table.makechild('tr', 'exist-day-' + n, 'exist-left');
+                        irow.innerHTML += '<td><b>' + t + '</b></td><td>' + o + '</td><td>' + (b.value || '<i>n/a</i>') + '</td><td>' + (minval || 0) + '/' + (maxval || 0) + '</td>';
+                    }
+                }
+            }
+        },
         display: function() {
             var date = exist.config('page.date'), len = exist.config('page.range');
             if(!exist.value(exist.data.weather.weather_summary, date)) {
@@ -851,12 +887,12 @@ var exist = {
                     }
                 }
             }
-            var hbody = document.getElementById('exist-header'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
-            if(hbody) {
-                hbody.innerHTML = '';
-                var hrow = hbody.makechild('tr', 'exist-title-row', 'exist-left'),
-                    head = hrow.makechild('td', 'exist-title-info', 'exist-left'),
-                    span = head.makechild('span', 'exist-title-info', 'exist-left');
+            var head = document.getElementById('exist-header'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
+            if(head) {
+                head.innerHTML = '';
+                var hrow = head.makechild('tr', 'exist-title-row', 'exist-left'),
+                    hdr = hrow.makechild('td', 'exist-title-info', 'exist-left'),
+                    span = hdr.makechild('span', 'exist-title-info', 'exist-left');
                 span.makechild('h4', 'exist-title-info-welcome', 'exist-left').innerHTML = 'Welcome ' + exist.info.first_name + ', here is your data for ' + day;
                 if(exist.value(exist.data.weather.weather_summary, date)) {
                     var weather = exist.data.weather, par = span.makechild('p', 'exist-title-info-weather', 'exist-left');
@@ -870,44 +906,14 @@ var exist = {
                     if(exist.value(weather.weather_temp_max, date))
                         par.innerHTML += ' ' + weather.weather_temp_max.label + ' of <b>' + exist.value(weather.weather_temp_max, date) + '&deg;C</b>.';
                 }
-                if(exist.value(exist.data.activity.steps, date)) {
-                    var activity = exist.data.activity, par = span.makechild('p', 'exist-title-info-activity', 'exist-left');
-                    par.innerHTML = exist.fa('fas fa-street-view', '#00FF00', 4, '0px 4px 0px 0px');
-                    if(exist.value(activity.steps, date)) par.innerHTML += ' <b>' + exist.value(activity.steps, date) + '</b> ' + activity.steps.label.toLowerCase() + '.';
-                    if(exist.value(activity.steps_active_min, date)) par.innerHTML += ' <b>' + exist.value(activity.steps_active_min, date) + '</b> ' + activity.steps_active_min.label.toLowerCase() + '.';
-                    if(exist.value(activity.steps_distance, date)) par.innerHTML += ' <b>' + exist.value(activity.steps_distance, date) + '</b> ' + activity.steps_distance.label.toLowerCase() + '.';
+                var table = hdr.makechild('table', 'exist-inner', 'exist-left'), c = exist.config('page.day');
+                if(c) {
+                    for(var q = 0; q < d.length; q++) exist.day.make(table, date, d[q], 0);
                 }
-                if(exist.value(exist.data.sleep.sleep, date)) {
-                    var sleep = exist.data.sleep, par = span.makechild('p', 'exist-title-info-sleep', 'exist-left');
-                    par.innerHTML = exist.fa('fas fa-bed', '#FF00FF', 4, '0px 4px 0px 0px');
-                    if(exist.value(sleep.sleep, date)) par.innerHTML += ' <b>' + exist.value(sleep.sleep, date) + 'm</b> ' + sleep.sleep.label.toLowerCase() + '.';
-                    if(exist.value(sleep.time_in_bed, date)) par.innerHTML += ' <b>' + exist.value(sleep.time_in_bed, date) + 'm</b> ' + sleep.time_in_bed.label.toLowerCase() + '.';
-                    if(exist.value(sleep.sleep_awakenings, date)) par.innerHTML += ' <b>' + exist.value(sleep.sleep_awakenings, date) + '</b> ' + sleep.sleep_awakenings.label.toLowerCase() + '.';
-                }
-                if(exist.data.health) {
-                    var health = exist.data.health, par = span.makechild('p', 'exist-title-info-health', 'exist-left');
-                    par.innerHTML = exist.fa('fas fa-heart', '#FF0000', 4, '0px 4px 0px 0px');
-                    if(exist.value(health.weight, date)) {
-                        par.innerHTML += ' ' + health.weight.label + ': <b>' + exist.value(health.weight, date) + '</b> kg.';
-                        if(health.weight.service == 'googlefit') par.innerHTML += ' (<a href="https://fit.google.com" target="_blank">Google Fit</a>)';
+                else {
+                    for(var q = 1; q <= 10; q++) {
+                        for(var i in exist.data) if(!isfunc(exist.data[i])) exist.day.make(table, date, i, q);
                     }
-                    var personal = exist.data.personal;
-                    if(exist.value(personal.pef, date))
-                        par.innerHTML += ' ' + personal.pef.label + ': <b>' + exist.value(personal.pef, date) + '</b> L/min.';
-                }
-                if(exist.data.mood) {
-                    var mood = exist.data.mood, par = span.makechild('p', 'exist-title-info-mood', 'exist-left');
-                    par.innerHTML = exist.fa('fas fa-question-circle', '#00FFFF', 4, '0px 4px 0px 0px');
-                    if(exist.value(mood.mood, date)) par.innerHTML += ' ' + mood.mood.label + ': <b>' + exist.value(mood.mood, date) + '</b>/' + mood.mood.maxval + '.';
-                    else par.innerHTML += ' ' + mood.mood.label + ': <i>Not Rated.</i>';
-                    if(exist.value(mood.mood_note, date)) par.innerHTML += ' Notes: <i>' + exist.value(mood.mood_note, date) + '</i>.';
-                    if(personal.cycle) {
-                        var cycle = personal.cycle;
-                        par.innerHTML += ' ' + cycle.label + ':';
-                        if(exist.value(cycle, date)) par.innerHTML += ' <b>' + exist.value(cycle, date) + '</b>/' + cycle.maxval + ' (' + exist.value(cycle, date, 'label')  + ').';
-                        else par.innerHTML += ' <i>Not Rated.</i>';
-                    }
-                    if(mood.mood.service == 'exist_for_android') par.innerHTML += ' (<a href="https://exist.io/mood/timeline/edit/' + date +  '/" target="_blank">Exist</a>)';
                 }
             }
             /*
@@ -915,8 +921,8 @@ var exist = {
             if(hdata) {
                 hdata.innerHTML = '';
                 var hrow = hdata.makechild('tr', 'exist-data-row', 'exist-left'),
-                    head = hrow.makechild('td', 'exist-data-info', 'exist-left'),
-                    span = head.makechild('span', 'exist-data-info', 'exist-left');
+                    hdr = hrow.makechild('td', 'exist-data-info', 'exist-left'),
+                    span = hdr.makechild('span', 'exist-data-info', 'exist-left');
                 span.makechild('h4', 'exist-data-info-update', 'exist-left').innerHTML = 'Update ' + day;
             }
             */
@@ -1298,10 +1304,10 @@ var exist = {
             exist.chart.resetwait = false;
             exist.chart.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             exist.chart.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-            var hbody = document.getElementById('exist-header');
-            if(hbody) {
-                hbody.innerHTML = '';
-                var hrow = hbody.makechild('tr', 'exist-chart-row', 'exist-left'),
+            var head = document.getElementById('exist-header');
+            if(head) {
+                head.innerHTML = '';
+                var hrow = head.makechild('tr', 'exist-chart-row', 'exist-left'),
                     head = hrow.makechild('td', 'exist-chart-info', 'exist-left'),
                     range = exist.config('page.range'), nav = 'Range: ';
                 if(!exist.config('page.print')) {

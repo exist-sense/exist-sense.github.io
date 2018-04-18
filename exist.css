@@ -1,4 +1,7 @@
 @charset "utf-8";
+table, thead, tr, td {
+    border: 0px;
+}
 .exist-bg1, #exist-h-row {
     background-color: rgba(0, 0, 0, 0.25);
 }
@@ -85,10 +88,22 @@ canvas {
     margin: 0px;
 }
 #exist-h-row, #exist-data-info, #exist-data-row, #exist-chart-row, #exist-data-xtra,
-  #exist-data-info, #exist-data-avatar, #exist-data-span {
+#exist-data-info, #exist-data-avatar, #exist-data-span {
     vertical-align: middle;
 }
 #exist-status {
     color: rgb(255, 240, 240);
     text-shadow: -1px -1px 4px rgb(255, 0, 0);
+}
+#exist-inner-row > th {
+    color: rgb(255, 240, 240);
+    text-shadow: -1px -1px 4px rgb(255, 0, 0);
+    font-weight: 700;
+    font-size: 18px;
+}
+#exist-inner {
+    max-width: 100%;
+    border: 0px;
+    vertical-align: middle;
+    margin-bottom: 16px;
 }
