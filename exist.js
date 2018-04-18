@@ -545,12 +545,20 @@ var exist = {
                                     isnum = true;
                                     start = 2;
                                 }
+                                var quot = false, off = false;
                                 for(var n = start; n < values.length; n++) {
-                                    if(grp == null) grp = values[n];
-                                    else grp += '_' + values[n];
-                                    if(label == null) label = values[n].capital();
-                                    else label += ' ' + values[n].capital();
+                                    if(values[n] == 'zq') {
+                                        quot = true;
+                                        label = label + ' (';
+                                    }
+                                    else if(values[n] == 'zn') off = true;
+                                    else {
+                                        var v = quot ? values[n] : values[n].capital();
+                                        label = label != null ? (label + ' ' + v) : v;
+                                        grp = grp != null ? (grp + '_' + values[n]) : values[n];
+                                    }
                                 }
+                                if(quot) label += ')';
                                 if(!isnum && grp) slug = grp;
                                 if(exist.data[name] == null) {
                                     exist.data[name] = {
@@ -648,12 +656,20 @@ var exist = {
                         isnum = true;
                         start = 2;
                     }
+                    var quot = false, off = false;
                     for(var n = start; n < values.length; n++) {
-                        if(grp == null) grp = values[n];
-                        else grp += '_' + values[n];
-                        if(label == null) label = values[n].capital();
-                        else label += ' ' + values[n].capital();
+                        if(values[n] == 'zq') {
+                            quot = true;
+                            label = label + ' (';
+                        }
+                        else if(values[n] == 'zn') off = true;
+                        else {
+                            var v = quot ? values[n] : values[n].capital();
+                            label = label != null ? (label + ' ' + v) : v;
+                            grp = grp != null ? (grp + '_' + values[n]) : values[n];
+                        }
                     }
+                    if(quot) label += ')';
                     if(!isnum && grp) slug = grp;
                     if(exist.data[name] == null) {
                         exist.data[name] = {
@@ -667,22 +683,23 @@ var exist = {
                     for(var j = 0; j < attr.values.length; j++) {
                         var item = attr.values[j];
                         if(item.value || !isnum) {
-                            if(exist.data[name][slug]['values'][item.date] == null) exist.data[name][slug]['values'][item.date] = {};
+                            var date = makedate(off ? -1 : 0, item.date);
+                            if(exist.data[name][slug]['values'][date] == null) exist.data[name][slug]['values'][date] = {};
                             if(values.length >= 2) {
-                                exist.data[name][slug]['values'][item.date]['value'] = isnum ? pint : item.value;
+                                exist.data[name][slug]['values'][date]['value'] = isnum ? pint : item.value;
                                 if(isnum) {
                                     if(exist.data[name][slug]['minval'] == null || exist.data[name][slug]['minval'] > pint)
                                         exist.data[name][slug]['minval'] = pint;
                                     if(exist.data[name][slug]['maxval'] == null || exist.data[name][slug]['maxval'] < pint)
                                         exist.data[name][slug]['maxval'] = pint;
                                 }
-                                else if(item.value == null) exist.data[name][slug]['values'][item.date]['value'] = 0;
+                                else if(item.value == null) exist.data[name][slug]['values'][date]['value'] = 0;
                                 if(grp) {
                                     var desc = isnum ? values[1] : slug;
-                                    if(exist.data[name][slug]['values'][item.date]['group'] == null)
-                                        exist.data[name][slug]['values'][item.date]['group'] = grp;
-                                    if(exist.data[name][slug]['values'][item.date]['label'] == null)
-                                        exist.data[name][slug]['values'][item.date]['label'] = label;
+                                    if(exist.data[name][slug]['values'][date]['group'] == null)
+                                        exist.data[name][slug]['values'][date]['group'] = grp;
+                                    if(exist.data[name][slug]['values'][date]['label'] == null)
+                                        exist.data[name][slug]['values'][date]['label'] = label;
                                     if(exist.data[name][slug]['desc'] == null) exist.data[name][slug]['desc'] = {};
                                     if(exist.data[name][slug]['desc'][desc] == null) {
                                         exist.data[name][slug][slug]['desc'][desc] = {
@@ -692,7 +709,7 @@ var exist = {
                                     }
                                 }
                             }
-                            else exist.data[name][slug]['values'][item.date] = { value: item.value };
+                            else exist.data[name][slug]['values'][date] = { value: item.value };
                         }
                     }
                 }
@@ -938,7 +955,7 @@ var exist = {
                 fontSize: 11,
                 fontStyle: 'bold',
                 backgroundColor: col,
-                borderColor: exist.colour(count.length, 1.0, exist.config('page.print') ? 0.5 : 1.5),
+                borderColor: exist.colour(count.length, 1.0, (exist.config('page.print') ? (isbool ? 0.25 : 0.5) : 1.5)),
                 pointBorderColor: col,
                 borderWidth: 1.5,
             };
@@ -965,7 +982,7 @@ var exist = {
                     zeroLineColor: '#333333',
                     zeroLineBorderDash: [],
                     zeroLineBorderDashOffset: 0,
-                    offsetGridLines: isbool && min == null ? true : false,
+                    offsetGridLines: min == null ? true : false,
                     borderDash: [],
                     borderDashOffset: 0
                 },
@@ -1136,7 +1153,7 @@ var exist = {
             data.options.scales.xAxes[0]['time'] = {
                 unit: 'day',
                 minUnit: 'day',
-                tooltipFormat: 'DDD LL',
+                tooltipFormat: 'ddd MMM Do YYYY',
                 displayFormats: {
                     day: 'DD'
                 }
