@@ -1128,7 +1128,7 @@ var exist = {
                         fontSize: 11,
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 1.2,
+                        lineHeight: 1.4,
                         padding: 4,
                         position: 'top',
                         weight: 2000,
