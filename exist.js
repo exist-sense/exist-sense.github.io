@@ -475,7 +475,7 @@ var exist = {
             exist.status('Logging in with ' + pname + '..');
             var reqdata = {
                 method: 'POST',
-                url: 'https://exist.redeclipse.net/oauth/access_token',
+                url: 'https://exist.io/oauth2/access_token',
                 data: {
                     grant_type: type,
                     client_id: '124d5b5764184a4d81c2',
@@ -505,7 +505,7 @@ var exist = {
             exist.status('Requesting ' + name + '..');
             var reqdata = {
                 method: method,
-                url: 'https://exist.redeclipse.net/api/1/' + uri + '/',
+                url: 'https://exist.io/api/1/' + uri + '/',
                 data: method != 'POST' ? data : JSON.stringify(data),
                 dataType: method != 'POST' ? null : 'json',
                 contentType: method != 'POST' ? 'application/x-www-form-urlencoded' : 'application/json',
