@@ -930,7 +930,6 @@ var exist = {
         },
         dataset: function(label, isbool, count, len) {
             var alpha = isbool ? 0.8 : (len > 1 ? 0.5+(1.0/len*0.25) : 0.75), col = exist.colour(count.length, alpha);
-            console.log('dataset', label, isbool, count, len, alpha, col);
             var data = {
                 label: label,
                 data: [],
@@ -1224,10 +1223,17 @@ var exist = {
                         }
                         else {
                             maxval = minval;
-                            for(var x = 0; x < values.length; x++) if(values[x].value > maxval) maxval = values[x].value;
                             for(var y in descs) {
+                                if(isfunc(descs[y])) continue;
                                 var z = parseInt(y);
                                 if(y == z && z > maxval) maxval = z;
+                            }
+                            for(var x = 0; x < values.length; x++) {
+                                if(values[x] == null) continue;
+                                for(var y in values[x]) {
+                                    if(values[x][y] == null || isfunc(values[x][y])) continue;
+                                    if(values[x][y].value != null && values[x][y].value > maxval) maxval = values[x][y].value;
+                                }
                             }
                             if((maxval-minval) >= 10) sz = sz*7/4;
                         }
