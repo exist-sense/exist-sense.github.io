@@ -1137,7 +1137,7 @@ var exist = {
             data.options.scales.xAxes[0]['time'] = {
                 unit: 'day',
                 minUnit: 'day',
-                tooltipFormat: 'LL',
+                tooltipFormat: 'DDD LL',
                 displayFormats: {
                     day: 'DD'
                 }
@@ -1169,6 +1169,14 @@ var exist = {
             }
             return false;
         },
+        values: function(data, date, len) {
+            var values = {};
+            for(var x = 0; x < len; x++) {
+                var test = makedate(0-x, date);
+                values[test] = data[test];
+            }
+            return values;
+        },
         make: function(head, len, date, size, data, q, count) {
             var list = data.split('-'), a = exist.data[list[0]];
             if(a && (q <= 0 || a.priority == q)) {
@@ -1188,7 +1196,8 @@ var exist = {
                             }
                             if(!found) continue;
                         }
-                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval, values = [b.values], labels = [b.label], extra = [];
+                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval,
+                            values = [exist.chart.values(b.values, date, len)], labels = [b.label], descs = [b.desc], extra = [];
                         if(g != null && g.length > 0) {
                             var k = j.split('_');
                             n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
@@ -1198,8 +1207,9 @@ var exist = {
                             for(var x = 0; x < extra.length; x++) {
                                 var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false;
                                 if(!exist.chart.maketest(c, cbool, null, 0, date, len)) continue;
-                                values[values.length] = c.values;
+                                values[values.length] = exist.chart.values(c.values, date, len);
                                 labels[labels.length] = c.label;
+                                descs[descs.length] = c.desc;
                                 if(c.minval < minval) minval = c.minval;
                                 if(c.maxval > maxval) maxval = c.maxval;
                             }
@@ -1212,7 +1222,15 @@ var exist = {
                             if(exist.config('page.range') > 31) sz = sz*7/6;
                             t = a.label + ': ' + b.label;
                         }
-                        else if((maxval-minval) >= 10) sz = sz*7/4;
+                        else {
+                            maxval = minval;
+                            for(var x = 0; x < values.length; x++) if(values[x].value > maxval) maxval = values[x].value;
+                            for(var y in descs) {
+                                var z = parseInt(y);
+                                if(y == z && z > maxval) maxval = z;
+                            }
+                            if((maxval-minval) >= 10) sz = sz*7/4;
+                        }
                         if(o == 'Integer') o = 'Count';
                         head.innerHTML += '<div class="exist-chart-container"><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
