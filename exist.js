@@ -1240,8 +1240,8 @@ var exist = {
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width;
                             if(sq > 1.0) sq = 1.0+((sq-1.0)*0.5);
-                            sz = 20*sq;
-                            if(exist.config('page.range') > 31) sz = sz*7/6;
+                            sz = 21.0*sq;
+                            if(exist.config('page.range') > 31) sz = sz*((exist.config('page.range')-30)/31.0);
                             t = a.label + ': ' + b.label;
                         }
                         else {
@@ -1272,7 +1272,7 @@ var exist = {
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = [],
                 c = exist.config('page.values'), sq = 1920.0/exist.chart.width,
-                size = 52*(sq > 1.0 ? 1.0+((sq-1.0)*0.5) : 1.0);
+                size = 52.0*(sq > 1.0 ? 1.0+((sq-1.0)*0.5) : 1.0);
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
