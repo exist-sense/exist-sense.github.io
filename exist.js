@@ -111,23 +111,14 @@ function makeset() {
         },
         overrides: {
             activity: {
-                steps: {
-                    value_type_description: 'Count'
-                },
                 steps_active_min: {
                     value_type_description: 'Period (min)'
                 },
                 steps_distance: {
                     value_type_description: 'Distance (km)'
                 },
-                steps_goal: {
-                    value_type_description: 'Count'
-                },
             },
             events: {
-                events: {
-                    value_type_description: 'Count'
-                },
                 events_duration: {
                     value_type_description: 'Period (min)'
                 },
@@ -143,11 +134,6 @@ function makeset() {
             location: {
                 location: {
                     value_type_description: 'Lat/Long'
-                }
-            },
-            media: {
-                tracks: {
-                    value_type_description: 'Count'
                 }
             },
             mood: {
@@ -197,16 +183,16 @@ function makeset() {
                 sleep: {
                     value_type_description: 'Period (min)'
                 },
-                awakenings: {
-                    value_type_description: 'Count'
-                },
                 time_in_bed: {
                     value_type_description: 'Period (min)'
                 }
             },
             weather: {
                 weather_precipitation: {
-                    value_type_description: 'Percentage'
+                    value_type_description: 'Percentage (%)'
+                },
+                weather_cloud_cover: {
+                    value_type_description: 'Percentage (%)'
                 },
                 weather_temp_max: {
                     value_type_description: 'Temp (°C)'
@@ -219,9 +205,6 @@ function makeset() {
                 }
             },
             workouts: {
-                workouts: {
-                    value_type_description: 'Count'
-                },
                 workouts_distance: {
                     value_type_description: 'Distance (km)'
                 },
@@ -634,7 +617,9 @@ var exist = {
                         if(exist.data[group][item.attribute] == null) exist.data[group][item.attribute] = {};
                         for(var k = 0; k < exist.settings.items.length; k++) {
                             var ex = exist.settings.items[k];
-                            exist.data[group][item.attribute][ex] = item[ex];
+                            if(ex == 'value' && (item['value_type_description'] == 'Percentage' || item['value_type_description'] == 'Percentage (%)'))
+                                exist.data[group][item.attribute][ex] = parseInt(item[ex] * 100);
+                            else exist.data[group][item.attribute][ex] = item[ex];
                         }
                         if(item.value != null && item.value_type != 2) {
                             if(exist.data[group][item.attribute]['minval'] == null || exist.data[group][item.attribute]['minval'] > item.value)
@@ -727,14 +712,17 @@ var exist = {
                     if(exist.data[group][attr.attribute]['values'] == null) exist.data[group][attr.attribute]['values'] = {};
                     var moods = exist.config('moods');
                     for(var j = 0; j < attr.values.length; j++) {
-                        var item = attr.values[j];
-                        exist.data[group][attr.attribute]['values'][item.date] = { value: item.value };
-                        if(item.value != null && group == 'mood' && attr.attribute == 'mood') {
+                        var item = attr.values[j], commit = item.value;
+                        if(exist.data[group][attr.attribute]['value_type_description'] == 'Percentage' || exist.data[group][attr.attribute]['value_type_description'] == 'Percentage (%)')
+                            commit = parseInt(item.value * 100);
+                        exist.data[group][attr.attribute]['values'][item.date] = { value: commit };
+                        if(commit == null) continue;
+                        if(group == 'mood' && attr.attribute == 'mood') {
                             var val = item.value.toString();
                             exist.data[group][attr.attribute]['values'][item.date]['group'] = moods[val].group;
                             exist.data[group][attr.attribute]['values'][item.date]['label'] = moods[val].label;
                         }
-                        if(item.value != null && exist.data[group][attr.attribute]['value_type'] != 2) {
+                        if(exist.data[group][attr.attribute]['value_type'] != 2) {
                             if(exist.data[group][attr.attribute]['minval'] == null || exist.data[group][attr.attribute]['minval'] > item.value)
                                 exist.data[group][attr.attribute]['minval'] = item.value;
                             if(exist.data[group][attr.attribute]['maxval'] == null || exist.data[group][attr.attribute]['maxval'] < item.value)
@@ -876,7 +864,6 @@ var exist = {
                         }
                         var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval,
                             value = b.values[date] != null && b.values[date].value != null ? b.values[date].value : '<i>n/a</i>';
-                        if(o == 'Integer') o = 'Count';
                         var irow = table.makechild('tr', 'exist-day-' + n, 'exist-left');
                         irow.innerHTML += '<td><b>' + t + '</b></td><td>' + o + '</td><td>' + value + '</td><td>' + (minval || 0) + '/' + (maxval || 0) + '</td>';
                     }
@@ -998,7 +985,7 @@ var exist = {
                     zeroLineColor: '#333333',
                     zeroLineBorderDash: [],
                     zeroLineBorderDashOffset: 0,
-                    offsetGridLines: min == null ? true : false,
+                    offsetGridLines: min == null && isbool ? true : false,
                     borderDash: [],
                     borderDashOffset: 0
                 },
@@ -1098,7 +1085,7 @@ var exist = {
                         intersect: true,
                         backgroundColor: bgcol,
                         fontSize: 10,
-                        titleFontStyle: 'normal',
+                        titleFontStyle: 'bold',
                         titleSpacing: 0,
                         titleMarginBottom: 0,
                         titleFontSize: 10,
@@ -1106,10 +1093,10 @@ var exist = {
                         titleAlign: 'left',
                         bodySpacing: 0,
                         bodyFontColor: fgcol,
-                        bodyFontStyle: 'normal',
+                        bodyFontStyle: 'bold',
                         bodyFontSize: isbool ? 0 : 10,
                         bodyAlign: 'left',
-                        footerFontStyle: 'normal',
+                        footerFontStyle: 'bold',
                         footerSpacing: 0,
                         footerMarginTop: 0,
                         footerFontColor: fgcol,
@@ -1122,13 +1109,21 @@ var exist = {
                         cornerRadius: 4,
                         multiKeyBackground: bgcol,
                         displayColors: false,
-                        borderColor: fgcol,
+                        borderColor: brcol,
                         borderWidth: 1.25,
                         callbacks: {
                             label: function(item, data) {
-                                var label = (data.datasets[item.datasetIndex].label || '') + ': ' + item.yLabel;
+                                var label = item.yLabel;
                                 if(descs != null && descs[item.yLabel] != null) label += ' (' + descs[item.yLabel].label + ')';
-                                return label;
+                                else {
+                                    var val = name.split('(');
+                                    console.log('val', name, val.length, val[0], val[1]);
+                                    if(val.length > 1) {
+                                        var unit = val[1].replace(')', '');
+                                        if(unit != null) label += ' ' + unit;
+                                    }
+                                }
+                                return (data.datasets[item.datasetIndex].label ? data.datasets[item.datasetIndex].label : '') + label;
                             }
                         }
                     },
@@ -1217,7 +1212,7 @@ var exist = {
             var values = {};
             for(var x = 0; x < len; x++) {
                 var test = makedate(0-x, date);
-                values[test] = data[test];
+                values[test] = data.values[test];
             }
             return values;
         },
@@ -1241,7 +1236,7 @@ var exist = {
                             if(!found) continue;
                         }
                         var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval,
-                            values = [exist.chart.values(b.values, date, len)], labels = [b.label], descs = [b.desc], extra = [];
+                            values = [exist.chart.values(b, date, len)], labels = [b.label], descs = [b.desc], extra = [];
                         if(g != null && g.length > 0) {
                             var k = j.split('_');
                             n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
@@ -1251,7 +1246,7 @@ var exist = {
                             for(var x = 0; x < extra.length; x++) {
                                 var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false;
                                 if(!exist.chart.maketest(c, cbool, null, 0, date, len)) continue;
-                                values[values.length] = exist.chart.values(c.values, date, len);
+                                values[values.length] = exist.chart.values(c, date, len);
                                 labels[labels.length] = c.label;
                                 descs[descs.length] = c.desc;
                                 if(c.minval < minval) minval = c.minval;
@@ -1284,7 +1279,6 @@ var exist = {
                             }
                             if((maxval-minval) >= 10) sz = sz*7/4;
                         }
-                        if(o == 'Integer') o = 'Count';
                         head.innerHTML += '<div class="exist-chart-container"><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
                             n, isbool ? 'bar' : 'line', t, o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, count
