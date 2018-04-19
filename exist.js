@@ -187,10 +187,12 @@ function makeset() {
             },
             weather: {
                 weather_precipitation: {
-                    value_type_description: 'Percentage (%)'
+                    value_type_description: 'Percentage (%)',
+                    value_conversion: 1,
                 },
                 weather_cloud_cover: {
-                    value_type_description: 'Percentage (%)'
+                    value_type_description: 'Percentage (%)',
+                    value_conversion: 1,
                 },
                 weather_temp_max: {
                     value_type_description: 'Temp (°C)'
@@ -584,20 +586,8 @@ var exist = {
                                     var ex = exist.load.items[k];
                                     if(ex == 'attribute') exist.data[name][slug][ex] = slug;
                                     else if(ex == 'label') exist.data[name][slug][ex] = slug == 'pef' ? 'Peak Expiratory Flow' : (isnum ? slug.capital() : label);
-                                    else if(ex == 'value' && isnum)
-                                    {
-                                        if(exist.data[name][slug]['minval'] == null || exist.data[name][slug]['minval'] > pint)
-                                            exist.data[name][slug]['minval'] = pint;
-                                        if(exist.data[name][slug]['maxval'] == null || exist.data[name][slug]['maxval'] < pint)
-                                            exist.data[name][slug]['maxval'] = pint;
-                                        if(item.value) exist.data[name][slug][ex] = pint;
-                                    }
-                                    else if(ex == 'value' && !isnum)
-                                    {
-                                        exist.data[name][slug][ex] = item.value != null ? item.value : 0;
-                                        exist.data[name][slug]['minval'] = 0;
-                                        exist.data[name][slug]['maxval'] = 1;
-                                    }
+                                    else if(ex == 'value' && isnum) exist.data[name][slug][ex] = pint;
+                                    else if(ex == 'value' && !isnum) exist.data[name][slug][ex] = item.value != null ? item.value : 0;
                                     else if(ex == 'value_type' && !isnum) exist.data[name][slug][ex] = 0;
                                     else if(ex == 'value_type_description' && !isnum) exist.data[name][slug][ex] = 'Boolean';
                                     else exist.data[name][slug][ex] = item[ex];
@@ -638,23 +628,10 @@ var exist = {
                         if(exist.data[group][item.attribute] == null) exist.data[group][item.attribute] = {};
                         for(var k = 0; k < exist.load.items.length; k++) {
                             var ex = exist.load.items[k];
-                            if(ex == 'value' && (item['value_type_description'] == 'Percentage' || item['value_type_description'] == 'Percentage (%)'))
-                                exist.data[group][item.attribute][ex] = parseInt(item[ex] * 100);
-                            else exist.data[group][item.attribute][ex] = item[ex];
-                        }
-                        if(item.value != null && item.value_type != 2) {
-                            if(exist.data[group][item.attribute]['minval'] == null || exist.data[group][item.attribute]['minval'] > item.value)
-                                exist.data[group][item.attribute]['minval'] = item.value;
-                            if(exist.data[group][item.attribute]['maxval'] == null || exist.data[group][item.attribute]['maxval'] < item.value)
-                                exist.data[group][item.attribute]['maxval'] = item.value;
+                            exist.data[group][item.attribute][ex] = item[ex];
                         }
                     }
                 }
-            }
-            if(exist.data.mood.mood) {
-                exist.data.mood.mood.minval = 1;
-                exist.data.mood.mood.maxval = 5;
-                exist.data.mood.mood.desc = exist.config('moods');
             }
         },
         attr: function(data) {
@@ -700,14 +677,7 @@ var exist = {
                             var date = makedate(off ? -1 : 0, item.date);
                             if(exist.data[name][slug]['values'][date] == null) exist.data[name][slug]['values'][date] = {};
                             if(values.length >= 2) {
-                                exist.data[name][slug]['values'][date]['value'] = isnum ? pint : item.value;
-                                if(isnum) {
-                                    if(exist.data[name][slug]['minval'] == null || exist.data[name][slug]['minval'] > pint)
-                                        exist.data[name][slug]['minval'] = pint;
-                                    if(exist.data[name][slug]['maxval'] == null || exist.data[name][slug]['maxval'] < pint)
-                                        exist.data[name][slug]['maxval'] = pint;
-                                }
-                                else if(item.value == null) exist.data[name][slug]['values'][date]['value'] = 0;
+                                exist.data[name][slug]['values'][date]['value'] = isnum ? pint : (!isnum && item.value == null ? 0 : item.value);
                                 if(grp) {
                                     var desc = isnum ? values[1] : slug;
                                     if(exist.data[name][slug]['values'][date]['group'] == null)
@@ -733,21 +703,13 @@ var exist = {
                     if(exist.data[group][attr.attribute]['values'] == null) exist.data[group][attr.attribute]['values'] = {};
                     var moods = exist.config('moods');
                     for(var j = 0; j < attr.values.length; j++) {
-                        var item = attr.values[j], commit = item.value;
-                        if(exist.data[group][attr.attribute]['value_type_description'] == 'Percentage' || exist.data[group][attr.attribute]['value_type_description'] == 'Percentage (%)')
-                            commit = parseInt(item.value * 100);
-                        exist.data[group][attr.attribute]['values'][item.date] = { value: commit };
-                        if(commit == null) continue;
+                        var item = attr.values[j];
+                        exist.data[group][attr.attribute]['values'][item.date] = { value: item.value };
+                        if(item.value == null) continue;
                         if(group == 'mood' && attr.attribute == 'mood') {
                             var val = item.value.toString();
                             exist.data[group][attr.attribute]['values'][item.date]['group'] = moods[val].group;
                             exist.data[group][attr.attribute]['values'][item.date]['label'] = moods[val].label;
-                        }
-                        if(exist.data[group][attr.attribute]['value_type'] != 2) {
-                            if(exist.data[group][attr.attribute]['minval'] == null || exist.data[group][attr.attribute]['minval'] > item.value)
-                                exist.data[group][attr.attribute]['minval'] = item.value;
-                            if(exist.data[group][attr.attribute]['maxval'] == null || exist.data[group][attr.attribute]['maxval'] < item.value)
-                                exist.data[group][attr.attribute]['maxval'] = item.value;
                         }
                     }
                 }
@@ -781,8 +743,11 @@ var exist = {
         },
         overrides: function(value, data, key) {
             for(var i in data) {
-                if(!value[i] || isfunc(value[i])) continue;
-                if(typeof(data[i]) == "object") exist.load.overrides(value[i], data[i], i);
+                if(isfunc(data[i])) continue;
+                if(typeof(data[i]) == "object") {
+                    if(value[i] == null) value[i] = {};
+                    exist.load.overrides(value[i], data[i], i);
+                }
                 else value[i] = data[i];
             }
         },
@@ -794,6 +759,35 @@ var exist = {
                 exist.status('Ready.', 'fas fa-check-circle');
                 exist.settings.ready = true;
                 for(var i in exist.settings.overrides) if(!isfunc(exist.settings.overrides[i])) exist.load.overrides(exist.data[i], exist.settings.overrides[i], i);
+                for(var i in exist.data) {
+                    if(exist.data[i] == null || isfunc(exist.data[i])) continue;
+                    for(var j in exist.data[i]) {
+                        if(exist.data[i][j] == null || isfunc(exist.data[i][j])) continue;
+                        if(exist.data[i][j].value_type != 2) {
+                            if(exist.data[i][j].value_conversion == 1) {
+                                if(exist.data[i][j].value) exist.data[i][j].value = parseInt(exist.data[i][j].value * 100);
+                                exist.data[i][j].value_type = 0;
+                                for(var k in exist.data[i][j].values) {
+                                    if(!exist.data[i][j].values[k] || isfunc(exist.data[i][j].values[k])) continue;
+                                    if(exist.data[i][j].values[k].value) {
+                                        exist.data[i][j].values[k].value = parseInt(exist.data[i][j].values[k].value * 100);
+                                    }
+                                }
+                             }
+                             if(exist.data[i][j].minval == null) {
+                                exist.data[i][j].minval = exist.data[i][j].value;
+                                exist.data[i][j].maxval = exist.data[i][j].value;
+                                for(var k in exist.data[i][j].values) {
+                                    if(!exist.data[i][j].values[k] || isfunc(exist.data[i][j].values[k])) continue;
+                                    if(exist.data[i][j].values[k].value) {
+                                        if(exist.data[i][j].values[k].value > exist.data[i][j].maxval) exist.data[i][j].maxval = exist.data[i][j].values[k].value;
+                                        if(exist.data[i][j].values[k].value < exist.data[i][j].minval) exist.data[i][j].minval = exist.data[i][j].values[k].value;
+                                    }
+                                }
+                             }
+                        }
+                    }
+                }
                 exist.load.draw();
             }
         },
@@ -1147,7 +1141,6 @@ var exist = {
                                 if(descs != null && descs[item.yLabel] != null) label += ' (' + descs[item.yLabel].label + ')';
                                 else {
                                     var val = name.split('(');
-                                    console.log('val', name, val.length, val[0], val[1]);
                                     if(val.length > 1) {
                                         var unit = val[1].replace(')', '');
                                         if(unit != null) label += ' ' + unit;
