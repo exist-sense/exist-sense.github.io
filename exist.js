@@ -316,7 +316,7 @@ var exist = {
         }
     },
     rangeanc: function(range, len) {
-        return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
+        return ' | <a href="#" onclick="return exist.seturl("range", ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
     },
     auth: function() {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
@@ -411,6 +411,12 @@ var exist = {
         return false;
     },
     start: function() {
+        var nav = document.getElementById('navbar-exist');
+        if(nav) {
+            nav.innerHTML = '<li class="navitem"><a href="https://github.com/exist-sense/core" title="GitHub Page"><span class="fab fa-github fa-fw" aria-hidden="true"></span><div class="navtext">GitHub Page</div></a></li>';
+            nav.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/core/issues/new" title="Submit a Feature Request or Bug Report"><span class="fas fa-list-alt fa-fw" aria-hidden="true"></span><div class="navtext">Requests &amp; Bugs</div></a></li>';
+            nav.innerHTML += '<li class="navitem"><a href="#" onclick="return exist.auth();" title="Login with Exist.io"><span class="fas fa-user-plus fa-fw" aria-hidden="true"></span><div class="navtext">Login</div></a></li>';
+        }
         exist.settings.cookies = {};
         var cookies = decodeURIComponent(document.cookie).split(';');
         if(cookies.length > 0) {
@@ -805,6 +811,15 @@ var exist = {
                 top.target = '_blank';
                 top.onclick = '';
             }
+            var nav = document.getElementById('navbar-exist');
+            if(nav) {
+                nav.innerHTML = '<li class="navitem"><a href="https://github.com/exist-sense/core" title="GitHub Page"><span class="fab fa-github fa-fw" aria-hidden="true"></span><div class="navtext">GitHub Page</div></a></li>';
+                nav.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/core/issues/new" title="Submit a Feature Request or Bug Report"><span class="fas fa-list-alt fa-fw" aria-hidden="true"></span><div class="navtext">Requests &amp; Bugs</div></a></li>';
+                nav.innerHTML += '<li class="navitem"><a href="#" onclick="return exist.seturl("id", "day");" title="Day View"><span class="fas fa-calendar-alt fa-fw" aria-hidden="true"></span><div class="navtext">Day View</div></a></li>';
+                nav.innerHTML += '<li class="navitem"><a href="#" onclick="return exist.seturl("id", "chart");" title="Chart View"><span class="fas fa-chart-line fa-fw" aria-hidden="true"></span><div class="navtext">Chart View</div></a></li>';
+                nav.innerHTML += '<li class="navitem"><a href="#" onclick="return exist.seturl("print", true);" title="Print View"><span class="fas fa-print fa-fw" aria-hidden="true"></span><div class="navtext">Print View</div></a></li>';
+                nav.innerHTML += '<li class="navitem"><a href="#" onclick="return exist.switch();" title="Logout"><span class="fas fa-user-times fa-fw" aria-hidden="true"></span><div class="navtext">Logout</div></a></li>';
+            }
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
         },
         draw: function() {
@@ -843,9 +858,9 @@ var exist = {
                         span.innerHTML += '<li>Custom tracking: <a href="https://exist.io/blog/custom-tracking/">https://exist.io/blog/custom-tracking/</a></li>';
                         span.innerHTML += '<li>GitHub: <a href="https://github.com/exist-sense/core">https://github.com/exist-sense/core</a></li>';
                         span.innerHTML += '</ul></p>';
-                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a></b> to continue.</p>';
+                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="return exist.auth();">Login with Exist.io</a></b> to continue.</p>';
                 }
-                exist.status('<a class="exist-left" href="#" onclick="exist.auth();">Login with Exist.io</a> to continue', 'fas fa-user');
+                exist.status('<a class="exist-left" href="#" onclick="return exist.auth();">Login with Exist.io</a> to continue', 'fas fa-user');
             }
         },
     },
