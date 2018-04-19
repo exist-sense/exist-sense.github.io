@@ -54,22 +54,15 @@
         </nav>
         <div class="container pagecontent">
             <div id="content-area" class="main pagecontainer">
-                <table id="exist-front" class="exist-left">
-                    <thead id="exist-link" class="exist-left">
+                <table id="exist-table" class="exist-left">
+                    <thead id="exist-header" class="exist-left">
                         <tr id="exist-l-row" class="exist-left">
                             <th id="exist-l-data" class="exist-left">
                                 <span id="exist-status"><span class="fas fa-cog fa-spin fa-fw"></span> Loading..</span>
-                            </th>
-                            <th id="exist-l-login" class="exist-right">
-                                <a id="exist-login" class="exist-left" href="#" onclick="exist.auth();"><img src="https://exist.io/static/favicon.png" title="Login with Exist.io" /></a>
+                                <span id="exist-avatar" style="float: right; clear: right"><a id="exist-login" class="exist-left" href="#" onclick="exist.auth();"><img src="https://exist.io/static/favicon.png" title="Login with Exist.io" /></a></span>
                             </th>
                         </tr>
                     </thead>
-                    <tbody id="exist-load" class="exist-left"></tbody>
-                    <tfoot id="exist-extra" class="exist-left"></tbody>
-                </table>
-                <table id="exist-table" class="exist-left">
-                    <thead id="exist-header" class="exist-left"></thead>
                     <tbody id="exist-body" class="exist-left"></tbody>
                     <tfoot id="exist-post" class="exist-left"></tbody>
                 </table>

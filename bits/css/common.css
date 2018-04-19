@@ -161,19 +161,23 @@ a:hover, a:active {
 }
 button, input, button, select, textarea {
     color: rgb(255, 255, 255);
-    background-color: rgb(0, 0, 32);
-    border-color: rgb(0, 0, 192);
+    background-color: rgb(0, 0, 48);
+    border: 2px solid rgb(0, 0, 192);
+    border-radius: 4px;
 }
 input[type="text"], input[type="submit"] {
-    padding: 2px 6px 2px 6px;
+    padding: 0px 6px 0px 6px;
+}
+input[type="radio"], input[type="checkbox"] {
+    visibility: hidden;
 }
 .radiobox {
-    display: inline-block;
+    display: inline;
     position: relative;
-    padding-right: 4px;
-    padding-left: 8px;
     cursor: pointer;
     font-size: 14px;
+    margin-left: 8px;
+    padding-right: 0px;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -184,21 +188,57 @@ input[type="text"], input[type="submit"] {
 }
 .radiomark {
     position: absolute;
-    top: 2px;
-    left: 0;
-    height: 16px;
-    width: 16px;
+    top: 0px;
+    left: 0px;
+    height: 18px;
+    width: 18px;
     background-color: rgb(0, 0, 128);
-    border-radius: 50%;
+    border: 2px solid rgb(0, 0, 192);
+    border-radius: 10%;
 }
-.radiobox:hover input ~ .radiomark {
-    background-color: rgb(0, 0, 192);
+.radiomark#value-0 {
+    background-color: rgb(128, 128, 128);
+    border: 2px solid rgb(192, 192, 192);
 }
-.radiobox input:checked ~ .radiomark {
-    background-color: rgb(0, 0, 128);
+.radiomark#value-1 {
+    background-color: rgb(192, 0, 0);
+    border: 2px solid rgb(255, 0, 0);
 }
-.radiobox:hover input:checked ~ .radiomark {
-    background-color: rgb(0, 0, 192);
+.radiomark#value-2 {
+    background-color: rgb(192, 64, 0);
+    border: 2px solid rgb(255, 64, 0);
+}
+.radiomark#value-3 {
+    background-color: rgb(192, 192, 0);
+    border: 2px solid rgb(255, 255, 0);
+}
+.radiomark#value-4 {
+    background-color: rgb(64, 192, 0);
+    border: 2px solid rgb(64, 255, 0);
+}
+.radiomark#value-5 {
+    background-color: rgb(64, 192, 192);
+    border: 2px solid rgb(64, 255, 255);
+}
+.radiomark#value-6 {
+    background-color: rgb(64, 128, 192);
+    border: 2px solid rgb(64, 128, 255);
+}
+.radiomark#value-7 {
+    background-color: rgb(64, 64, 192);
+    border: 2px solid rgb(64, 64, 255);
+}
+.radiomark#value-8 {
+    background-color: rgb(192, 64, 192);
+    border: 2px solid rgb(192, 64, 255);
+}
+.radiomark#value-9 {
+    background-color: rgb(192, 128, 192);
+    border: 2px solid rgb(255, 128, 255);
+}
+.radiomark#value-10 {
+    background-color: rgb(192, 96, 96);
+    border: 2px solid rgb(255, 128, 128);
 }
 .radiomark:after {
     content: "";
@@ -209,12 +249,73 @@ input[type="text"], input[type="submit"] {
     display: block;
 }
 .radiobox .radiomark:after {
-    top: 3px;
-    left: 3px;
+    top: 2px;
+    left: 2px;
     width: 10px;
     height: 10px;
-    border-radius: 50%;
+    border: 1px solid rgb(192, 192, 192);
+    border-radius: 10%;
     background: rgb(255, 255, 255);
+}
+.radiobox:hover input ~ .radiomark {
+    background-color: rgb(0, 0, 192);
+}
+.radiobox input:checked ~ .radiomark {
+    background-color: rgb(0, 0, 128);
+}
+.radiobox:hover input:checked ~ .radiomark {
+    background-color: rgb(0, 0, 192);
+}
+.checkbox {
+    display: inline;
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 8px;
+    padding-right: 8px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.checkbox input {
+    opacity: 0;
+}
+.checkmark {
+    position: absolute;
+    top: 2px;
+    left: 0px;
+    height: 18px;
+    width: 18px;
+    background-color: rgb(0, 0, 128);
+    border: 2px solid rgb(0, 0, 192);
+    border-radius: 10%;
+}
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+.checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+.checkbox .checkmark:after {
+    top: 2px;
+    left: 2px;
+    width: 10px;
+    height: 10px;
+    border: 1px solid rgb(192, 192, 192);
+    border-radius: 10%;
+    background: rgb(255, 255, 255);
+}
+.checkbox:hover input ~ .checkmark {
+    background-color: rgb(0, 0, 192);
+}
+.checkbox input:checked ~ .checkmark {
+    background-color: rgb(0, 0, 128);
+}
+.checkbox:hover input:checked ~ .checkmark {
+    background-color: rgb(0, 0, 192);
 }
 .nowrap-text {
     white-space: nowrap;
@@ -278,21 +379,19 @@ input[type="text"], input[type="submit"] {
 }
 @media screen and (max-width: 1024px) {
     .hide-small {
+        border-collapse: collapse;
+        visibility: hidden;
         display: none;
+        width: 0px;
+        height: 0px;
     }
 }
 @media screen and (max-width: 800px) {
-    .hide-small {
-        display: none;
-    }
     .footer {
         font-size: 13px;
     }
 }
 @media screen and (max-width: 560px) {
-    .hide-small {
-        display: none;
-    }
     .footer {
         font-size: 12px;
     }
@@ -300,9 +399,6 @@ input[type="text"], input[type="submit"] {
 @media screen and (max-width: 432px) {
     body {
         font-size: 12px;
-    }
-    .hide-small {
-        display: none;
     }
     .footer {
         font-size: 10px;

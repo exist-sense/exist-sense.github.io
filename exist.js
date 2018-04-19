@@ -108,33 +108,91 @@ function makeset() {
         },
         overrides: {
             activity: {
-                steps_active_min: {
-                    value_type_description: 'Period (min)'
-                },
-                steps_distance: {
-                    value_type_description: 'Distance (km)'
-                },
+                group: 'activity',
+                label: 'Activity',
+                steps: { attribute: 'steps', label: 'Steps', value_type: 0, value_type_description: 'Count' },
+                steps_active_min: { attribute: 'steps_active_min', label: 'Steps active min', value_type: 3, value_type_description: 'Period (min)' },
+                steps_elevation: { attribute: 'steps_elevation', label: 'Steps elevation', value_type: 1, value_type_description: 'Distance (km)' },
+                floors: { attribute: 'floors', label: 'Floors', value_type: 0, value_type_description: 'Count' },
+                steps_distance: { attribute: 'steps_distance', label: 'Steps distance', value_type: 1, value_type_description: 'Distance (km)' },
+                cycle_min: { attribute: 'cycle_min', label: 'Cycle min', value_type: 3, value_type_description: 'Period (min)' },
+                cycle_distance: { attribute: 'cycle_distance', label: 'Cycle distance', value_type: 1, value_type_description: 'Distance (km)' },
             },
-            events: {
-                events_duration: {
-                    value_type_description: 'Period (min)'
-                },
+            workouts: {
+                group: 'workouts',
+                label: 'Workouts',
+                workouts: { attribute: 'workouts', label: 'Workouts', value_type: 0, value_type_description: 'Integer' },
+                workouts_min: { attribute: 'workouts_min', label: 'Workouts min', value_type: 3, value_type_description: 'Period (min)' },
+                workouts_distance: { attribute: 'workouts_distance', label: 'Workouts distance', value_type: 1, value_type_description: 'Distance (km)' },
             },
-            health: {
-                heartrate: {
-                    value_type_description: 'Beats (per min)'
-                },
-                weight: {
-                    value_type_description: 'Weight (kg)'
-                },
+            productivity: {
+                group: 'productivity',
+                label: 'Productivity',
+                productive_min: { attribute: 'productive_min', label: 'Productive min', value_type: 3, value_type_description: 'Period (min)' },
+                neutral_min: { attribute: 'neutral_min', label: 'Neutral min', value_type: 3, value_type_description: 'Period (min)' },
+                distracting_min: { attribute: 'distracting_min', label: 'Distracting min', value_type: 3, value_type_description: 'Period (min)' },
+                commits: { attribute: 'commits', label: 'Commits', value_type: 0, value_type_description: 'Count' },
+                tasks_completed: { attribute: 'tasks_completed', label: 'Tasks completed', value_type: 0, value_type_description: 'Count' },
+                words_written: { attribute: 'words_written', label: 'Words written', value_type: 0, value_type_description: 'Count' },
+                emails_sent: { attribute: 'emails_sent', label: 'Emails sent', value_type: 0, value_type_description: 'Count' },
+                emails_received: { attribute: 'emails_received', label: 'Emails received', value_type: 0, value_type_description: 'Count' },
             },
-            location: {
-                location: {
-                    value_type_description: 'Lat/Long'
+            personal: {
+                group: 'personal',
+                label: 'Personal',
+                cycle: {
+                    label: 'Bipolar cycle',
+                    value_type_description: '1 to 5',
+                    minval: 1,
+                    maxval: 5,
+                },
+                pain: {
+                    value_type_description: '0 to 5',
+                    minval: 0,
+                    maxval: 5,
+                },
+                pef: {
+                    label: 'Peak expiratory flow',
+                    value_type_description: 'Volume (L/min)',
+                },
+                sq: {
+                    label: 'Sleep quality',
+                    value_type_description: '0 to 5',
+                    minval: 0,
+                    maxval: 5,
                 }
             },
+            food: {
+                group: 'food',
+                label: 'Food and drink',
+                coffees: { attribute: 'coffees', label: 'Coffees', value_type: 0, value_type_description: 'Count' },
+                alcoholic_drinks: { attribute: 'alcoholic_drinks', label: 'Alcoholic drinks', value_type: 0, value_type_description: 'Count' },
+                energy: { attribute: 'energy', label: 'Energy', value_type: 1, value_type_description: 'Intake (kJ)' },
+                water: { attribute: 'water', label: 'Water', value_type: 0, value_type_description: 'Intake (ml)' },
+                carbohydrates: { attribute: 'carbohydrates', label: 'Carbohydrates', value_type: 1, value_type_description: 'Intake (g)' },
+                fat: { attribute: 'fat', label: 'Fat', value_type: 1, value_type_description: 'Intake (g)' },
+                fibre: { attribute: 'fibre', label: 'Fibre', value_type: 1, value_type_description: 'Intake (g)' },
+                protein: { attribute: 'protein', label: 'Protein', value_type: 1, value_type_description: 'Intake (g)' },
+                sugar: { attribute: 'sugar', label: 'Sugar', value_type: 1, value_type_description: 'Intake (g)' },
+                sodium: { attribute: 'sodium', label: 'Sodium', value_type: 1, value_type_description: 'Intake (mg)' },
+                cholesterol: { attribute: 'cholesterol', label: 'Cholesterol', value_type: 1, value_type_description: 'Intake (mg)' },
+                caffeine: { attribute: 'caffeine', label: 'Caffeine', value_type: 1, value_type_description: 'Intake (mg)' },
+            },
+            finance: {
+                group: 'finance',
+                label: 'Finance',
+                money_spent: { attribute: 'money_spent', label: 'Money spent', value_type: 1, value_type_description: 'Currency' },
+            },
             mood: {
+                group: 'mood',
+                label: 'Mood',
                 mood: {
+                    attribute: 'mood',
+                    label: 'Mood',
+                    value_type: 0,
+                    value_type_description: '1 to 5',
+                    minval: 1,
+                    maxval: 5,
                     desc: {
                         '1': { group: 'awful', label: 'Awful' },
                         '2': { group: 'bad', label: 'Bad' },
@@ -142,74 +200,74 @@ function makeset() {
                         '4': { group: 'good', label: 'Good' },
                         '5': { group: 'great', label: 'Great' }
                     },
-                    minval: 1,
-                    maxval: 5,
-                    value_type_description: '1 to 5'
-                }
-            },
-            personal: {
-                cycle: {
-                    minval: 1,
-                    maxval: 5,
-                    label: 'Bipolar cycle',
-                    value_type_description: '1 to 5'
                 },
-                pain: {
-                    minval: 0,
-                    maxval: 5,
-                    value_type_description: '0 to 5'
-                },
-                pef: {
-                    label: 'Peak expiratory flow',
-                    value_type_description: 'Volume (L/min)'
-                },
-                sq: {
-                    label: 'Sleep quality',
-                    value_type_description: '0 to 5'
-                }
-            },
-            productivity: {
-                distracting_min: {
-                    label: 'Entertainment time'
-                },
-                productive_min: {
-                    label: 'Working time'
-                }
+                mood_note: { attribute: 'mood_note', label: 'Mood note', value_type: 2, value_type_description: 'String' },
             },
             sleep: {
-                sleep: {
-                    value_type_description: 'Period (min)'
-                },
-                time_in_bed: {
-                    value_type_description: 'Period (min)'
-                }
+                group: 'sleep',
+                label: 'Sleep',
+                sleep: { attribute: 'sleep', label: 'Sleep', value_type: 3, value_type_description: 'Period (min)' },
+                time_in_bed: { attribute: 'time_in_bed', label: 'Time in bed', value_type: 3, value_type_description: 'Period (min)' },
+                sleep_start: { attribute: 'sleep_start', label: 'Sleep start', value_type: 6, value_type_description: 'Time (mins from midday)' },
+                sleep_end: { attribute: 'sleep_end', label: 'Sleep end', value_type: 4, value_type_description: 'Time (mins from midnight)' },
+                sleep_awakenings: { attribute: 'sleep_awakenings', label: 'Sleep awakenings', value_type: 0, value_type_description: 'Count' },
+            },
+            events: {
+                group: 'events',
+                label: 'Events',
+                events: { attribute: 'events', label: 'Events', value_type: 0, value_type_description: 'Count' },
+                events_duration: { attribute: 'events_duration', label: 'Events duration', value_type: 3, value_type_description: 'Period (min)' },
+            },
+            health: {
+                group: 'location',
+                label: 'Location',
+                weight: { attribute: 'weight', label: 'Weight', value_type: 1, value_type_description: 'Weight (kg)' },
+                body_fat: { attribute: 'body_fat', label: 'Body fat', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
+                heartrate: { attribute: 'heartrate', label: 'Heartrate', value_type: 0, value_type_description: 'Interval (beats per min)' },
+                meditation_min: { attribute: 'meditation_min', label: 'Meditation min', value_type: 3, value_type_description: 'Period (min)' },
+            },
+            location: {
+                group: 'location',
+                label: 'Location',
+                checkins: { attribute: 'checkins', label: 'Checkins', value_type: 0, value_type_description: 'Count' },
+                location: { attribute: 'location', label: 'Location', value_type: 2, value_type_description: 'Lat/Long' },
+            },
+            media: {
+                group: 'media',
+                label: 'Media',
+                tracks: { attribute: 'tracks', label: 'Tracks', value_type: 0, value_type_description: 'Count' },
+                articles_read: { attribute: 'articles_read', label: 'Articles read', value_type: 0, value_type_description: 'Count' },
+            },
+            social: {
+                group: 'social',
+                label: 'Social',
+                facebook_posts: { attribute: 'facebook_posts', label: 'Instagram posts', value_type: 0, value_type_description: 'Count' },
+                facebook_reactions: { attribute: 'facebook_reactions', label: 'Instagram reactions', value_type: 0, value_type_description: 'Count' },
+                facebook_comments: { attribute: 'facebook_comments', label: 'Instagram comments', value_type: 0, value_type_description: 'Count' },
+                instagram_posts: { attribute: 'instagram_posts', label: 'Instagram posts', value_type: 0, value_type_description: 'Count' },
+                instagram_comments: { attribute: 'instagram_comments', label: 'Instagram comments', value_type: 0, value_type_description: 'Count' },
+                instagram_likes: { attribute: 'instagram_likes', label: 'Instagram likes', value_type: 0, value_type_description: 'Count' },
+                instagram_username: { attribute: 'instagram_username', label: 'Instagram username', value_type: 2, value_type_description: 'String' },
+            },
+            twitter: {
+                group: 'twitter',
+                label: 'Twitter',
+                tweets: { attribute: 'tweets', label: 'Tweets', value_type: 0, value_type_description: 'Count' },
+                twitter_mentions: { attribute: 'twitter_mentions', label: 'Twitter mentions', value_type: 0, value_type_description: 'Count' },
+                twitter_username: { attribute: 'twitter_username', label: 'Twitter username', value_type: 2, value_type_description: 'String' },
             },
             weather: {
-                weather_precipitation: {
-                    value_type_description: 'Percentage (%)',
-                    value_conversion: 1,
-                },
-                weather_cloud_cover: {
-                    value_type_description: 'Percentage (%)',
-                    value_conversion: 1,
-                },
-                weather_temp_max: {
-                    value_type_description: 'Temp (°C)'
-                },
-                weather_temp_min: {
-                    value_type_description: 'Temp (°C)'
-                },
-                weather_wind_speed: {
-                    value_type_description: 'Speed (km/h)'
-                }
-            },
-            workouts: {
-                workouts_distance: {
-                    value_type_description: 'Distance (km)'
-                },
-                workouts_min: {
-                    value_type_description: 'Period (min)'
-                }
+                group: 'weather',
+                label: 'Weather',
+                weather_temp_max: { attribute: 'weather_temp_max', label: 'Weather temp max', value_type: 1, value_type_description: 'Temp (°C)' },
+                weather_temp_min: { attribute: 'weather_temp_min', label: 'Weather temp min', value_type: 1, value_type_description: 'Temp (°C)' },
+                weather_precipitation: { attribute: 'weather_precipitation', label: 'Weather precipitation', value_type: 1, value_type_description: 'Percentage (%)', value_conversion: 1 },
+                weather_cloud_cover: { attribute: 'weather_cloud_cover', label: 'Weather cloud cover', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
+                weather_wind_speed: { attribute: 'weather_wind_speed', label: 'Weather wind speed', value_type: 1, value_type_description: 'Speed (km/h)' },
+                weather_summary: { attribute: 'weather_summary', label: 'Weather summary', value_type: 2, value_type_description: 'String' },
+                weather_icon: { attribute: 'weather_icon', label: 'Weather icon', value_type: 2, value_type_description: 'String' },
+                sunrise: { attribute: 'sunrise', label: 'Sunrise', value_type: 4, value_type_description: 'Time (mins from midnight)' },
+                sunset: { attribute: 'sunset', label: 'Sunset', value_type: 6, value_type_description: 'Time (mins from midday)' },
             }
         },
         print: {
@@ -276,7 +334,7 @@ var exist = {
             exist.makergba(64,  64,  255, a, v),
         ];
     },
-    makescol: function(xr, xa, xv) {
+    makescol: function(xr, xa, xv, invert) {
         var r = Math.min(Math.max(xr, 0), 5), a = xa || 1.0, v = xv || 1.0,
             data = [
                 exist.makergba(128, 128, 128, a, v),
@@ -286,6 +344,7 @@ var exist = {
                 exist.makergba(32,  255, 128, a, v),
                 exist.makergba(32,  255, 32,  a, v),
             ];
+        if(invert && r > 0) r = 6-r;
         return data[r];
     },
     colour: function(iter, alpha, value) {
@@ -374,7 +433,7 @@ var exist = {
         }
         if(!exist.config('ready') || exist.config('page.print') != print) {
             var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
-            var head = document.getElementById('exist-header');
+            var head = document.getElementById('exist-body');
             if(head) head.innerHTML = '';
             Chart.defaults.global.defaultColor = fgcol;
             Chart.defaults.global.defaultFontColor = fgcol;
@@ -569,13 +628,14 @@ var exist = {
                                     isnum = true;
                                     start = 2;
                                 }
-                                var quot = 0, off = false;
+                                var quot = 0, off = false, inv = false;
                                 for(var n = start; n < values.length; n++) {
                                     if(values[n] == 'zq') {
                                         label = label + ' (';
                                         quot++;
                                     }
                                     else if(values[n] == 'zn') off = true;
+                                    else if(values[n] == 'zi') inv = true;
                                     else {
                                         var v = quot ? values[n] : values[n].capital();
                                         label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
@@ -592,7 +652,7 @@ var exist = {
                                         priority: item.priority
                                     };
                                 }
-                                if(exist.data[name][slug] == null) exist.data[name][slug] = {};
+                                if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, invert: inv };
                                 for(var k = 0; k < exist.load.items.length; k++) {
                                     var ex = exist.load.items[k];
                                     if(ex == 'attribute') exist.data[name][slug][ex] = slug;
@@ -658,17 +718,19 @@ var exist = {
                         isnum = true;
                         start = 2;
                     }
-                    var quot = false, off = false;
+                    var quot = 0, off = false, inv = false;
                     for(var n = start; n < values.length; n++) {
                         if(values[n] == 'zq') {
-                            quot = true;
                             label = label + ' (';
+                            quot++;
                         }
                         else if(values[n] == 'zn') off = true;
+                        else if(values[n] == 'zi') inv = true;
                         else {
                             var v = quot ? values[n] : values[n].capital();
-                            label = label != null ? (label + ' ' + v) : v;
+                            label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
                             grp = grp != null ? (grp + '_' + values[n]) : values[n];
+                            if(quot) quot++;
                         }
                     }
                     if(quot) label += ')';
@@ -680,21 +742,20 @@ var exist = {
                             priority: attr.priority
                         };
                     }
-                    if(exist.data[name][slug] == null) exist.data[name][slug] = { values: {} };
+                    if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, invert: inv, values: {} };
                     if(exist.data[name][slug]['values'] == null) exist.data[name][slug]['values'] = {};
                     for(var j = 0; j < attr.values.length; j++) {
                         var item = attr.values[j];
                         if(item.value || !isnum) {
-                            var date = makedate(off ? -1 : 0, item.date);
-                            if(exist.data[name][slug]['values'][date] == null) exist.data[name][slug]['values'][date] = {};
+                            if(exist.data[name][slug]['values'][item.date] == null) exist.data[name][slug]['values'][item.date] = {};
                             if(values.length >= 2) {
-                                exist.data[name][slug]['values'][date]['value'] = isnum ? pint : (!isnum && item.value == null ? 0 : item.value);
+                                exist.data[name][slug]['values'][item.date]['value'] = isnum ? pint : (!isnum && item.value == null ? 0 : item.value);
                                 if(grp) {
                                     var desc = isnum ? values[1] : slug;
-                                    if(exist.data[name][slug]['values'][date]['group'] == null)
-                                        exist.data[name][slug]['values'][date]['group'] = grp;
-                                    if(exist.data[name][slug]['values'][date]['label'] == null)
-                                        exist.data[name][slug]['values'][date]['label'] = label;
+                                    if(exist.data[name][slug]['values'][item.date]['group'] == null)
+                                        exist.data[name][slug]['values'][item.date]['group'] = grp;
+                                    if(exist.data[name][slug]['values'][item.date]['label'] == null)
+                                        exist.data[name][slug]['values'][item.date]['label'] = label;
                                     if(exist.data[name][slug]['desc'] == null) exist.data[name][slug]['desc'] = {};
                                     if(exist.data[name][slug]['desc'][desc] == null) {
                                         exist.data[name][slug][slug]['desc'][desc] = {
@@ -704,7 +765,7 @@ var exist = {
                                     }
                                 }
                             }
-                            else exist.data[name][slug]['values'][date] = { value: item.value };
+                            else exist.data[name][slug]['values'][item.date] = { value: item.value };
                         }
                     }
                 }
@@ -753,12 +814,11 @@ var exist = {
             return false;
         },
         overrides: function(value, data, key) {
+            if(value == null) value = {};
             for(var i in data) {
+                if(value[i] == null) value[i] = {};
                 if(isfunc(data[i])) continue;
-                if(typeof(data[i]) == "object") {
-                    if(value[i] == null) value[i] = {};
-                    exist.load.overrides(value[i], data[i], i);
-                }
+                if(typeof(data[i]) == "object") exist.load.overrides(value[i], data[i], i);
                 else value[i] = data[i];
             }
         },
@@ -825,7 +885,7 @@ var exist = {
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
         },
         draw: function() {
-            var head = document.getElementById('exist-header');
+            var head = document.getElementById('exist-body');
             if(exist.info.id) {
                 var page = exist.config('page.id');
                 for (var i in Chart.instances) if(!isfunc(Chart.instances[i])) Chart.instances[i].destroy();
@@ -874,10 +934,8 @@ var exist = {
         make: function(table, date, data, q) {
             var list = data.split('-'), a = exist.data[list[0]];
             if(a && (q <= 0 || a.priority == q)) {
-                var thead = table.makechild('thead', 'exist-inner-head', 'exist-left'),
-                    trow = thead.makechild('tr', 'exist-inner-row', 'exist-left'),
-                    tbody = table.makechild('tbody', 'exist-inner-body', 'exist-left');
-                trow.innerHTML += '<th colspan="4">' + a.label + '</th>';
+                var trow = table.makechild('tr', 'exist-inner-row', 'exist-left');
+                trow.innerHTML += '<th colspan="2">' + a.label + '</th><th id="hide-small" class="hide-small"></th><th style="text-align: right">Acquired</th>';
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
                         if(isfunc(a[j])) continue;
@@ -894,10 +952,24 @@ var exist = {
                             }
                             if(!found) continue;
                         }
-                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval,
-                            value = b.values[date] != null && b.values[date].value != null ? b.values[date].value : '<i>n/a</i>';
-                        var irow = table.makechild('tr', 'exist-day-' + n, 'exist-left');
-                        irow.innerHTML += '<td><b>' + t + '</b></td><td>' + o + '</td><td>' + value + '</td><td>' + (minval || 0) + '/' + (maxval || 0) + '</td>';
+                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label,
+                            value = b.values != null && b.values[date] != null && b.values[date].value != null ? b.values[date].value : null,
+                            acquired = b.service == 'exist_sense' ? true : false, irow = table.makechild('tr', 'exist-day-' + n, 'exist-left');
+                        if(b.offset) t += ' (last night)';
+                        irow.innerHTML += '<td><b>' + t + '</b></td>';
+                        if(isbool) irow.innerHTML += '<td style="width: 192px; text-align: right; padding-right: 16px;"><label class="checkbox"><input type="checkbox" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value ? 'checked' : '') + ' /><span class="checkmark"></span><span class="checklabel">&nbsp;</span></label></td>';
+                        else if((b.minval == 0 || b.minval == 1) && (b.maxval >= 5 && b.maxval <= (list[0] == 'personal' ? 10 : 5))) {
+                            var inputs = '';
+                            for(var z = b.minval; z <= b.maxval; z++) {
+                                var y = String(z), desc = b.desc && b.desc[y] ? (b.desc[y].label + ' (' + y + ')') : y;
+                                if(z == 6) inputs += '<br />';
+                                inputs += '<label class="radiobox" title="' + desc + '"><input type="radio" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value == z ? 'checked' : '') + ' /><span id="value-' + (b.invert && z > 0 ? 11-z : z) + '" class="radiomark"></span><span class="radiolabel">&nbsp;</span></label>';
+                            }
+                            irow.innerHTML += '<td style="width: 192px; text-align: right; padding-right: 12px">' + inputs + '</td>';
+                        }
+                        else irow.innerHTML += '<td style="width: 192px; text-align: right"><input type="text" autocomplete="off" id="exist-value-' + n + '" name="exist-value-' + n + '" value="' + (value || '') + '" style="width: 100%;" /></td>';
+                        irow.innerHTML += '<td id="hide-small" class="hide-small">' + o + '</td>';
+                        irow.innerHTML += '<td style="text-align: right; padding-right: 12px"><label class="checkbox"><input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' /><span class="checkmark"></span><span class="checklabel">&nbsp;</span></label></td>';
                     }
                 }
             }
@@ -914,7 +986,7 @@ var exist = {
                     }
                 }
             }
-            var head = document.getElementById('exist-header'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
+            var head = document.getElementById('exist-body'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
             if(head) {
                 head.innerHTML = '';
                 var hrow = head.makechild('tr', 'exist-title-row', 'exist-left'),
@@ -933,16 +1005,25 @@ var exist = {
                     if(exist.value(weather.weather_temp_max, date))
                         par.innerHTML += ' ' + weather.weather_temp_max.label + ' of <b>' + exist.value(weather.weather_temp_max, date) + '&deg;C</b>.';
                 }
-                var table = hdr.makechild('table', 'exist-inner', 'exist-left'), c = exist.config('page.values');
+                var form = hdr.makechild('form', 'exist-form', 'exist-left');
+                form.action = '#';
+                form.setAttribute('onSubmit', 'alert("Not yet implemented, sorry!"); return false;');
+                var table = form.makechild('table', 'exist-inner', 'exist-left'),
+                    thead = table.makechild('thead', 'exist-inner-head', 'exist-left'),
+                    c = exist.config('page.values');
                 if(c) {
                     var d = c.split(',');
-                    for(var q = 0; q < d.length; q++) exist.day.make(table, date, d[q], 0);
+                    for(var q = 0; q < d.length; q++) exist.day.make(thead, date, d[q], 0);
                 }
                 else {
                     for(var q = 1; q <= 10; q++) {
-                        for(var i in exist.data) if(!isfunc(exist.data[i])) exist.day.make(table, date, i, q);
+                        for(var i in exist.data) if(!isfunc(exist.data[i])) exist.day.make(thead, date, i, q);
                     }
                 }
+                var trow = thead.makechild('tr', 'exist-inner-finish', 'exist-left');
+                trow.innerHTML += '<th colspan="4">Finished</th>';
+                var vrow = thead.makechild('tr', 'exist-inner-submit', 'exist-left');
+                vrow.innerHTML += '<td colspan="3">Exist Sense will take ownership of the attributes marked as acquired to update them (not yet implemented).</td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" style="width: 100%; margin-right: -5px" /></td>';
             }
             /*
             var hdata = document.getElementById('exist-body');
@@ -1242,8 +1323,9 @@ var exist = {
         values: function(data, date, len) {
             var values = {};
             for(var x = 0; x < len; x++) {
-                var test = makedate(0-x, date);
-                values[test] = data.values[test];
+                var fr = makedate(0-x, date), to = fr;
+                if(data.offset) to = makedate(-1, fr);
+                values[to] = data.values[fr];
             }
             return values;
         },
@@ -1266,7 +1348,7 @@ var exist = {
                             }
                             if(!found) continue;
                         }
-                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval, maxval = b.maxval,
+                        var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval || 0, maxval = b.maxval || 0,
                             values = [exist.chart.values(b, date, len)], labels = [b.label], descs = [b.desc], extra = [];
                         if(g != null && g.length > 0) {
                             var k = j.split('_');
@@ -1280,8 +1362,8 @@ var exist = {
                                 values[values.length] = exist.chart.values(c, date, len);
                                 labels[labels.length] = c.label;
                                 descs[descs.length] = c.desc;
-                                if(c.minval < minval) minval = c.minval;
-                                if(c.maxval > maxval) maxval = c.maxval;
+                                if(c.minval != null && c.minval < minval) minval = c.minval;
+                                if(c.maxval != null && c.maxval > maxval) maxval = c.maxval;
                             }
                         }
                         var sz = size;
@@ -1293,19 +1375,23 @@ var exist = {
                             t = a.label + ': ' + b.label;
                         }
                         else {
-                            maxval = minval;
+                            maxval = null;
+                            minval = null;
                             for(var x = 0; x < descs.length; x++) {
                                 for(var y in descs[x]) {
                                     if(isfunc(descs[x][y])) continue;
                                     var z = parseInt(y);
-                                    if(y == z && z > maxval) maxval = z;
+                                    if(y != z) continue;
+                                    if(maxval == null || z > maxval) maxval = z;
+                                    if(minval == null || z < minval) minval = z;
                                 }
                             }
                             for(var x = 0; x < values.length; x++) {
                                 if(values[x] == null) continue;
                                 for(var y in values[x]) {
                                     if(values[x][y] == null || isfunc(values[x][y])) continue;
-                                    if(values[x][y].value != null && values[x][y].value > maxval) maxval = values[x][y].value;
+                                    if(values[x][y].value != null && (maxval == null || values[x][y].value > maxval)) maxval = values[x][y].value;
+                                    if(values[x][y].value != null && (minval == null || values[x][y].value < minval)) minval = values[x][y].value;
                                 }
                             }
                             if((maxval-minval) >= 10) sz = sz*7/4;
@@ -1353,7 +1439,7 @@ var exist = {
             exist.chart.resetwait = false;
             exist.chart.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             exist.chart.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-            var head = document.getElementById('exist-header');
+            var head = document.getElementById('exist-body');
             if(head) {
                 head.innerHTML = '';
                 var hrow = head.makechild('tr', 'exist-chart-row', 'exist-left'),

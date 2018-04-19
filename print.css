@@ -107,9 +107,9 @@ dt, th {
 .row {
     margin: 0px;
 }
-#exist-front {
-    visibility: hidden;
+#exist-header, #exist-l-row, #exist-l-data {
+    visibility: collapse;
     height: 0px;
-    margin: 0px 0px -30px 0px;
     padding: 0px;
+    margin: 0px;
 }
