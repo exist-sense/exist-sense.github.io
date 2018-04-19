@@ -98,12 +98,20 @@ canvas {
 #exist-inner-row > th {
     color: rgb(240, 240, 255);
     text-shadow: -1px -1px 4px rgb(0, 0, 255);
-    font-weight: 700;
-    font-size: 18px;
+    font-weight: 600;
+    font-size: 16px;
 }
 #exist-inner {
     max-width: 100%;
     border: 0px;
     vertical-align: middle;
     margin-bottom: 16px;
+}
+#exist-range {
+    float: right;
+    clear: both;
+    text-align: right;
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: 600;
 }

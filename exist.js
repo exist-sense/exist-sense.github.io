@@ -95,8 +95,7 @@ function makeset() {
                 productive_min: ['neutral_min', 'distracting_min'],
                 distracting_min: ['!disabled'],
                 neutral_min: ['!disabled'],
-                commits: ['emails_received', 'emails_sent'],
-                emails_received: ['!disabled'],
+                emails_received: ['emails_sent'],
                 emails_sent: ['!disabled']
             },
             weather: {
@@ -318,7 +317,7 @@ var exist = {
         }
     },
     rangeanc: function(range, len) {
-        return ' | <a href="#" onclick="return exist.seturl("range", ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
+        return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
     },
     auth: function() {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
@@ -818,9 +817,9 @@ var exist = {
                 top.onclick = '';
             }
             exist.makenav([
-                '<li class="navitem"><a href="#" onclick="return exist.seturl("id", "day");" title="Day View"><span class="fas fa-calendar-alt fa-fw" aria-hidden="true"></span><div class="navtext">Day View</div></a></li>',
-                '<li class="navitem"><a href="#" onclick="return exist.seturl("id", "chart");" title="Chart View"><span class="fas fa-chart-line fa-fw" aria-hidden="true"></span><div class="navtext">Chart View</div></a></li>',
-                '<li class="navitem"><a href="#" onclick="return exist.seturl("print", true);" title="Print View"><span class="fas fa-print fa-fw" aria-hidden="true"></span><div class="navtext">Print View</div></a></li>',
+                '<li class="navitem"><a href="#" onclick="return exist.seturl(\'id\', \'day\');" title="Day View"><span class="fas fa-calendar-alt fa-fw" aria-hidden="true"></span><div class="navtext">Day View</div></a></li>',
+                '<li class="navitem"><a href="#" onclick="return exist.seturl(\'id\', \'chart\');" title="Chart View"><span class="fas fa-chart-line fa-fw" aria-hidden="true"></span><div class="navtext">Chart View</div></a></li>',
+                '<li class="navitem"><a href="#" onclick="return exist.seturl(\'print\', true);" title="Print View"><span class="fas fa-print fa-fw" aria-hidden="true"></span><div class="navtext">Print View</div></a></li>',
                 '<li class="navitem"><a href="#" onclick="return exist.switch();" title="Logout"><span class="fas fa-user-times fa-fw" aria-hidden="true"></span><div class="navtext">Logout</div></a></li>'
             ]);
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
@@ -1368,7 +1367,7 @@ var exist = {
                     nav += exist.rangeanc(range, 60);
                     nav += exist.rangeanc(range, 90);
                     nav += exist.rangeanc(range, 120);
-                    head.innerHTML += '<div id="exist-range" style="float: right; clear: both; text-align: right; margin-top: 4px">' + nav + '</div>';
+                    head.innerHTML += '<div id="exist-range">' + nav + '</div>';
                 }
                 head.innerHTML += '<h4 id="exist-chart-pre" class="exist-left">Last ' + range + ' days for ' + exist.info.first_name + '</h4>';
                 exist.chart.draw(head, exist.config('page.date'), range);

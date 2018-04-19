@@ -18,6 +18,9 @@ body {
     -webkit-font-smoothing: subpixel-antialiased;
     text-shadow: -1px -1px 4px rgb(96, 96, 255);
 }
+strong, b {
+    font-weight: 600;
+}
 a, a:link, a:visited {
     color: rgb(128, 128, 255);
     text-decoration: none;
