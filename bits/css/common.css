@@ -1,6 +1,6 @@
 @charset "utf-8";
 body {
-    background: #340201 url(/bits/bg2.jpg) no-repeat center top;
+    background: rgb(4, 4, 48) url(/bits/background.png) repeat-x center top;
     color: rgb(255, 255, 255);
     font-size: 14px;
     font-weight: 400;
@@ -16,16 +16,16 @@ body {
     -moz-osx-font-smoothing: grayscale;
     font-smoothing: subpixel-antialiased;
     -webkit-font-smoothing: subpixel-antialiased;
-    text-shadow: -1px -1px 4px rgb(255, 96, 96);
+    text-shadow: -1px -1px 4px rgb(96, 96, 255);
 }
 a, a:link, a:visited {
-    color: rgb(255, 128, 128);
+    color: rgb(128, 128, 255);
     text-decoration: none;
-    text-shadow: -1px -1px 4px rgb(255, 0, 0);
+    text-shadow: -1px -1px 4px rgb(0, 0, 255);
 }
 a:hover, a:active {
-    color: rgb(255, 240, 240);
-    text-shadow: -1px -1px 4px rgb(255, 240, 240);
+    color: rgb(240, 240, 255);
+    text-shadow: -1px -1px 4px rgb(240, 240, 255);
 }
 #navbar {
     width: 900px;
@@ -41,11 +41,16 @@ a:hover, a:active {
     vertical-align: middle;
     text-align: right;
 }
+#navbar-list {
+    vertical-align: middle;
+    text-align: right;
+    clear: right;
+}
 .navbar-right {
-    margin-right: -12px;
+    margin-right: 0px;
 }
 .navbar-inverse {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(4, 4, 48, 0.65);
     border: none;
 }
 .navbar-nav > li {
@@ -69,22 +74,22 @@ a:hover, a:active {
     text-align: right;
 }
 .navbar-inverse .navbar-nav > li > a, .navbar-inverse .navbar-nav > li > a:link, .navbar-inverse .navbar-nav > li > a:visited {
-    color: rgb(255, 178, 178);
+    color: rgb(178, 178, 255);
     font-weight: 600;
     text-align: right;
 }
 .navbar-inverse .navbar-nav > li > a:hover, .navbar-nav > li > a:active {
     color: rgb(255, 255, 255);
-    background-color: rgba(0, 0, 0, 0.1);
-    text-shadow: -1px -1px 5px rgb(255, 0, 0);
+    background-color: rgba(4, 4, 48, 0.65);
+    text-shadow: -1px -1px 5px rgb(0, 0, 255);
     -moz-box-shadow: inset 0px 0px 40px 0px rgba(0, 0, 0, 0.7);
     -webkit-box-shadow: inset 0px 0px 40px 0px rgba(0, 0, 0.7);
     -o-box-shadow: inset 0px 0px 40px 0px rgba(0, 0, 0, 0.7);
     box-shadow: inset 0px 0px 40px 0px rgba(0, 0, 0, 0.7);
 }
 .navbar-inverse .navbar-nav > li > a:hover > svg, .navbar-nav > li > a:active > svg {
-    -webkit-filter: drop-shadow( -1px -1px 5px rgb(255, 0, 0));
-    filter: drop-shadow(-1px -1px 5px rgb(255, 0, 0));
+    -webkit-filter: drop-shadow( -1px -1px 5px rgb(0, 0, 255));
+    filter: drop-shadow(-1px -1px 5px rgb(0, 0, 255));
 }
 @media screen and (max-width: 1200px) {
     #navbar {
@@ -105,7 +110,7 @@ a:hover, a:active {
     padding: 0;
 }
 .navbar-brand:hover, .navbar-brand:active {
-    text-shadow: -1px -1px 5px rgb(255, 0, 0);
+    text-shadow: -1px -1px 5px rgb(0, 0, 255);
 }
 .row {
     margin-left: 0px;
@@ -135,26 +140,26 @@ a:hover, a:active {
 }
 .footer a, .footer a:link, .footer a:visited {
     font-weight: 600;
-    color: rgb(255, 96, 96);
+    color: rgb(96, 96, 255);
 }
 .footer a:hover, .footer a:active {
-    color: rgb(255, 240, 240);
-    text-shadow: -1px -1px 4px rgb(255, 240, 240);
+    color: rgb(240, 240, 255);
+    text-shadow: -1px -1px 4px rgb(240, 240, 255);
 }
 .carousel-control {
     width: 6%;
 }
 .pagecontent {
     padding: 8px 0px 0px 0px;
-    background-color: rgba(16, 16, 16, .7);
+    background-color: rgba(4, 4, 48, .65);
 }
 .navbar {
     margin-bottom: unset;
 }
 button, input, button, select, textarea {
     color: rgb(255, 255, 255);
-    background-color: rgb(32, 0, 0);
-    border-color: rgb(192, 0, 0);
+    background-color: rgb(0, 0, 32);
+    border-color: rgb(0, 0, 192);
 }
 input[type="text"], input[type="submit"] {
     padding: 2px 6px 2px 6px;
@@ -180,17 +185,17 @@ input[type="text"], input[type="submit"] {
     left: 0;
     height: 16px;
     width: 16px;
-    background-color: rgb(128, 0, 0);
+    background-color: rgb(0, 0, 128);
     border-radius: 50%;
 }
 .radiobox:hover input ~ .radiomark {
-    background-color: rgb(192, 0, 0);
+    background-color: rgb(0, 0, 192);
 }
 .radiobox input:checked ~ .radiomark {
-    background-color: rgb(128, 0, 0);
+    background-color: rgb(0, 0, 128);
 }
 .radiobox:hover input:checked ~ .radiomark {
-    background-color: rgb(192, 0, 0);
+    background-color: rgb(0, 0, 192);
 }
 .radiomark:after {
     content: "";
