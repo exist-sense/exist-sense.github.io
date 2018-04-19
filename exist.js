@@ -83,8 +83,6 @@ function makeset() {
         ready: false,
         access: {},
         cookies: {},
-        attrs: [ 'group', 'label', 'priority' ],
-        items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
         moods: {
             '1': { group: 'terrible', label: 'Terrible' },
             '2': { group: 'bad', label: 'Bad' },
@@ -164,7 +162,7 @@ function makeset() {
                 },
                 pef: {
                     label: 'Peak expiratory flow',
-                    value_type_description: 'L/min'
+                    value_type_description: 'Volume (L/min)'
                 },
                 sq: {
                     label: 'Sleep quality',
@@ -251,31 +249,43 @@ var exist = {
         }
         else return data.value;
     },
-    makergba: function(xr, xg, xb, a, value) {
-        var v = value || 1.0,
-            r = Math.floor(Math.min(xr * v, 255)),
-            g = Math.floor(Math.min(xg * v, 255)),
-            b = Math.floor(Math.min(xb * v, 255));
+    makergba: function(xr, xg, xb, xa, xv) {
+        var a = xa || 1.0, v = xv || 1.0,
+            r = Math.floor(Math.max(Math.min(xr * v, 255), 0)),
+            g = Math.floor(Math.max(Math.min(xg * v, 255), 0)),
+            b = Math.floor(Math.max(Math.min(xb * v, 255), 0));
         return 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
     },
-    makecol: function(alpha, value) {
-        var a = alpha || 1.0;
+    makecol: function(xa, xv) {
+        var a = xa || 1.0, v = xv || 1.0;
         return [
-            exist.makergba(32,  255, 32,  a, value),
-            exist.makergba(200, 32,  32,  a, value),
-            exist.makergba(200, 128, 32,  a, value),
-            exist.makergba(200, 32,  200, a, value),
-            exist.makergba(128, 200, 255, a, value),
-            exist.makergba(255, 255, 64,  a, value),
-            exist.makergba(255, 32,  32,  a, value),
-            exist.makergba(64,  128, 255, a, value),
-            exist.makergba(42,  42,  192, a, value),
-            exist.makergba(32,  255, 64,  a, value),
-            exist.makergba(255, 255, 32,  a, value),
-            exist.makergba(255, 128, 255, a, value),
-            exist.makergba(255, 128, 64,  a, value),
-            exist.makergba(64,  64,  255, a, value),
+            exist.makergba(32,  255, 32,  a, v),
+            exist.makergba(200, 32,  32,  a, v),
+            exist.makergba(200, 128, 32,  a, v),
+            exist.makergba(200, 32,  200, a, v),
+            exist.makergba(128, 200, 255, a, v),
+            exist.makergba(255, 255, 64,  a, v),
+            exist.makergba(255, 32,  32,  a, v),
+            exist.makergba(64,  128, 255, a, v),
+            exist.makergba(42,  42,  192, a, v),
+            exist.makergba(32,  255, 64,  a, v),
+            exist.makergba(255, 255, 32,  a, v),
+            exist.makergba(255, 128, 255, a, v),
+            exist.makergba(255, 128, 64,  a, v),
+            exist.makergba(64,  64,  255, a, v),
         ];
+    },
+    makescol: function(xr, xa, xv) {
+        var r = Math.min(Math.max(xr, 0), 5), a = xa || 1.0, v = xv || 1.0,
+            data = [
+                exist.makergba(128, 128, 128, a, v),
+                exist.makergba(255, 32,  32,  a, v),
+                exist.makergba(255, 128, 32,  a, v),
+                exist.makergba(255, 255, 32,  a, v),
+                exist.makergba(32,  255, 128, a, v),
+                exist.makergba(32,  255, 32,  a, v),
+            ];
+        return data[r];
     },
     colour: function(iter, alpha, value) {
         var colours = exist.makecol(alpha, value);
@@ -296,7 +306,7 @@ var exist = {
         var load = document.getElementById('exist-status');
         if(load) {
             if(title && title != '') {
-                load.innerHTML = exist.fa(type, '#FFCCCC', 0) + ' ' + title;
+                load.innerHTML = exist.fa(type, exist.makergba(255, 200, 200), 0) + ' ' + title;
                 load.visibility = 'visible';
             }
             else {
@@ -305,12 +315,8 @@ var exist = {
             }
         }
     },
-    setrange: function(data) {
-        exist.checkurl({range: data});
-        return false;
-    },
     rangeanc: function(range, len) {
-        return ' | <a href="#" onclick="return exist.setrange(' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
+        return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
     },
     auth: function() {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
@@ -323,6 +329,7 @@ var exist = {
         makecookie('token_type', '', 0);
         exist.settings.cookies.token_type = null;
         exist.start();
+        return false;
     },
     checkurl: function(values, chg) {
         var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0], print = exist.config('page.print');
@@ -365,7 +372,7 @@ var exist = {
             value = vars ? opts : hash[0];
         }
         if(!exist.config('ready') || exist.config('page.print') != print) {
-            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
+            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
             var head = document.getElementById('exist-header');
             if(head) head.innerHTML = '';
             Chart.defaults.global.defaultColor = fgcol;
@@ -396,6 +403,12 @@ var exist = {
             else window.history.pushState({}, document.title, value);
         }
         if(!exist.load.more() && exist.config('ready')) window.setTimeout(exist.load.draw, 50);
+    },
+    seturl: function(id, data) {
+        var value = {};
+        value[id] = data;
+        exist.checkurl(value);
+        return false;
     },
     start: function() {
         exist.settings.cookies = {};
@@ -518,6 +531,8 @@ var exist = {
         },
     },
     load: {
+        attrs: [ 'group', 'label', 'priority' ],
+        items: [ 'attribute', 'label', 'priority', 'private', 'service', 'value', 'value_type', 'value_type_description' ],
         data: function(data) {
             for(var i = 0; i < data.length; i++) {
                 var attr = data[i], group = attr['group'];
@@ -559,8 +574,8 @@ var exist = {
                                     };
                                 }
                                 if(exist.data[name][slug] == null) exist.data[name][slug] = {};
-                                for(var k = 0; k < exist.settings.items.length; k++) {
-                                    var ex = exist.settings.items[k];
+                                for(var k = 0; k < exist.load.items.length; k++) {
+                                    var ex = exist.load.items[k];
                                     if(ex == 'attribute') exist.data[name][slug][ex] = slug;
                                     else if(ex == 'label') exist.data[name][slug][ex] = slug == 'pef' ? 'Peak Expiratory Flow' : (isnum ? slug.capital() : label);
                                     else if(ex == 'value' && isnum)
@@ -599,8 +614,8 @@ var exist = {
                                     };
                                 }
                                 if(exist.data[name][name] == null) exist.data[name][name] = {};
-                                for(var k = 0; k < exist.settings.items.length; k++) {
-                                    var ex = exist.settings.items[k];
+                                for(var k = 0; k < exist.load.items.length; k++) {
+                                    var ex = exist.load.items[k];
                                     exist.data[name][name][ex] = item[ex];
                                 }
                             }
@@ -609,14 +624,14 @@ var exist = {
                 }
                 else {
                     if(exist.data[group] == null) exist.data[group] = {};
-                    for(var j = 0; j < exist.settings.attrs.length; j++) {
-                        exist.data[group][exist.settings.attrs[j]] = attr[exist.settings.attrs[j]];
+                    for(var j = 0; j < exist.load.attrs.length; j++) {
+                        exist.data[group][exist.load.attrs[j]] = attr[exist.load.attrs[j]];
                     }
                     for(var j = 0; j < attr.items.length; j++) {
                         var item = attr.items[j];
                         if(exist.data[group][item.attribute] == null) exist.data[group][item.attribute] = {};
-                        for(var k = 0; k < exist.settings.items.length; k++) {
-                            var ex = exist.settings.items[k];
+                        for(var k = 0; k < exist.load.items.length; k++) {
+                            var ex = exist.load.items[k];
                             if(ex == 'value' && (item['value_type_description'] == 'Percentage' || item['value_type_description'] == 'Percentage (%)'))
                                 exist.data[group][item.attribute][ex] = parseInt(item[ex] * 100);
                             else exist.data[group][item.attribute][ex] = item[ex];
@@ -893,7 +908,7 @@ var exist = {
                     var weather = exist.data.weather, par = span.makechild('p', 'exist-title-info-weather', 'exist-left');
                     if(exist.value(weather.weather_icon, date))
                         par.innerHTML += ' <img src="https://exist.io/static/img/weather/' + exist.value(weather.weather_icon, date) + '.png" title="' + exist.value(weather.weather_summary, date) + '" class="exist-icon" />';
-                    else par.innerHTML += ' ' + exist.fa('fas fa-sun', '#FFFF00', 4, '0px 4px 0px 0px');
+                    else par.innerHTML += ' ' + exist.fa('fas fa-sun', exist.makergba(255, 255, 0), 4, '0px 4px 0px 0px');
                     if(exist.value(weather.weather_summary, date))
                         par.innerHTML += ' <i>' + exist.value(weather.weather_summary, date) + '</i>';
                     if(exist.value(weather.weather_temp_min, date))
@@ -938,10 +953,10 @@ var exist = {
                     if(exist.chart.clickwait == null) exist.chart.clickwait = '';
                     var label = values.target.id.replace('exist-chart-', ''), bits = label.split('-');
                     if(bits.length >= 2 && exist.data[bits[0]] && exist.data[bits[0]][bits[1]] && exist.data[bits[0]][bits[1]].value_type_description == 'Boolean') label = bits[0];
-                    exist.checkurl({values: label});
+                    exist.seturl('values', label);
                 }
                 else {
-                    exist.checkurl({values: exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null});
+                    exist.seturl('values', exist.chart.clickwait && exist.chart.clickwait != '' ? exist.chart.clickwait : null);
                     exist.chart.clickwait = null;
                 }
                 window.setTimeout(function(){window.scrollTo(0, $('#' + values.target.id).offset().top-($(window).height()/2)+($('#' + values.target.id).height()/2));}, 200);
@@ -965,7 +980,7 @@ var exist = {
             return data;
         },
         scale: function(min, max, display, label, isbool) {
-            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
+            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
             var data = {
                 display: display || false,
                 position: 'left',
@@ -975,14 +990,14 @@ var exist = {
                 fontStyle: 'bold',
                 gridLines: {
                     display: display || false,
-                    color: '#333333',
+                    color: exist.makergba(32, 32, 32),
                     lineWidth: 1,
                     drawBorder: display || false,
                     drawOnChartArea: display || false,
                     drawTicks: display || false,
                     tickMarkLength: 4,
                     zeroLineWidth: 0,
-                    zeroLineColor: '#333333',
+                    zeroLineColor: exist.makergba(32, 32, 32),
                     zeroLineBorderDash: [],
                     zeroLineBorderDashOffset: 0,
                     offsetGridLines: min == null && isbool ? true : false,
@@ -1022,7 +1037,7 @@ var exist = {
             return data;
         },
         config: function(id, type, title, name, isbool, len, descs) {
-            var print = exist.config('page.print'), bgcol = print ? '#FFFFFF' : '#000000', fgcol = print ? '#000000' : '#FFFFFF', brcol = print ? '#444444' : '#BBBBBB';
+            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
             var data = {
                 id: 'exist-chart-' + id,
                 type: type,
