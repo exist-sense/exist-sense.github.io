@@ -379,7 +379,7 @@ var exist = {
         return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
     },
     auth: function() {
-        window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
+        window.location = 'https://exist.io/oauth2/authorize?response_type=code&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
     },
     switch: function() {
         makecookie('access_token', '', 0);
