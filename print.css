@@ -113,3 +113,10 @@ dt, th {
     padding: 0px;
     margin: 0px;
 }
+.hide-print {
+    border-collapse: collapse;
+    visibility: hidden;
+    display: none;
+    width: 0px;
+    height: 0px;
+}
