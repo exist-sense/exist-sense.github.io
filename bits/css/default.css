@@ -44,7 +44,7 @@ h1, h2, h3, h4, h5, h6 {
     margin: 6px 0px 8px 0px;
     color: rgb(255, 255, 255);
     font-weight: 600;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
     text-shadow: -1px -1px 4px rgb(0, 0, 255);
 }
 h1 > svg, h2 > svg, h3 > svg, h4 > svg, h5 > svg, h6 > svg, h1 > a > svg, h2 > a > svg, h3 > a > svg, h4 > a > svg, h5 > a > svg, h6 > a > svg {

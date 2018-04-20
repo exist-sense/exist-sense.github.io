@@ -432,15 +432,8 @@ var exist = {
             value = vars ? opts : hash[0];
         }
         if(!exist.config('ready') || exist.config('page.print') != print) {
-            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
             var head = document.getElementById('exist-body');
             if(head) head.innerHTML = '';
-            Chart.defaults.global.defaultColor = fgcol;
-            Chart.defaults.global.defaultFontColor = fgcol;
-            Chart.defaults.global.defaultFontFamily = 'monospace';
-            Chart.defaults.global.defaultFontSize = 11;
-            Chart.defaults.global.defaultFontStyle = 'bold';
-            Chart.defaults.global.showLines = true;
             var hdr = document.getElementsByTagName('head');
             if(hdr) {
                 var ccss = document.getElementsByClassName('exist-css');
@@ -1036,6 +1029,20 @@ var exist = {
         clickwait: null,
         width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
         height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
+        defaults: function() {
+            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
+            Chart.defaults.global.defaultColor = fgcol;
+            Chart.defaults.global.defaultFontColor = fgcol;
+            Chart.defaults.global.defaultFontFamily = 'monospace';
+            Chart.defaults.global.defaultFontSize = exist.chart.size(11);
+            Chart.defaults.global.defaultFontStyle = 'bold';
+            Chart.defaults.global.showLines = true;
+        },
+        size: function(size) {
+            var sz = size, sq = exist.chart.width/1920.0; // 11 - 7 = 4, 640 / 1920 = 0.3333333333333333
+            if(sq < 1.0) sz -= (size-6)*(1.0-sq);
+            return Math.max(sz, 6);
+        },
         click: function(values, name) {
             if(values.target.id) {
                 if(exist.chart.clickwait == null) {
@@ -1060,7 +1067,7 @@ var exist = {
                 data: [],
                 spanGaps: true,
                 fontColor: col,
-                fontSize: 11,
+                fontSize: exist.chart.size(11),
                 fontStyle: 'bold',
                 backgroundColor: col,
                 borderColor: brcol,
@@ -1076,7 +1083,7 @@ var exist = {
                 position: 'left',
                 offset: true,
                 fontColor: fgcol,
-                fontSize: 11,
+                fontSize: exist.chart.size(11),
                 fontStyle: 'bold',
                 gridLines: {
                     display: display || false,
@@ -1097,7 +1104,7 @@ var exist = {
                 scaleLabel: {
                     display: min != null ? true : false,
                     fontColor: brcol,
-                    fontSize: 10,
+                    fontSize: exist.chart.size(10),
                     fontStyle: 'bold',
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
@@ -1119,7 +1126,7 @@ var exist = {
                     autoSkipPadding: 0,
                     labelOffset: 0,
                     fontColor: brcol,
-                    fontSize: 10,
+                    fontSize: exist.chart.size(10),
                     fontStyle: 'bold',
                     fontFamily: 'monospace'
                 },
@@ -1189,23 +1196,23 @@ var exist = {
                         position: 'nearest',
                         intersect: true,
                         backgroundColor: bgcol,
-                        fontSize: 10,
+                        fontSize: exist.chart.size(10),
                         titleFontStyle: 'bold',
                         titleSpacing: 0,
                         titleMarginBottom: 0,
-                        titleFontSize: 10,
+                        titleFontSize: exist.chart.size(10),
                         titleFontColor: fgcol,
                         titleAlign: 'left',
                         bodySpacing: 0,
                         bodyFontColor: fgcol,
                         bodyFontStyle: 'bold',
-                        bodyFontSize: isbool ? 0 : 10,
+                        bodyFontSize: isbool ? 0 : exist.chart.size(10),
                         bodyAlign: 'left',
                         footerFontStyle: 'bold',
                         footerSpacing: 0,
                         footerMarginTop: 0,
                         footerFontColor: fgcol,
-                        footerFontSize: isbool ? 0 : 10,
+                        footerFontSize: isbool ? 0 : exist.chart.size(10),
                         footerAlign: 'left',
                         yPadding: 3,
                         xPadding: 4,
@@ -1234,23 +1241,25 @@ var exist = {
                     legend: {
                         display: len > 1 ? true : false,
                         position: 'top',
-                        fontColor: fgcol,
-                        fontSize: 11,
-                        fontStyle: 'bold',
                         fullWidth: false,
-                        reverse: false,
-                        weight: 1000,
-                        boxWidth: 8,
-                        padding: 1
+                        labels: {
+                            boxWidth: 11,
+                            fontColor: fgcol,
+                            fontSize: exist.chart.size(11),
+                            fontStyle: 'bold',
+                            reverse: false,
+                            weight: 1000,
+                            padding: 8
+                        }
                     },
                     title: {
                         display: len <= 1 ? true : false,
                         fontColor: fgcol,
-                        fontSize: 11,
+                        fontSize: exist.chart.size(11),
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 1.4,
-                        padding: 4,
+                        lineHeight: 0.5,
+                        padding: 8,
                         position: 'top',
                         weight: 2000,
                         text: title,
@@ -1361,7 +1370,7 @@ var exist = {
                         var sz = size;
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
-                            if(sq > 1.0) sq = 1.0+((sq-1.0)*0.55);
+                            if(sq > 1.0) sq = 1.0+((sq-1.0)*0.5);
                             sz = 20.0*sq;
                             if(range > 31) sz += sz*((range-31)/31.0)*0.0625;
                             t = a.label + ': ' + b.label;
@@ -1428,6 +1437,7 @@ var exist = {
             }
         },
         display: function() {
+            exist.chart.defaults();
             exist.chart.resetwait = false;
             exist.chart.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
             exist.chart.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
