@@ -142,12 +142,12 @@ function makeset() {
                 label: 'Personal',
                 cycle: {
                     label: 'Bipolar cycle',
-                    value_type_description: '1 to 5',
+                    value_type_description: 'Scale (1 to 5)',
                     minval: 1,
                     maxval: 5,
                 },
                 pain: {
-                    value_type_description: '0 to 5',
+                    value_type_description: 'Scale (0 to 5)',
                     minval: 0,
                     maxval: 5,
                 },
@@ -157,7 +157,7 @@ function makeset() {
                 },
                 sq: {
                     label: 'Sleep quality',
-                    value_type_description: '0 to 5',
+                    value_type_description: 'Scale (0 to 5)',
                     minval: 0,
                     maxval: 5,
                 }
@@ -190,7 +190,7 @@ function makeset() {
                     attribute: 'mood',
                     label: 'Mood',
                     value_type: 0,
-                    value_type_description: '1 to 5',
+                    value_type_description: 'Scale (1 to 5)',
                     minval: 1,
                     maxval: 5,
                     desc: {
@@ -923,7 +923,7 @@ var exist = {
     },
     day: {
         maketest: function(b, isbool, r, date) {
-            if(b == null || (r > 0 && b.priority != r)) return false;
+            if(b == null || b.value_type == null || (r > 0 && (b.priority || 1) != r)) return false;
             return true;
         },
         make: function(table, date, data, q) {
@@ -964,7 +964,9 @@ var exist = {
                         }
                         else irow.innerHTML += '<td style="width: 192px; text-align: right"><input type="text" autocomplete="off" id="exist-value-' + n + '" name="exist-value-' + n + '" value="' + (value || '') + '" style="width: 100%;" /></td>';
                         irow.innerHTML += '<td class="hide-small">' + o + '</td>';
-                        irow.innerHTML += '<td style="text-align: right"><label class="checkbox"><input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' /><span class="checkmark"></span></label></td>';
+                        irow.innerHTML += '<td style="text-align: right"><label class="checkbox" title="Owned by: ' + (b.service || 'none') + '">' +
+                            '<input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' />' + 
+                            '<span class="checkmark"></span></label></td>';
                     }
                 }
             }
@@ -1018,7 +1020,7 @@ var exist = {
                 var trow = thead.makechild('tr', 'exist-inner-finish');
                 trow.innerHTML += '<th colspan="4">Finished</th>';
                 var vrow = thead.makechild('tr', 'exist-inner-submit');
-                vrow.innerHTML += '<td colspan="2">Exist Sense will take ownership of the attributes marked as acquired to update them (not yet implemented).</td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" style="width: 100%" /></td>';
+                vrow.innerHTML += '<td colspan="2"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired.</td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
             }
         },
     },
