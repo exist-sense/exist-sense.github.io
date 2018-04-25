@@ -111,11 +111,11 @@ function makeset() {
                 group: 'activity',
                 label: 'Activity',
                 steps: { attribute: 'steps', label: 'Steps', value_type: 0, value_type_description: 'Count' },
-                steps_active_min: { attribute: 'steps_active_min', label: 'Active min', value_type: 3, value_type_description: 'Period (min)' },
+                steps_active_min: { attribute: 'steps_active_min', label: 'Active time', value_type: 3, value_type_description: 'Period (min)' },
                 steps_elevation: { attribute: 'steps_elevation', label: 'Elevation', value_type: 1, value_type_description: 'Distance (km)' },
                 floors: { attribute: 'floors', label: 'Floors', value_type: 0, value_type_description: 'Count' },
                 steps_distance: { attribute: 'steps_distance', label: 'Distance', value_type: 1, value_type_description: 'Distance (km)' },
-                cycle_min: { attribute: 'cycle_min', label: 'Cycle min', value_type: 3, value_type_description: 'Period (min)' },
+                cycle_min: { attribute: 'cycle_min', label: 'Cycle time', value_type: 3, value_type_description: 'Period (min)' },
                 cycle_distance: { attribute: 'cycle_distance', label: 'Cycle distance', value_type: 1, value_type_description: 'Distance (km)' },
             },
             workouts: {
@@ -129,13 +129,13 @@ function makeset() {
                 group: 'productivity',
                 label: 'Productivity',
                 productive_min: { attribute: 'productive_min', label: 'Productive', value_type: 3, value_type_description: 'Period (min)' },
-                neutral_min: { attribute: 'neutral_min', label: 'Neutral min', value_type: 3, value_type_description: 'Period (min)' },
+                neutral_min: { attribute: 'neutral_min', label: 'Neutral', value_type: 3, value_type_description: 'Period (min)' },
                 distracting_min: { attribute: 'distracting_min', label: 'Distracting', value_type: 3, value_type_description: 'Period (min)' },
-                commits: { attribute: 'commits', label: 'Commits', value_type: 0, value_type_description: 'Count' },
+                commits: { attribute: 'commits', label: 'Source code checkins', value_type: 0, value_type_description: 'Count' },
                 tasks_completed: { attribute: 'tasks_completed', label: 'Tasks', value_type: 0, value_type_description: 'Count' },
                 words_written: { attribute: 'words_written', label: 'Words', value_type: 0, value_type_description: 'Count' },
-                emails_sent: { attribute: 'emails_sent', label: 'Emails sent', value_type: 0, value_type_description: 'Count' },
-                emails_received: { attribute: 'emails_received', label: 'Emails received', value_type: 0, value_type_description: 'Count' },
+                emails_sent: { attribute: 'emails_sent', label: 'Emails out', value_type: 0, value_type_description: 'Count' },
+                emails_received: { attribute: 'emails_received', label: 'Emails in', value_type: 0, value_type_description: 'Count' },
             },
             personal: {
                 group: 'personal',
@@ -189,7 +189,6 @@ function makeset() {
                 mood: {
                     attribute: 'mood',
                     label: 'Mood',
-                    value_type: 0,
                     value_type_description: 'Scale (1 to 5)',
                     minval: 1,
                     maxval: 5,
@@ -206,17 +205,17 @@ function makeset() {
             sleep: {
                 group: 'sleep',
                 label: 'Sleep',
-                sleep: { attribute: 'sleep', label: 'Asleep', value_type: 3, value_type_description: 'Period (min)' },
-                time_in_bed: { attribute: 'time_in_bed', label: 'In bed', value_type: 3, value_type_description: 'Period (min)' },
-                sleep_start: { attribute: 'sleep_start', label: 'Start', value_type: 6, value_type_description: 'Time (mins from midday)' },
-                sleep_end: { attribute: 'sleep_end', label: 'End', value_type: 4, value_type_description: 'Time (mins from midnight)' },
+                sleep: { attribute: 'sleep', label: 'Sleep time', value_type: 3, value_type_description: 'Period (min)' },
+                time_in_bed: { attribute: 'time_in_bed', label: 'Time in bed', value_type: 3, value_type_description: 'Period (min)' },
+                sleep_start: { attribute: 'sleep_start', label: 'Sleep Start', value_type: 6, value_type_description: 'Time (mins from midday)' },
+                sleep_end: { attribute: 'sleep_end', label: 'Sleep End', value_type: 4, value_type_description: 'Time (mins from midnight)' },
                 sleep_awakenings: { attribute: 'sleep_awakenings', label: 'Awakenings', value_type: 0, value_type_description: 'Count' },
             },
             events: {
                 group: 'events',
                 label: 'Events',
                 events: { attribute: 'events', label: 'Events', value_type: 0, value_type_description: 'Count' },
-                events_duration: { attribute: 'events_duration', label: 'Duration', value_type: 3, value_type_description: 'Period (min)' },
+                events_duration: { attribute: 'events_duration', label: 'Time in events', value_type: 3, value_type_description: 'Period (min)' },
             },
             health: {
                 group: 'location',
@@ -235,8 +234,8 @@ function makeset() {
             media: {
                 group: 'media',
                 label: 'Media',
-                tracks: { attribute: 'tracks', label: 'Tracks', value_type: 0, value_type_description: 'Count' },
-                articles_read: { attribute: 'articles_read', label: 'Articles', value_type: 0, value_type_description: 'Count' },
+                tracks: { attribute: 'tracks', label: 'Tracks played', value_type: 0, value_type_description: 'Count' },
+                articles_read: { attribute: 'articles_read', label: 'Articles read', value_type: 0, value_type_description: 'Count' },
             },
             social: {
                 group: 'social',
@@ -253,18 +252,18 @@ function makeset() {
                 group: 'twitter',
                 label: 'Twitter',
                 tweets: { attribute: 'tweets', label: 'Tweets', value_type: 0, value_type_description: 'Count' },
-                twitter_mentions: { attribute: 'twitter_mentions', label: 'Mentions', value_type: 0, value_type_description: 'Count' },
-                twitter_username: { attribute: 'twitter_username', label: 'Username', value_type: 2, value_type_description: 'String' },
+                twitter_mentions: { attribute: 'twitter_mentions', label: 'Twitter mentions', value_type: 0, value_type_description: 'Count' },
+                twitter_username: { attribute: 'twitter_username', label: 'Twitter username', value_type: 2, value_type_description: 'String' },
             },
             weather: {
                 group: 'weather',
                 label: 'Weather',
-                weather_temp_max: { attribute: 'weather_temp_max', label: 'Maximum', value_type: 1, value_type_description: 'Temp (°C)' },
-                weather_temp_min: { attribute: 'weather_temp_min', label: 'Minimum', value_type: 1, value_type_description: 'Temp (°C)' },
+                weather_temp_max: { attribute: 'weather_temp_max', label: 'Max Temp', value_type: 1, value_type_description: 'Temp (°C)' },
+                weather_temp_min: { attribute: 'weather_temp_min', label: 'Min Temp', value_type: 1, value_type_description: 'Temp (°C)' },
                 weather_precipitation: { attribute: 'weather_precipitation', label: 'Precipitation', value_type: 1, value_type_description: 'Percentage (%)', value_conversion: 1 },
                 weather_cloud_cover: { attribute: 'weather_cloud_cover', label: 'Cloud cover', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
                 weather_wind_speed: { attribute: 'weather_wind_speed', label: 'Wind speed', value_type: 1, value_type_description: 'Speed (km/h)' },
-                weather_summary: { attribute: 'weather_summary', label: 'Summary', value_type: 2, value_type_description: 'String' },
+                weather_summary: { attribute: 'weather_summary', label: 'Weather summary', value_type: 2, value_type_description: 'String' },
                 weather_icon: { attribute: 'weather_icon', label: 'Icon', value_type: 2, value_type_description: 'String' },
                 sunrise: { attribute: 'sunrise', label: 'Sunrise', value_type: 4, value_type_description: 'Time (mins from midnight)' },
                 sunset: { attribute: 'sunset', label: 'Sunset', value_type: 6, value_type_description: 'Time (mins from midday)' },
@@ -830,7 +829,7 @@ var exist = {
                     for(var j in exist.data[i]) {
                         if(exist.data[i][j] == null || isfunc(exist.data[i][j])) continue;
                         if(exist.data[i][j].value_type != 2) {
-                            if(exist.data[i][j].value_conversion == 1) {
+                            if(exist.data[i][j].value_conversion == 1 && !exist.data[i][j].value_converted) {
                                 if(exist.data[i][j].value) exist.data[i][j].value = parseInt(exist.data[i][j].value * 100);
                                 exist.data[i][j].value_type = 0;
                                 for(var k in exist.data[i][j].values) {
@@ -839,6 +838,7 @@ var exist = {
                                         exist.data[i][j].values[k].value = parseInt(exist.data[i][j].values[k].value * 100);
                                     }
                                 }
+                                exist.data[i][j].value_converted = true;
                              }
                              if(exist.data[i][j].minval == null) {
                                 exist.data[i][j].minval = exist.data[i][j].value;
