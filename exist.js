@@ -917,9 +917,9 @@ var exist = {
             else {
                 if(head) {
                     head.innerHTML = '';
-                    var hrow = head.makechild('tr', 'exist-title-row'),
-                        hdr = hrow.makechild('td', 'exist-title-info'),
-                        span = hdr.makechild('span', 'exist-title-info');
+                    var hrow = head.makechild('tr', 'exist-title-row', 'exist-center'),
+                        hdr = hrow.makechild('td', 'exist-title-info', 'exist-center'),
+                        span = hdr.makechild('span', 'exist-title-info', 'exist-center');
                         span.innerHTML += '<h4>About Exist Sense</h4>';
                         span.innerHTML += '<p>Exist Sense is a work in progress web app which aims to provide an interface to all Exist data along with converting custom tags into usable values. My main goal was to generate charts for my doctor, so all the app really does at the moment at the moment is spit out charts (because that was the point), but basically, it can detect custom tags which specify numeric values, and group together string values.</p>';
                         span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 31), and a value selector (<tt>#values=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&values=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
@@ -976,7 +976,7 @@ var exist = {
                             acquired = b.service == 'exist_sense' ? true : false, irow = table.makechild('tr', 'exist-day-' + n);
                         if(b.offset) t += ' (last night)';
                         irow.innerHTML += '<td style="text-align: right;"><b>' + t + '</b></td>';
-                        if(isbool) irow.innerHTML += '<td style="width: 192px; text-align: right;"><label class="checkbox"><input type="checkbox" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value ? 'checked' : '') + ' /><span class="checkmark"></span></label></td>';
+                        if(isbool) irow.innerHTML += '<td style="width: 200px; text-align: right;"><label class="checkbox"><input type="checkbox" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value ? 'checked' : '') + ' /><span class="checkmark"></span></label></td>';
                         else if((b.minval == 0 || b.minval == 1) && (b.maxval >= 5 && b.maxval <= (list[0] == 'personal' ? 10 : 5))) {
                             var inputs = '';
                             for(var z = b.minval; z <= b.maxval; z++) {
@@ -984,9 +984,9 @@ var exist = {
                                 if(z == 6) inputs += '<br />';
                                 inputs += '<label class="radiobox" title="' + desc + '"><input type="radio" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value == z ? 'checked' : '') + ' /><span id="value-' + (b.invert && z > 0 ? 11-z : z) + '" class="radiomark"></span></label>';
                             }
-                            irow.innerHTML += '<td style="width: 192px; text-align: right">' + inputs + '</td>';
+                            irow.innerHTML += '<td style="width: 200px; text-align: right">' + inputs + '</td>';
                         }
-                        else irow.innerHTML += '<td style="width: 192px; text-align: right"><input type="text" autocomplete="off" id="exist-value-' + n + '" name="exist-value-' + n + '" value="' + (value || '') + '" style="width: 100%;" /></td>';
+                        else irow.innerHTML += '<td style="width: 200px; text-align: right"><input type="text" autocomplete="off" id="exist-value-' + n + '" name="exist-value-' + n + '" value="' + (value || '') + '" style="width: 100%;" /></td>';
                         irow.innerHTML += '<td class="hide-small">' + o + '</td>';
                         irow.innerHTML += '<td style="text-align: right"><label class="checkbox" title="Owned by: ' + (b.service || 'none') + '">' +
                             '<input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' />' + 
@@ -1010,9 +1010,9 @@ var exist = {
             var head = document.getElementById('exist-body'), day = (date != makedate() ? (date != makedate(-1) ? date : 'yesterday') : 'today');
             if(head) {
                 head.innerHTML = '';
-                var hrow = head.makechild('tr', 'exist-title-row'),
-                    hdr = hrow.makechild('td', 'exist-title-info'),
-                    span = hdr.makechild('span', 'exist-title-info');
+                var hrow = head.makechild('tr', 'exist-title-row', 'exist-center'),
+                    hdr = hrow.makechild('td', 'exist-title-info', 'exist-center'),
+                    span = hdr.makechild('span', 'exist-title-info', 'exist-center');
                 span.makechild('h4', 'exist-title-info-welcome').innerHTML = 'Welcome ' + exist.info.first_name + ', here is your data for ' + day;
                 if(exist.value(exist.data.weather.weather_summary, date)) {
                     var weather = exist.data.weather, par = span.makechild('p', 'exist-title-info-weather');
@@ -1032,6 +1032,7 @@ var exist = {
                 var table = form.makechild('table', 'exist-inner'),
                     thead = table.makechild('thead', 'exist-inner-head'),
                     c = exist.config('page.values');
+                table.align = 'center';
                 if(c) {
                     var d = c.split(',');
                     for(var q = 0; q < d.length; q++) exist.day.make(thead, date, d[q], 0);
@@ -1042,7 +1043,7 @@ var exist = {
                     }
                 }
                 var trow = thead.makechild('tr', 'exist-inner-finish');
-                trow.innerHTML += '<th colspan="4">Finished</th>';
+                trow.innerHTML += '<th colspan="2">Finished</th><th class="hide-small"></th><th></th>';
                 var vrow = thead.makechild('tr', 'exist-inner-submit');
                 vrow.innerHTML += '<td colspan="2"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired.</td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
             }
@@ -1396,9 +1397,9 @@ var exist = {
                         var sz = size;
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
-                            if(sq > 1.0) sq = 1.0+((sq-1.0)*0.5);
-                            sz = 20.0*sq;
-                            if(range > 31) sz += sz*((range-31)/31.0)*0.0625;
+                            if(sq > 1.0) sq = 1.0+(sq-1.0);
+                            sz = 11.0*sq;
+                            if(range > 31) sz += sz*((range-31)/31.0)*0.15;
                             t = a.label + ': ' + b.label;
                         }
                         else {
@@ -1434,7 +1435,7 @@ var exist = {
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 31, count = [],
                 c = exist.config('page.values'), sq = 1920.0/exist.chart.width,
-                size = 52.0*(sq > 1.0 ? 1.0+((sq-1.0)*0.5) : 1.0);
+                size = 31.0*(sq > 1.0 ? 1.0+(sq-1.0) : 1.0);
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
@@ -1465,7 +1466,7 @@ var exist = {
         display: function() {
             exist.chart.defaults();
             exist.chart.resetwait = false;
-            exist.chart.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+            exist.chart.width = exist.config('page.print') ? 1800 : (window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth);
             exist.chart.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
             var head = document.getElementById('exist-body');
             if(head) {

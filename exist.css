@@ -104,7 +104,7 @@ canvas {
     font-size: 16px;
 }
 #exist-inner {
-    width: 100%;
+    //width: 100%;
     max-width: 100%;
     border: 0px;
     vertical-align: middle;

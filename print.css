@@ -1,4 +1,7 @@
 @charset "utf-8";
+.container {
+    width: 1600px;
+}
 .exist-bg1, #exist-h-row, #exist-title-row {
     background-color: rgba(255, 255, 255, 0.25);
 }
