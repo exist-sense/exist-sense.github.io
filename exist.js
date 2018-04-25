@@ -696,6 +696,7 @@ var exist = {
                                     exist.data[name][name][ex] = item[ex];
                                 }
                             }
+                            exist.data[name][slug].value_converted = false;
                         }
                     }
                 }
@@ -711,6 +712,7 @@ var exist = {
                             var ex = exist.load.items[k];
                             exist.data[group][item.attribute][ex] = item[ex];
                         }
+                        exist.data[group][item.attribute].value_converted = false;
                     }
                 }
             }
@@ -775,6 +777,7 @@ var exist = {
                                 }
                             }
                             else exist.data[name][slug]['values'][item.date] = { value: item.value };
+                            exist.data[name][slug]['values'][item.date].value_converted = false;
                         }
                     }
                 }
@@ -792,6 +795,7 @@ var exist = {
                             exist.data[group][attr.attribute]['values'][item.date]['group'] = moods[val].group;
                             exist.data[group][attr.attribute]['values'][item.date]['label'] = moods[val].label;
                         }
+                        exist.data[group][attr.attribute]['values'][item.date].value_converted = false;
                     }
                 }
             }
@@ -844,16 +848,21 @@ var exist = {
                     for(var j in exist.data[i]) {
                         if(exist.data[i][j] == null || isfunc(exist.data[i][j])) continue;
                         if(exist.data[i][j].value_type != 2) {
-                            if(exist.data[i][j].value_conversion == 1 && !exist.data[i][j].value_converted) {
-                                if(exist.data[i][j].value) exist.data[i][j].value = parseInt(exist.data[i][j].value * 100);
+                            if(exist.data[i][j].value_conversion == 1) {
+                                if(!exist.data[i][j].value_converted && exist.data[i][j].value) {
+                                    exist.data[i][j].value = parseInt(exist.data[i][j].value * 100);
+                                    exist.data[i][j].value_converted = true;
+                                }
                                 exist.data[i][j].value_type = 0;
                                 for(var k in exist.data[i][j].values) {
                                     if(!exist.data[i][j].values[k] || isfunc(exist.data[i][j].values[k])) continue;
                                     if(exist.data[i][j].values[k].value) {
-                                        exist.data[i][j].values[k].value = parseInt(exist.data[i][j].values[k].value * 100);
+                                        if(!exist.data[i][j].values[k].value_converted) {
+                                            exist.data[i][j].values[k].value = parseInt(exist.data[i][j].values[k].value * 100);
+                                            exist.data[i][j].values[k].value_converted = true;
+                                        }
                                     }
                                 }
-                                exist.data[i][j].value_converted = true;
                              }
                              if(exist.data[i][j].minval == null) {
                                 exist.data[i][j].minval = exist.data[i][j].value;
