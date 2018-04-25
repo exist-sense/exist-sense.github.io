@@ -954,7 +954,7 @@ var exist = {
             var list = data.split('-'), a = exist.data[list[0]];
             if(a && (q <= 0 || a.priority == q)) {
                 var trow = table.makechild('tr', 'exist-inner-row');
-                trow.innerHTML += '<th colspan="2">' + a.label + '</th><th class="hide-small"></th><th style="text-align: right; font-size: 12px;">Acquired</th>';
+                trow.innerHTML += '<th colspan="2">' + a.label + '</th><th class="hide-small"></th><th class="hide-small"></th><th style="text-align: right; font-size: 12px;">Acquired</th>';
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
                         if(isfunc(a[j])) continue;
@@ -974,7 +974,6 @@ var exist = {
                         var n = list[0] + '-' + j, o = b.value_type_description, t = b.label,
                             value = b.values != null && b.values[date] != null && b.values[date].value != null ? b.values[date].value : null,
                             acquired = b.service == 'exist_sense' ? true : false, irow = table.makechild('tr', 'exist-day-' + n);
-                        if(b.offset) t += ' (last night)';
                         irow.innerHTML += '<td style="text-align: right;"><b>' + t + '</b></td>';
                         if(isbool) irow.innerHTML += '<td style="width: 200px; text-align: right;"><label class="checkbox"><input type="checkbox" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value ? 'checked' : '') + ' /><span class="checkmark"></span></label></td>';
                         else if((b.minval == 0 || b.minval == 1) && (b.maxval >= 5 && b.maxval <= (list[0] == 'personal' ? 10 : 5))) {
@@ -987,7 +986,8 @@ var exist = {
                             irow.innerHTML += '<td style="width: 200px; text-align: right">' + inputs + '</td>';
                         }
                         else irow.innerHTML += '<td style="width: 200px; text-align: right"><input type="text" autocomplete="off" id="exist-value-' + n + '" name="exist-value-' + n + '" value="' + (value || '') + '" style="width: 100%;" /></td>';
-                        irow.innerHTML += '<td class="hide-small">' + o + '</td>';
+                        irow.innerHTML += '<td class="hide-small">' + (b.offset ? 'Last night' : 'Today') + '</td>';
+                        irow.innerHTML += '<td class="hide-small"><i>' + o + '</i></td>';
                         irow.innerHTML += '<td style="text-align: right"><label class="checkbox" title="Owned by: ' + (b.service || 'none') + '">' +
                             '<input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' />' + 
                             '<span class="checkmark"></span></label></td>';
@@ -1043,9 +1043,9 @@ var exist = {
                     }
                 }
                 var trow = thead.makechild('tr', 'exist-inner-finish');
-                trow.innerHTML += '<th colspan="2">Finished</th><th class="hide-small"></th><th></th>';
+                trow.innerHTML += '<th colspan="2">Finished</th><th class="hide-small"></th><th class="hide-small"></th><th></th>';
                 var vrow = thead.makechild('tr', 'exist-inner-submit');
-                vrow.innerHTML += '<td colspan="2"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired.</td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
+                vrow.innerHTML += '<td colspan="2"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired.</td><td class="hide-small"></td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
             }
         },
     },
