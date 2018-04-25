@@ -137,31 +137,6 @@ function makeset() {
                 emails_sent: { attribute: 'emails_sent', label: 'Emails out', value_type: 0, value_type_description: 'Count' },
                 emails_received: { attribute: 'emails_received', label: 'Emails in', value_type: 0, value_type_description: 'Count' },
             },
-            personal: {
-                group: 'personal',
-                label: 'Personal',
-                cycle: {
-                    label: 'Bipolar cycle',
-                    value_type_description: 'Scale (1 to 5)',
-                    minval: 1,
-                    maxval: 5,
-                },
-                pain: {
-                    value_type_description: 'Scale (0 to 5)',
-                    minval: 0,
-                    maxval: 5,
-                },
-                pef: {
-                    label: 'Peak expiratory flow',
-                    value_type_description: 'Volume (L/min)',
-                },
-                sq: {
-                    label: 'Sleep quality',
-                    value_type_description: 'Scale (0 to 5)',
-                    minval: 0,
-                    maxval: 5,
-                }
-            },
             food: {
                 group: 'food',
                 label: 'Food and drink',
@@ -267,7 +242,49 @@ function makeset() {
                 weather_icon: { attribute: 'weather_icon', label: 'Icon', value_type: 2, value_type_description: 'String' },
                 sunrise: { attribute: 'sunrise', label: 'Sunrise', value_type: 4, value_type_description: 'Time (mins from midnight)' },
                 sunset: { attribute: 'sunset', label: 'Sunset', value_type: 6, value_type_description: 'Time (mins from midday)' },
-            }
+            },
+            personal: {
+                group: 'personal',
+                label: 'Personal',
+                bpd: {
+                    label: 'Bipolar cycle',
+                    value_type_description: 'Scale (1 to 5)',
+                    minval: 1,
+                    maxval: 5,
+                },
+                pain: {
+                    value_type_description: 'Scale (0 to 5)',
+                    invert: true,
+                    minval: 0,
+                    maxval: 5,
+                },
+                pef: {
+                    label: 'Peak expiratory flow',
+                    value_type_description: 'Volume (L/min)',
+                },
+                sq: {
+                    label: 'Sleep quality',
+                    value_type_description: 'Scale (0 to 5)',
+                    minval: 0,
+                    maxval: 5,
+                }
+            },
+            med: {
+                group: 'med',
+                label: 'Medication',
+            },
+            pact: {
+                group: 'pact',
+                label: 'Predominant activity',
+            },
+            proj: {
+                group: 'proj',
+                label: 'Active project',
+            },
+            symp: {
+                group: 'symp',
+                label: 'Symptom',
+            },
         },
         print: {
             on: ['/print.css'],
@@ -622,14 +639,13 @@ var exist = {
                                     isnum = true;
                                     start = 2;
                                 }
-                                var quot = 0, off = false, inv = false;
+                                var quot = 0, off = false;
                                 for(var n = start; n < values.length; n++) {
-                                    if(values[n] == 'zq') {
+                                    if(values[n] == 'q') {
                                         label = label + ' (';
                                         quot++;
                                     }
-                                    else if(values[n] == 'zn') off = true;
-                                    else if(values[n] == 'zi') inv = true;
+                                    else if(values[n] == 'n') off = true;
                                     else {
                                         var v = quot ? values[n] : values[n].capital();
                                         label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
@@ -646,7 +662,7 @@ var exist = {
                                         priority: item.priority
                                     };
                                 }
-                                if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, invert: inv };
+                                if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off };
                                 for(var k = 0; k < exist.load.items.length; k++) {
                                     var ex = exist.load.items[k];
                                     if(ex == 'attribute') exist.data[name][slug][ex] = slug;
@@ -712,14 +728,13 @@ var exist = {
                         isnum = true;
                         start = 2;
                     }
-                    var quot = 0, off = false, inv = false;
+                    var quot = 0, off = false;
                     for(var n = start; n < values.length; n++) {
-                        if(values[n] == 'zq') {
+                        if(values[n] == 'q') {
                             label = label + ' (';
                             quot++;
                         }
-                        else if(values[n] == 'zn') off = true;
-                        else if(values[n] == 'zi') inv = true;
+                        else if(values[n] == 'n') off = true;
                         else {
                             var v = quot ? values[n] : values[n].capital();
                             label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
@@ -736,7 +751,7 @@ var exist = {
                             priority: attr.priority
                         };
                     }
-                    if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, invert: inv, values: {} };
+                    if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, values: {} };
                     if(exist.data[name][slug]['values'] == null) exist.data[name][slug]['values'] = {};
                     for(var j = 0; j < attr.values.length; j++) {
                         var item = attr.values[j];
