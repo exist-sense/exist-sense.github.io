@@ -79,8 +79,7 @@ String.prototype.capital = function() {
 
 function makeset() {
     return {
-        nologin: false,
-        ready: false,
+        nologin: false, ready: false,
         access: {},
         cookies: {},
         moods: {
@@ -180,10 +179,10 @@ function makeset() {
             sleep: {
                 group: 'sleep',
                 label: 'Sleep',
-                sleep: { attribute: 'sleep', label: 'Sleep time', value_type: 3, value_type_description: 'Period (min)' },
+                sleep: { attribute: 'sleep', label: 'Time asleep', value_type: 3, value_type_description: 'Period (min)' },
                 time_in_bed: { attribute: 'time_in_bed', label: 'Time in bed', value_type: 3, value_type_description: 'Period (min)' },
-                sleep_start: { attribute: 'sleep_start', label: 'Sleep Start', value_type: 6, value_type_description: 'Time (mins from midday)' },
-                sleep_end: { attribute: 'sleep_end', label: 'Sleep End', value_type: 4, value_type_description: 'Time (mins from midnight)' },
+                sleep_start: { attribute: 'sleep_start', label: 'Sleep start', value_type: 6, value_type_description: 'Time (mins from midday)' },
+                sleep_end: { attribute: 'sleep_end', label: 'Sleep end', value_type: 4, value_type_description: 'Time (mins from midnight)' },
                 sleep_awakenings: { attribute: 'sleep_awakenings', label: 'Awakenings', value_type: 0, value_type_description: 'Count' },
             },
             events: {
@@ -392,7 +391,8 @@ var exist = {
         }
     },
     rangeanc: function(range, len) {
-        return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');" style="font-weight: ' + (range == len ? 900 : 400) + '; text-decoration: ' + (range == len ? 'underline' : 'none') + '">' + len + '</a>';
+        if(range == len) return ' | <span style="font-weight: 700;">' + len + '</span>'
+        return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');">' + len + '</a>';
     },
     auth: function() {
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
@@ -567,7 +567,7 @@ var exist = {
             exist.status('Logging in with ' + pname + '..');
             var reqdata = {
                 method: 'POST',
-                url: 'https://exist.redeclipse.net/oauth2/access_token',
+                url: 'https://exist.io/oauth2/access_token',
                 data: {
                     grant_type: type,
                     client_id: '124d5b5764184a4d81c2',
@@ -922,7 +922,7 @@ var exist = {
                         span = hdr.makechild('span', 'exist-title-info', 'exist-center');
                         span.innerHTML += '<h4>About Exist Sense</h4>';
                         span.innerHTML += '<p>Exist Sense is a work in progress web app which aims to provide an interface to all Exist data along with converting custom tags into usable values. My main goal was to generate charts for my doctor, so all the app really does at the moment at the moment is spit out charts (because that was the point), but basically, it can detect custom tags which specify numeric values, and group together string values.</p>';
-                        span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 31), and a value selector (<tt>#values=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&values=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
+                        span.innerHTML += '<p>There are also (currently unexposed) features to pick a date (<tt>#date=YYYY-MM-DD</tt>, defaults to today), a history range (<tt>#range=&lt;num&gt;</tt>, defaults to 60), and a value selector (<tt>#values=&lt;first&gt;,&lt;second&gt;,etc</tt>) that is accessible through options embedded in the URL hash [#] (<a href="https://exist.redeclipse.net/#range=60&values=mood-mood,personal-pain,weather-temp">This example</a> compares ‘mood’ with ‘pain’ and ‘weather temperature’ over the last 60 days).</p>';
                         span.innerHTML += '<p>The format for custom tags is: <tt>&lt;tag&gt; &lt;value&gt; [label]</tt></p>';
                         span.innerHTML += '<p>Some examples of tags I use:<ul>';
                         span.innerHTML += '<li><b>pef 500</b> = numeric value ‘500’ for ‘pef’ (Peak Expiratory Flow)</li>';
@@ -939,9 +939,9 @@ var exist = {
                         span.innerHTML += '<li>Custom tracking: <a href="https://exist.io/blog/custom-tracking/">https://exist.io/blog/custom-tracking/</a></li>';
                         span.innerHTML += '<li>GitHub: <a href="https://github.com/exist-sense/core">https://github.com/exist-sense/core</a></li>';
                         span.innerHTML += '</ul></p>';
-                        span.innerHTML += '<p>Please <b><a class="exist-left" href="#" onclick="return exist.auth();">Login with Exist.io</a></b> to continue.</p>';
+                        span.innerHTML += '<p>Please <b><a href="#" onclick="return exist.auth();">Login with Exist.io</a></b> to continue.</p>';
                 }
-                exist.status('<a class="exist-left" href="#" onclick="return exist.auth();">Login with Exist.io</a> to continue', 'fas fa-user');
+                exist.status('<a href="#" onclick="return exist.auth();">Login with Exist.io</a> to continue', 'fas fa-user');
             }
         },
     },
@@ -1060,15 +1060,15 @@ var exist = {
             var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
             Chart.defaults.global.defaultColor = fgcol;
             Chart.defaults.global.defaultFontColor = fgcol;
-            Chart.defaults.global.defaultFontFamily = 'monospace';
+            Chart.defaults.global.defaultFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
             Chart.defaults.global.defaultFontSize = exist.chart.size(11);
             Chart.defaults.global.defaultFontStyle = 'bold';
             Chart.defaults.global.showLines = true;
         },
         size: function(size) {
             var sz = size, sq = exist.chart.width/1920.0; // 11 - 7 = 4, 640 / 1920 = 0.3333333333333333
-            if(sq < 1.0) sz -= (size-6)*(1.0-sq);
-            return Math.max(sz, 6);
+            if(sq < 1.0) sz -= Math.max(size-8, 1)*(1.0-sq);
+            return Math.max(sz, 8);
         },
         click: function(values, name) {
             if(values.target.id) {
@@ -1094,7 +1094,7 @@ var exist = {
                 data: [],
                 spanGaps: true,
                 fontColor: col,
-                fontSize: exist.chart.size(11),
+                fontSize: exist.chart.size(12),
                 fontStyle: 'bold',
                 backgroundColor: col,
                 borderColor: brcol,
@@ -1110,7 +1110,7 @@ var exist = {
                 position: 'left',
                 offset: true,
                 fontColor: fgcol,
-                fontSize: exist.chart.size(11),
+                fontSize: exist.chart.size(12),
                 fontStyle: 'bold',
                 gridLines: {
                     display: display || false,
@@ -1132,7 +1132,7 @@ var exist = {
                     display: min != null ? true : false,
                     fontColor: brcol,
                     fontSize: exist.chart.size(10),
-                    fontStyle: 'bold',
+                    fontStyle: 'normal',
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
                     padding: {
@@ -1236,7 +1236,7 @@ var exist = {
                         bodyFontSize: isbool ? 0 : exist.chart.size(10),
                         bodyAlign: 'left',
                         footerFontStyle: 'bold',
-                        footerSpacing: 0,
+                        footerSpacing: 2,
                         footerMarginTop: 0,
                         footerFontColor: fgcol,
                         footerFontSize: isbool ? 0 : exist.chart.size(10),
@@ -1270,23 +1270,23 @@ var exist = {
                         position: 'top',
                         fullWidth: false,
                         labels: {
-                            boxWidth: 11,
+                            boxWidth: 11.5,
                             fontColor: fgcol,
-                            fontSize: exist.chart.size(11),
+                            fontSize: exist.chart.size(13),
                             fontStyle: 'bold',
                             reverse: false,
                             weight: 1000,
-                            padding: 8
+                            padding: 12
                         }
                     },
                     title: {
                         display: len <= 1 ? true : false,
                         fontColor: fgcol,
-                        fontSize: exist.chart.size(11),
+                        fontSize: exist.chart.size(13),
                         fontStyle: 'bold',
                         fullWidth: true,
-                        lineHeight: 0.5,
-                        padding: 8,
+                        lineHeight: 1.5,
+                        padding: 6,
                         position: 'top',
                         weight: 2000,
                         text: title,
@@ -1398,7 +1398,7 @@ var exist = {
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
                             if(sq > 1.0) sq = 1.0+(sq-1.0);
-                            sz = 11.0*sq;
+                            sz = (exist.config('page.print') ? 15 : 14)*sq;
                             if(range > 31) sz += sz*((range-31)/31.0)*0.15;
                             t = a.label + ': ' + b.label;
                         }
@@ -1433,9 +1433,9 @@ var exist = {
             }
         },
         draw: function(head, indate, inlen) {
-            var date = indate ? indate : makedate(), len = inlen || 31, count = [],
+            var date = indate ? indate : makedate(), len = inlen || 60, count = [],
                 c = exist.config('page.values'), sq = 1920.0/exist.chart.width,
-                size = 31.0*(sq > 1.0 ? 1.0+(sq-1.0) : 1.0);
+                size = 31*(sq > 1.0 ? 1.0+(sq-1.0) : 1.0);
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
@@ -1471,8 +1471,8 @@ var exist = {
             var head = document.getElementById('exist-body');
             if(head) {
                 head.innerHTML = '';
-                var hrow = head.makechild('tr', 'exist-chart-row'),
-                    head = hrow.makechild('td', 'exist-chart-info'),
+                var hrow = head.makechild('tr', 'exist-chart-row', 'exist-center'),
+                    head = hrow.makechild('td', 'exist-chart-info', 'exist-center'),
                     range = exist.config('page.range'), nav = 'Range';
                 nav += exist.rangeanc(range, 7);
                 nav += exist.rangeanc(range, 14);
@@ -1481,8 +1481,8 @@ var exist = {
                 nav += exist.rangeanc(range, 60);
                 nav += exist.rangeanc(range, 90);
                 nav += exist.rangeanc(range, 120);
+                head.innerHTML += '<h4 id="exist-chart-pre">' + makedate(1-range, exist.config('page.date')) + ' to ' + makedate(0, exist.config('page.date')) + ' (' + range + ' ' + (range != 1 ? 'days' : 'day') + ')';
                 head.innerHTML += '<div id="exist-range" class="hide-print">' + nav + '</div>';
-                head.innerHTML += '<h4 id="exist-chart-pre" class="exist-left">Last ' + range + ' days for ' + exist.info.first_name + '</h4>';
                 exist.chart.draw(head, exist.config('page.date'), range);
             }
         },

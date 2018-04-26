@@ -111,10 +111,6 @@ canvas {
     margin-bottom: 16px;
 }
 #exist-range {
-    float: right;
-    clear: both;
-    text-align: right;
-    margin-top: 4px;
     font-size: 14px;
     font-weight: 600;
 }
