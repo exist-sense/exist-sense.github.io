@@ -395,6 +395,8 @@ var exist = {
         return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');">' + len + '</a>';
     },
     auth: function() {
+        var head = document.getElementById('exist-body');
+        if(head) head.innerHTML = '';
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
     },
     switch: function() {
@@ -497,6 +499,8 @@ var exist = {
         }
     },
     start: function() {
+        var head = document.getElementById('exist-body');
+        if(head) head.innerHTML = '';
         exist.makenav(['<li class="navitem"><a href="#" onclick="return exist.auth();" title="Login with Exist.io"><span class="fas fa-user-plus fa-fw" aria-hidden="true"></span><div class="navtext">Login</div></a></li>']);
         exist.settings.cookies = {};
         var cookies = decodeURIComponent(document.cookie).split(';');
