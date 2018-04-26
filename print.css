@@ -123,3 +123,6 @@ dt, th {
     width: 0px;
     height: 0px;
 }
+.exist-chart-container {
+    border-bottom: 1px solid #222222;
+}

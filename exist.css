@@ -114,3 +114,6 @@ canvas {
     font-size: 14px;
     font-weight: 600;
 }
+.exist-chart-container {
+    border-bottom: 1px solid #222222;
+}

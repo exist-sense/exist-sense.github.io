@@ -1136,7 +1136,7 @@ var exist = {
                     display: min != null ? true : false,
                     fontColor: brcol,
                     fontSize: exist.chart.size(10),
-                    fontStyle: 'normal',
+                    fontStyle: 'bold',
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
                     padding: {
@@ -1227,7 +1227,6 @@ var exist = {
                         position: 'nearest',
                         intersect: true,
                         backgroundColor: bgcol,
-                        fontSize: exist.chart.size(10),
                         titleFontStyle: 'bold',
                         titleSpacing: 0,
                         titleMarginBottom: 0,
@@ -1240,12 +1239,12 @@ var exist = {
                         bodyFontSize: isbool ? 0 : exist.chart.size(10),
                         bodyAlign: 'left',
                         footerFontStyle: 'bold',
-                        footerSpacing: 2,
+                        footerSpacing: 0,
                         footerMarginTop: 0,
                         footerFontColor: fgcol,
-                        footerFontSize: isbool ? 0 : exist.chart.size(10),
+                        footerFontSize: 0,
                         footerAlign: 'left',
-                        yPadding: 3,
+                        yPadding: 4,
                         xPadding: 4,
                         caretPadding: 2,
                         caretSize: 4,
@@ -1290,7 +1289,7 @@ var exist = {
                         fontStyle: 'bold',
                         fullWidth: true,
                         lineHeight: 1.5,
-                        padding: 6,
+                        padding: 7,
                         position: 'top',
                         weight: 2000,
                         text: title,
@@ -1402,7 +1401,7 @@ var exist = {
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
                             if(sq > 1.0) sq = 1.0+(sq-1.0);
-                            sz = (exist.config('page.print') ? 15 : 14)*sq;
+                            sz = (exist.config('page.print') ? 16 : 14)*sq;
                             if(range > 31) sz += sz*((range-31)/31.0)*0.15;
                             t = a.label + ': ' + b.label;
                         }
@@ -1439,7 +1438,7 @@ var exist = {
         draw: function(head, indate, inlen) {
             var date = indate ? indate : makedate(), len = inlen || 60, count = [],
                 c = exist.config('page.values'), sq = 1920.0/exist.chart.width,
-                size = 31*(sq > 1.0 ? 1.0+(sq-1.0) : 1.0);
+                size = 32*(sq > 1.0 ? 1.0+(sq-1.0) : 1.0);
             exist.chart.data = [];
             if(c) {
                 var d = c.split(',');
