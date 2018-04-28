@@ -268,6 +268,10 @@ function makeset() {
                     maxval: 5,
                 }
             },
+            exr: {
+                group: 'exr',
+                label: 'Exercise',
+            },
             med: {
                 group: 'med',
                 label: 'Medication',
