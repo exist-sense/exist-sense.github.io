@@ -288,6 +288,10 @@ function makeset() {
                 group: 'symp',
                 label: 'Symptom',
             },
+            trpy: {
+                group: 'trpy',
+                label: 'Therapy',
+            },
         },
         print: {
             on: ['/print.css'],
@@ -637,75 +641,82 @@ var exist = {
                 if(group == 'custom') {
                     for(var j = 0; j < attr.items.length; j++) {
                         var item = attr.items[j];
-                        if(item.attribute != 'custom') {
-                            var values = item.attribute.split('_'), name = values[0], string = item.label.split(' ');
-                            if(values.length >= 2) {
-                                var pint = parseInt(values[1]), slug = values[1], grp = null, label = null, isnum = false, start = 1;
-                                if(values[1] == pint) {
-                                    slug = name;
-                                    name = 'personal';
-                                    isnum = true;
-                                    start = 2;
+                        if(item.attribute == 'custom') continue;
+                        var values = item.attribute.split('_'), name = values[0], string = item.label.split(' ');
+                        if(values.length >= 2) {
+                            var pint = parseInt(values[1]), slug = values[1], grp = null, label = null, isnum = false, start = 1;
+                            if(values[1] == pint) {
+                                slug = name;
+                                name = 'personal';
+                                isnum = true;
+                                start = 2;
+                            }
+                            var quot = 0, off = false;
+                            for(var n = start; n < values.length; n++) {
+                                if(values[n] == 'q') {
+                                    label = label + ' (';
+                                    quot++;
                                 }
-                                var quot = 0, off = false;
-                                for(var n = start; n < values.length; n++) {
-                                    if(values[n] == 'q') {
-                                        label = label + ' (';
-                                        quot++;
-                                    }
-                                    else if(values[n] == 'n') off = true;
-                                    else {
-                                        var v = quot ? values[n] : values[n].capital();
-                                        label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
-                                        grp = grp != null ? (grp + '_' + values[n]) : values[n];
-                                        if(quot) quot++;
-                                    }
-                                }
-                                if(quot) label += ')';
-                                if(!isnum && grp) slug = grp;
-                                if(exist.data[name] == null) {
-                                    exist.data[name] = {
-                                        group: name,
-                                        label: name.capital(),
-                                        priority: item.priority
-                                    };
-                                }
-                                if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off };
-                                for(var k = 0; k < exist.load.items.length; k++) {
-                                    var ex = exist.load.items[k];
-                                    if(ex == 'attribute') exist.data[name][slug][ex] = slug;
-                                    else if(ex == 'label') exist.data[name][slug][ex] = slug == 'pef' ? 'Peak Expiratory Flow' : (isnum ? slug.capital() : label);
-                                    else if(ex == 'value' && isnum) exist.data[name][slug][ex] = pint;
-                                    else if(ex == 'value' && !isnum) exist.data[name][slug][ex] = item.value != null ? item.value : 0;
-                                    else if(ex == 'value_type' && !isnum) exist.data[name][slug][ex] = 0;
-                                    else if(ex == 'value_type_description' && !isnum) exist.data[name][slug][ex] = 'Boolean';
-                                    else exist.data[name][slug][ex] = item[ex];
-                                }
-                                if(grp) {
-                                    var desc = isnum ? values[1] : slug;
-                                    if(exist.data[name][slug]['desc'] == null) exist.data[name][slug]['desc'] = {};
-                                    exist.data[name][slug]['desc'][desc] = {
-                                        group: grp,
-                                        label: label
-                                    };
+                                else if(values[n] == 'n') off = true;
+                                else {
+                                    var v = quot ? values[n] : values[n].capital();
+                                    label = label != null ? (label + (quot == 1 ? '' : ' ') + v) : v;
+                                    grp = grp != null ? (grp + '_' + values[n]) : values[n];
+                                    if(quot) quot++;
                                 }
                             }
-                            else {
-                                if(exist.data[name] == null) {
-                                    exist.data[name] = {
-                                        group: name,
-                                        label: name.capital(),
-                                        priority: item.priority
-                                    };
-                                }
-                                if(exist.data[name][name] == null) exist.data[name][name] = {};
-                                for(var k = 0; k < exist.load.items.length; k++) {
-                                    var ex = exist.load.items[k];
-                                    exist.data[name][name][ex] = item[ex];
-                                }
+                            if(quot) label += ')';
+                            if(!isnum && grp) slug = grp;
+                            if(exist.data[name] == null) {
+                                exist.data[name] = {
+                                    group: name,
+                                    label: name.capital(),
+                                    priority: item.priority,
+                                    source: {
+                                        group: group,
+                                        tag: values[0],
+                                    }
+                                };
                             }
-                            exist.data[name][slug].value_converted = false;
+                            if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off };
+                            for(var k = 0; k < exist.load.items.length; k++) {
+                                var ex = exist.load.items[k];
+                                if(ex == 'attribute') exist.data[name][slug][ex] = slug;
+                                else if(ex == 'label') exist.data[name][slug][ex] = slug == 'pef' ? 'Peak Expiratory Flow' : (isnum ? slug.capital() : label);
+                                else if(ex == 'value' && isnum) exist.data[name][slug][ex] = pint;
+                                else if(ex == 'value' && !isnum) exist.data[name][slug][ex] = item.value != null ? item.value : 0;
+                                else if(ex == 'value_type' && !isnum) exist.data[name][slug][ex] = 0;
+                                else if(ex == 'value_type_description' && !isnum) exist.data[name][slug][ex] = 'Boolean';
+                                else exist.data[name][slug][ex] = item[ex];
+                            }
+                            if(grp) {
+                                var desc = isnum ? values[1] : slug;
+                                if(exist.data[name][slug]['desc'] == null) exist.data[name][slug]['desc'] = {};
+                                exist.data[name][slug]['desc'][desc] = {
+                                    group: grp,
+                                    label: label
+                                };
+                            }
                         }
+                        else {
+                            if(exist.data[name] == null) {
+                                exist.data[name] = {
+                                    group: name,
+                                    label: name.capital(),
+                                    priority: item.priority,
+                                    source: {
+                                        group: group,
+                                        tag: values[0],
+                                    }
+                                };
+                            }
+                            if(exist.data[name][name] == null) exist.data[name][name] = {};
+                            for(var k = 0; k < exist.load.items.length; k++) {
+                                var ex = exist.load.items[k];
+                                exist.data[name][name][ex] = item[ex];
+                            }
+                        }
+                        exist.data[name][slug].value_converted = false;
                     }
                 }
                 else {
@@ -758,7 +769,11 @@ var exist = {
                         exist.data[name] = {
                             group: name,
                             label: name.capital(),
-                            priority: attr.priority
+                            priority: attr.priority,
+                            source: {
+                                group: group,
+                                tag: values[0],
+                            }
                         };
                     }
                     if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, values: {} };
@@ -1053,7 +1068,7 @@ var exist = {
                 var trow = thead.makechild('tr', 'exist-inner-finish');
                 trow.innerHTML += '<th colspan="2">Finished</th><th class="hide-small"></th><th class="hide-small"></th><th></th>';
                 var vrow = thead.makechild('tr', 'exist-inner-submit');
-                vrow.innerHTML += '<td colspan="2"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired.</td><td class="hide-small"></td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
+                vrow.innerHTML += '<td colspan="2" style="width: 200px"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired. If you are making edits to values that are tracked by another service, please remember to <b><a href="https://exist.io/account/attributes/">edit your attributes</a> when you are done</b>.</td><td class="hide-small"></td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
             }
         },
     },
@@ -1074,7 +1089,7 @@ var exist = {
             Chart.defaults.global.showLines = true;
         },
         size: function(size) {
-            var sz = size, sq = exist.chart.width/1920.0; // 11 - 7 = 4, 640 / 1920 = 0.3333333333333333
+            var sz = size, sq = exist.chart.width/1920.0;
             if(sq < 1.0) sz -= Math.max(size-8, 1)*(1.0-sq);
             return Math.max(sz, 8);
         },
@@ -1405,8 +1420,8 @@ var exist = {
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
                             if(sq > 1.0) sq = 1.0+(sq-1.0);
-                            sz = (exist.config('page.print') ? 16 : 14)*sq;
-                            if(range > 31) sz += sz*((range-31)/31.0)*0.15;
+                            sz = (exist.config('page.print') ? 16 : 15)*sq;
+                            if(range > 31) sz += sz*((range-31)/31.0)*0.125;
                             t = a.label + ': ' + b.label;
                         }
                         else {
