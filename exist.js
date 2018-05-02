@@ -110,12 +110,12 @@ function makeset() {
                 group: 'activity',
                 label: 'Activity',
                 steps: { attribute: 'steps', label: 'Steps', value_type: 0, value_type_description: 'Count' },
-                steps_active_min: { attribute: 'steps_active_min', label: 'Active time', value_type: 3, value_type_description: 'Period (min)' },
+                steps_active_min: { attribute: 'steps_active_min', label: 'Active Time', value_type: 3, value_type_description: 'Period (min)' },
                 steps_elevation: { attribute: 'steps_elevation', label: 'Elevation', value_type: 1, value_type_description: 'Distance (km)' },
                 floors: { attribute: 'floors', label: 'Floors', value_type: 0, value_type_description: 'Count' },
                 steps_distance: { attribute: 'steps_distance', label: 'Distance', value_type: 1, value_type_description: 'Distance (km)' },
-                cycle_min: { attribute: 'cycle_min', label: 'Cycle time', value_type: 3, value_type_description: 'Period (min)' },
-                cycle_distance: { attribute: 'cycle_distance', label: 'Cycle distance', value_type: 1, value_type_description: 'Distance (km)' },
+                cycle_min: { attribute: 'cycle_min', label: 'Cycle Time', value_type: 3, value_type_description: 'Period (min)' },
+                cycle_distance: { attribute: 'cycle_distance', label: 'Cycle Distance', value_type: 1, value_type_description: 'Distance (km)' },
             },
             workouts: {
                 group: 'workouts',
@@ -130,17 +130,17 @@ function makeset() {
                 productive_min: { attribute: 'productive_min', label: 'Productive', value_type: 3, value_type_description: 'Period (min)' },
                 neutral_min: { attribute: 'neutral_min', label: 'Neutral', value_type: 3, value_type_description: 'Period (min)' },
                 distracting_min: { attribute: 'distracting_min', label: 'Distracting', value_type: 3, value_type_description: 'Period (min)' },
-                commits: { attribute: 'commits', label: 'Source code checkins', value_type: 0, value_type_description: 'Count' },
+                commits: { attribute: 'commits', label: 'Source Code Checkins', value_type: 0, value_type_description: 'Count' },
                 tasks_completed: { attribute: 'tasks_completed', label: 'Tasks', value_type: 0, value_type_description: 'Count' },
                 words_written: { attribute: 'words_written', label: 'Words', value_type: 0, value_type_description: 'Count' },
-                emails_sent: { attribute: 'emails_sent', label: 'Emails out', value_type: 0, value_type_description: 'Count' },
-                emails_received: { attribute: 'emails_received', label: 'Emails in', value_type: 0, value_type_description: 'Count' },
+                emails_sent: { attribute: 'emails_sent', label: 'Emails Out', value_type: 0, value_type_description: 'Count' },
+                emails_received: { attribute: 'emails_received', label: 'Emails In', value_type: 0, value_type_description: 'Count' },
             },
             food: {
                 group: 'food',
-                label: 'Food and drink',
+                label: 'Food and Drink',
                 coffees: { attribute: 'coffees', label: 'Coffees', value_type: 0, value_type_description: 'Count' },
-                alcoholic_drinks: { attribute: 'alcoholic_drinks', label: 'Alcoholic drinks', value_type: 0, value_type_description: 'Count' },
+                alcoholic_drinks: { attribute: 'alcoholic_drinks', label: 'Alcoholic Drinks', value_type: 0, value_type_description: 'Count' },
                 energy: { attribute: 'energy', label: 'Energy', value_type: 1, value_type_description: 'Intake (kJ)' },
                 water: { attribute: 'water', label: 'Water', value_type: 0, value_type_description: 'Intake (ml)' },
                 carbohydrates: { attribute: 'carbohydrates', label: 'Carbohydrates', value_type: 1, value_type_description: 'Intake (g)' },
@@ -155,7 +155,7 @@ function makeset() {
             finance: {
                 group: 'finance',
                 label: 'Finance',
-                money_spent: { attribute: 'money_spent', label: 'Money spent', value_type: 1, value_type_description: 'Currency' },
+                money_spent: { attribute: 'money_spent', label: 'Money Spent', value_type: 1, value_type_description: 'Currency' },
             },
             mood: {
                 group: 'mood',
@@ -174,29 +174,29 @@ function makeset() {
                         '5': { group: 'great', label: 'Great' }
                     },
                 },
-                mood_note: { attribute: 'mood_note', label: 'Mood note', value_type: 2, value_type_description: 'String' },
+                mood_note: { attribute: 'mood_note', label: 'Mood Note', value_type: 2, value_type_description: 'String' },
             },
             sleep: {
                 group: 'sleep',
                 label: 'Sleep',
-                sleep: { attribute: 'sleep', label: 'Time asleep', value_type: 3, value_type_description: 'Period (min)' },
-                time_in_bed: { attribute: 'time_in_bed', label: 'Time in bed', value_type: 3, value_type_description: 'Period (min)' },
-                sleep_start: { attribute: 'sleep_start', label: 'Sleep start', value_type: 6, value_type_description: 'Time (mins from midday)' },
-                sleep_end: { attribute: 'sleep_end', label: 'Sleep end', value_type: 4, value_type_description: 'Time (mins from midnight)' },
+                sleep: { attribute: 'sleep', label: 'Time Asleep', value_type: 3, value_type_description: 'Period (min)' },
+                time_in_bed: { attribute: 'time_in_bed', label: 'Time in Bed', value_type: 3, value_type_description: 'Period (min)' },
+                sleep_start: { attribute: 'sleep_start', label: 'Sleep start', value_type: 6, value_type_description: 'Time (mins from Midday)' },
+                sleep_end: { attribute: 'sleep_end', label: 'Sleep End', value_type: 4, value_type_description: 'Time (mins from Midnight)' },
                 sleep_awakenings: { attribute: 'sleep_awakenings', label: 'Awakenings', value_type: 0, value_type_description: 'Count' },
             },
             events: {
                 group: 'events',
                 label: 'Events',
                 events: { attribute: 'events', label: 'Events', value_type: 0, value_type_description: 'Count' },
-                events_duration: { attribute: 'events_duration', label: 'Time in events', value_type: 3, value_type_description: 'Period (min)' },
+                events_duration: { attribute: 'events_duration', label: 'Time in Events', value_type: 3, value_type_description: 'Period (min)' },
             },
             health: {
                 group: 'location',
                 label: 'Location',
                 weight: { attribute: 'weight', label: 'Weight', value_type: 1, value_type_description: 'Weight (kg)' },
-                body_fat: { attribute: 'body_fat', label: 'Body fat', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
-                heartrate: { attribute: 'heartrate', label: 'Heartrate', value_type: 0, value_type_description: 'Interval (beats per min)' },
+                body_fat: { attribute: 'body_fat', label: 'Body Fat', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
+                heartrate: { attribute: 'heartrate', label: 'Heartrate', value_type: 0, value_type_description: 'Interval (beats per Min)' },
                 meditation_min: { attribute: 'meditation_min', label: 'Meditation', value_type: 3, value_type_description: 'Period (min)' },
             },
             location: {
@@ -208,26 +208,26 @@ function makeset() {
             media: {
                 group: 'media',
                 label: 'Media',
-                tracks: { attribute: 'tracks', label: 'Tracks played', value_type: 0, value_type_description: 'Count' },
-                articles_read: { attribute: 'articles_read', label: 'Articles read', value_type: 0, value_type_description: 'Count' },
+                tracks: { attribute: 'tracks', label: 'Tracks Played', value_type: 0, value_type_description: 'Count' },
+                articles_read: { attribute: 'articles_read', label: 'Articles Read', value_type: 0, value_type_description: 'Count' },
             },
             social: {
                 group: 'social',
                 label: 'Social',
-                facebook_posts: { attribute: 'facebook_posts', label: 'Facebook posts', value_type: 0, value_type_description: 'Count' },
-                facebook_reactions: { attribute: 'facebook_reactions', label: 'Facebook reactions', value_type: 0, value_type_description: 'Count' },
-                facebook_comments: { attribute: 'facebook_comments', label: 'Facebook comments', value_type: 0, value_type_description: 'Count' },
-                instagram_posts: { attribute: 'instagram_posts', label: 'Instagram posts', value_type: 0, value_type_description: 'Count' },
-                instagram_comments: { attribute: 'instagram_comments', label: 'Instagram comments', value_type: 0, value_type_description: 'Count' },
-                instagram_likes: { attribute: 'instagram_likes', label: 'Instagram likes', value_type: 0, value_type_description: 'Count' },
-                instagram_username: { attribute: 'instagram_username', label: 'Instagram username', value_type: 2, value_type_description: 'String' },
+                facebook_posts: { attribute: 'facebook_posts', label: 'Facebook Posts', value_type: 0, value_type_description: 'Count' },
+                facebook_reactions: { attribute: 'facebook_reactions', label: 'Facebook Reactions', value_type: 0, value_type_description: 'Count' },
+                facebook_comments: { attribute: 'facebook_comments', label: 'Facebook Comments', value_type: 0, value_type_description: 'Count' },
+                instagram_posts: { attribute: 'instagram_posts', label: 'Instagram Posts', value_type: 0, value_type_description: 'Count' },
+                instagram_comments: { attribute: 'instagram_comments', label: 'Instagram Comments', value_type: 0, value_type_description: 'Count' },
+                instagram_likes: { attribute: 'instagram_likes', label: 'Instagram Likes', value_type: 0, value_type_description: 'Count' },
+                instagram_username: { attribute: 'instagram_username', label: 'Instagram Username', value_type: 2, value_type_description: 'String' },
             },
             twitter: {
                 group: 'twitter',
                 label: 'Twitter',
                 tweets: { attribute: 'tweets', label: 'Tweets', value_type: 0, value_type_description: 'Count' },
-                twitter_mentions: { attribute: 'twitter_mentions', label: 'Twitter mentions', value_type: 0, value_type_description: 'Count' },
-                twitter_username: { attribute: 'twitter_username', label: 'Twitter username', value_type: 2, value_type_description: 'String' },
+                twitter_mentions: { attribute: 'twitter_mentions', label: 'Twitter Mentions', value_type: 0, value_type_description: 'Count' },
+                twitter_username: { attribute: 'twitter_username', label: 'Twitter Username', value_type: 2, value_type_description: 'String' },
             },
             weather: {
                 group: 'weather',
@@ -235,18 +235,18 @@ function makeset() {
                 weather_temp_max: { attribute: 'weather_temp_max', label: 'Max Temp', value_type: 1, value_type_description: 'Temp (°C)' },
                 weather_temp_min: { attribute: 'weather_temp_min', label: 'Min Temp', value_type: 1, value_type_description: 'Temp (°C)' },
                 weather_precipitation: { attribute: 'weather_precipitation', label: 'Precipitation', value_type: 1, value_type_description: 'Percentage (%)', value_conversion: 1 },
-                weather_cloud_cover: { attribute: 'weather_cloud_cover', label: 'Cloud cover', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
-                weather_wind_speed: { attribute: 'weather_wind_speed', label: 'Wind speed', value_type: 1, value_type_description: 'Speed (km/h)' },
-                weather_summary: { attribute: 'weather_summary', label: 'Weather summary', value_type: 2, value_type_description: 'String' },
+                weather_cloud_cover: { attribute: 'weather_cloud_cover', label: 'Cloud Cover', value_type: 5, value_type_description: 'Percentage (%)', value_conversion: 1 },
+                weather_wind_speed: { attribute: 'weather_wind_speed', label: 'Wind Speed', value_type: 1, value_type_description: 'Speed (km/h)' },
+                weather_summary: { attribute: 'weather_summary', label: 'Weather Summary', value_type: 2, value_type_description: 'String' },
                 weather_icon: { attribute: 'weather_icon', label: 'Icon', value_type: 2, value_type_description: 'String' },
-                sunrise: { attribute: 'sunrise', label: 'Sunrise', value_type: 4, value_type_description: 'Time (mins from midnight)' },
-                sunset: { attribute: 'sunset', label: 'Sunset', value_type: 6, value_type_description: 'Time (mins from midday)' },
+                sunrise: { attribute: 'sunrise', label: 'Sunrise', value_type: 4, value_type_description: 'Time (mins from Midnight)' },
+                sunset: { attribute: 'sunset', label: 'Sunset', value_type: 6, value_type_description: 'Time (mins from Midday)' },
             },
             personal: {
                 group: 'personal',
                 label: 'Personal',
                 bpd: {
-                    label: 'Bipolar cycle',
+                    label: 'Bipolar Cycle',
                     value_type_description: 'Scale (1 to 5)',
                     minval: 1,
                     maxval: 5,
@@ -258,11 +258,11 @@ function makeset() {
                     maxval: 5,
                 },
                 pef: {
-                    label: 'Peak expiratory flow',
+                    label: 'Peak Expiratory Flow',
                     value_type_description: 'Volume (L/min)',
                 },
                 sq: {
-                    label: 'Sleep quality',
+                    label: 'Sleep Quality',
                     value_type_description: 'Scale (0 to 5)',
                     minval: 0,
                     maxval: 5,
@@ -278,11 +278,11 @@ function makeset() {
             },
             pact: {
                 group: 'pact',
-                label: 'Predominant activity',
+                label: 'Predominant Activity',
             },
             proj: {
                 group: 'proj',
-                label: 'Active project',
+                label: 'Active Project',
             },
             symp: {
                 group: 'symp',
@@ -672,17 +672,13 @@ var exist = {
                                     group: name,
                                     label: name.capital(),
                                     priority: item.priority,
-                                    source: {
-                                        group: group,
-                                        tag: values[0],
-                                    }
                                 };
                             }
                             if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off };
                             for(var k = 0; k < exist.load.items.length; k++) {
                                 var ex = exist.load.items[k];
                                 if(ex == 'attribute') exist.data[name][slug][ex] = slug;
-                                else if(ex == 'label') exist.data[name][slug][ex] = slug == 'pef' ? 'Peak Expiratory Flow' : (isnum ? slug.capital() : label);
+                                else if(ex == 'label') exist.data[name][slug][ex] = isnum ? slug.capital() : label;
                                 else if(ex == 'value' && isnum) exist.data[name][slug][ex] = pint;
                                 else if(ex == 'value' && !isnum) exist.data[name][slug][ex] = item.value != null ? item.value : 0;
                                 else if(ex == 'value_type' && !isnum) exist.data[name][slug][ex] = 0;
@@ -704,10 +700,6 @@ var exist = {
                                     group: name,
                                     label: name.capital(),
                                     priority: item.priority,
-                                    source: {
-                                        group: group,
-                                        tag: values[0],
-                                    }
                                 };
                             }
                             if(exist.data[name][name] == null) exist.data[name][name] = {};
@@ -718,6 +710,7 @@ var exist = {
                         }
                         exist.data[name][slug].value_converted = false;
                     }
+                    if(exist.data[name] != null) exist.data[name]['source'] = group;
                 }
                 else {
                     if(exist.data[group] == null) exist.data[group] = {};
@@ -733,6 +726,7 @@ var exist = {
                         }
                         exist.data[group][item.attribute].value_converted = false;
                     }
+                    if(exist.data[group] != null) exist.data[group]['source'] = group;
                 }
             }
         },
@@ -740,7 +734,8 @@ var exist = {
             for(var i = 0; i < data.length; i++) {
                 var attr = data[i], group = attr['group'];
                 if(group.name) group = group.name;
-                if(group == 'custom' && attr.attribute != 'custom') {
+                if(group == 'custom') {
+                    if(attr.attribute == 'custom') continue;
                     var values = attr.attribute.split('_'), name = values[0], slug = values[1],
                         pint = parseInt(values[1]), grp = null, label = null, isnum = false, start = 1;
                     if(values[1] == pint) {
@@ -770,10 +765,6 @@ var exist = {
                             group: name,
                             label: name.capital(),
                             priority: attr.priority,
-                            source: {
-                                group: group,
-                                tag: values[0],
-                            }
                         };
                     }
                     if(exist.data[name][slug] == null) exist.data[name][slug] = { offset: off, values: {} };
@@ -803,6 +794,7 @@ var exist = {
                             exist.data[name][slug]['values'][item.date].value_converted = false;
                         }
                     }
+                    if(exist.data[name] != null) exist.data[name]['source'] = group;
                 }
                 else {
                     if(exist.data[group] == null) exist.data[group] = {};
@@ -820,6 +812,7 @@ var exist = {
                         }
                         exist.data[group][attr.attribute]['values'][item.date].value_converted = false;
                     }
+                    if(exist.data[group] != null) exist.data[group]['source'] = group;
                 }
             }
         },
@@ -969,6 +962,9 @@ var exist = {
         },
     },
     day: {
+        submission: function() {
+            return false;
+        },
         maketest: function(b, isbool, r, date) {
             if(b == null || b.value_type == null || (r > 0 && (b.priority || 1) != r)) return false;
             return true;
@@ -977,7 +973,7 @@ var exist = {
             var list = data.split('-'), a = exist.data[list[0]];
             if(a && (q <= 0 || a.priority == q)) {
                 var trow = table.makechild('tr', 'exist-inner-row');
-                trow.innerHTML += '<th colspan="2">' + a.label + '</th><th class="hide-small"></th><th class="hide-small"></th><th style="text-align: right; font-size: 12px;">Acquired</th>';
+                trow.innerHTML += '<th colspan="2">' + a.label + '</th><th class="hide-small"></th><th class="hide-small"></th><th style="text-align: right; font-size: 12px;">Acquired</th><th class="hide-small"></th>';
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
                         if(isfunc(a[j])) continue;
@@ -1014,6 +1010,7 @@ var exist = {
                         irow.innerHTML += '<td style="text-align: right"><label class="checkbox" title="Owned by: ' + (b.service || 'none') + '">' +
                             '<input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' />' + 
                             '<span class="checkmark"></span></label></td>';
+                        irow.innerHTML += '<td class="hide-small" style="text-align: right; vertical-align: middle"><tt style="font-size: 75%">' + n + '</tt></td>';
                     }
                 }
             }
@@ -1051,7 +1048,7 @@ var exist = {
                 }
                 var form = hdr.makechild('form', 'exist-form');
                 form.action = '#';
-                form.setAttribute('onSubmit', 'alert("Not yet implemented, sorry!"); return false;');
+                form.setAttribute('onSubmit', 'return exist.day.submission();');
                 var table = form.makechild('table', 'exist-inner'),
                     thead = table.makechild('thead', 'exist-inner-head'),
                     c = exist.config('page.values');
@@ -1066,9 +1063,9 @@ var exist = {
                     }
                 }
                 var trow = thead.makechild('tr', 'exist-inner-finish');
-                trow.innerHTML += '<th colspan="2">Finished</th><th class="hide-small"></th><th class="hide-small"></th><th></th>';
+                trow.innerHTML += '<th colspan="2">Finished</th><th class="hide-small"></th><th class="hide-small"></th><th></th><th class="hide-small"></th>';
                 var vrow = thead.makechild('tr', 'exist-inner-submit');
-                vrow.innerHTML += '<td colspan="2" style="width: 200px"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired. If you are making edits to values that are tracked by another service, please remember to <b><a href="https://exist.io/account/attributes/">edit your attributes</a> when you are done</b>.</td><td class="hide-small"></td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" title="Not implemented yet!" style="width: 100%" disabled /></td>';
+                vrow.innerHTML += '<td colspan="2" style="width: 200px"><b>NOTE:</b> Exist Sense will only take ownership of attributes marked as acquired. If you are making edits to values that are tracked by another service, please remember to <b><a href="https://exist.io/account/attributes/">edit your attributes</a> when you are done</b>.</td><td class="hide-small"></td><td class="hide-small"></td><td style="text-align: right"><input type="submit" name="Submit" value="Submit" style="width: 100%" /></td><td class="hide-small"></td>';
             }
         },
     },
