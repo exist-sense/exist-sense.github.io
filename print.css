@@ -1,4 +1,7 @@
 @charset "utf-8";
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 700;
+}
 .container {
     width: 1600px;
 }
@@ -124,5 +127,8 @@ dt, th {
     height: 0px;
 }
 .exist-chart-container {
-    border-bottom: 1px solid #222222;
+    border: 2px solid rgb(128, 128, 128);
+    border-radius: 4px;
+    padding: 1px 1px 1px 8px;
+    margin: 4px 1px 1px 1px;
 }

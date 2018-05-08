@@ -115,5 +115,8 @@ canvas {
     font-weight: 600;
 }
 .exist-chart-container {
-    border-bottom: 1px solid #222222;
+    border: 2px solid rgb(16, 16, 128);
+    border-radius: 4px;
+    padding: 1px 1px 1px 8px;
+    margin: 4px 1px 1px 1px;
 }

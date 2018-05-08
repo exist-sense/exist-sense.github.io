@@ -91,18 +91,44 @@ function makeset() {
         },
         groups: {
             productivity: {
-                productive_min: ['neutral_min', 'distracting_min'],
-                distracting_min: ['!disabled'],
-                neutral_min: ['!disabled'],
-                emails_received: ['emails_sent'],
-                emails_sent: ['!disabled']
+                productive_min: {
+                    label: 'Productivity',
+                    group: ['neutral_min', 'distracting_min']
+                },
+                distracting_min: {
+                    label: '!disabled'
+                },
+                neutral_min: {
+                    label: '!disabled'
+                },
+                emails_received: {
+                    label: 'Emails',
+                    group: ['emails_sent']
+                },
+                emails_sent: {
+                    label: '!disabled'
+                }
             },
             weather: {
-                weather_temp_min: ['weather_temp_max'],
-                weather_temp_max: ['!disabled']
+                weather_temp_min: {
+                    label: 'Temperature',
+                    group: ['weather_temp_max']
+                },
+                weather_temp_max: {
+                    label: '!disabled'
+                }
             },
             sleep: {
-                sleep_goal: ['!disabled']
+                sleep: {
+                    label: 'Sleep Time',
+                    group: ['time_in_bed']
+                },
+                sleep_goal: {
+                    label: '!disabled'
+                },
+                time_in_bed: {
+                    label: '!disabled'
+                }
             }
         },
         overrides: {
@@ -1077,7 +1103,7 @@ var exist = {
         width: window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth,
         height: window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight,
         defaults: function() {
-            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
+            var print = exist.config('page.print'), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255);
             Chart.defaults.global.defaultColor = fgcol;
             Chart.defaults.global.defaultFontColor = fgcol;
             Chart.defaults.global.defaultFontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"';
@@ -1107,41 +1133,44 @@ var exist = {
             }
         },
         dataset: function(label, isbool, count, len) {
-            var print = exist.config('page.print'), alpha = isbool ? (print ? 0.9 : 0.6) : (len > 1 ? 0.225+(1.0/len*0.75) : 0.6),
-                col = exist.colour(count.length, alpha), brcol = exist.colour(count.length, 1.0, (print ? (isbool ? 0.25 : 0.5) : 1.65));
+            var print = exist.config('page.print'), alpha = isbool ? 0.35 : (len > 1 ? 1.0/len*0.35 : 0.35),
+                col = exist.colour(count.length, alpha), brcol = exist.colour(count.length, 1.0, (print ? 0.35 : 1.5));
             var data = {
                 label: label,
                 data: [],
                 spanGaps: true,
                 fontColor: col,
                 fontSize: exist.chart.size(12),
-                fontStyle: 'bold',
+                fontStyle: 'normal',
                 backgroundColor: col,
                 borderColor: brcol,
                 pointBorderColor: brcol,
-                borderWidth: 1.5,
+                borderWidth: 2,
             };
             return data;
         },
         scale: function(min, max, display, label, isbool) {
-            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
+            var print = exist.config('page.print'),
+                bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0),
+                fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255),
+                brcol = print ? exist.makergba(32, 32, 32) : exist.makergba(64, 64, 64);
             var data = {
                 display: display || false,
                 position: 'left',
                 offset: true,
                 fontColor: fgcol,
                 fontSize: exist.chart.size(12),
-                fontStyle: 'bold',
+                fontStyle: 'normal',
                 gridLines: {
                     display: display || false,
-                    color: exist.makergba(32, 32, 32),
+                    color: brcol,
                     lineWidth: 1,
                     drawBorder: display || false,
                     drawOnChartArea: display || false,
                     drawTicks: display || false,
                     tickMarkLength: 4,
                     zeroLineWidth: 0,
-                    zeroLineColor: exist.makergba(32, 32, 32),
+                    zeroLineColor: brcol,
                     zeroLineBorderDash: [],
                     zeroLineBorderDashOffset: 0,
                     offsetGridLines: min == null && isbool ? true : false,
@@ -1150,8 +1179,9 @@ var exist = {
                 },
                 scaleLabel: {
                     display: min != null ? true : false,
-                    fontColor: brcol,
+                    fontColor: fgcol,
                     fontSize: exist.chart.size(10),
+                    fontFamily: 'monospace',
                     fontStyle: 'bold',
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
@@ -1172,7 +1202,7 @@ var exist = {
                     autoSkip: true,
                     autoSkipPadding: 0,
                     labelOffset: 0,
-                    fontColor: brcol,
+                    fontColor: fgcol,
                     fontSize: exist.chart.size(10),
                     fontStyle: 'bold',
                     fontFamily: 'monospace'
@@ -1181,7 +1211,10 @@ var exist = {
             return data;
         },
         config: function(id, type, title, name, isbool, len, descs) {
-            var print = exist.config('page.print'), bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0), fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255), brcol = print ? exist.makergba(64, 64, 64) : exist.makergba(192, 192, 192);
+            var print = exist.config('page.print'),
+                bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0),
+                fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255),
+                brcol = print ? exist.makergba(32, 32, 32) : exist.makergba(64, 64, 64);
             var data = {
                 id: 'exist-chart-' + id,
                 type: type,
@@ -1207,7 +1240,7 @@ var exist = {
                         line: {
                             tension: 0.2,
                             backgroundColor: bgcol,
-                            borderWidth: 1.5,
+                            borderWidth: 2,
                             borderColor: brcol,
                             borderCapStyle: 'round',
                             borderDashOffset: 0,
@@ -1286,36 +1319,36 @@ var exist = {
                     },
                     legend: {
                         display: len > 1 ? true : false,
-                        position: 'top',
+                        position: 'bottom',
                         fullWidth: false,
                         labels: {
-                            boxWidth: 11.5,
+                            boxWidth: 13,
                             fontColor: fgcol,
-                            fontSize: exist.chart.size(13),
+                            fontSize: exist.chart.size(12),
                             fontStyle: 'bold',
                             reverse: false,
                             weight: 1000,
-                            padding: 12
+                            padding: 8
                         }
                     },
                     title: {
-                        display: len <= 1 ? true : false,
+                        display: false,
                         fontColor: fgcol,
-                        fontSize: exist.chart.size(13),
-                        fontStyle: 'bold',
-                        fullWidth: true,
-                        lineHeight: 1.5,
-                        padding: 7,
-                        position: 'top',
-                        weight: 2000,
-                        text: title,
+                        fontSize: exist.chart.size(12),
+                        fontStyle: 'normal',
+                        fullWidth: false,
+                        lineHeight: 1,
+                        padding: 0,
+                        position: 'bottom',
+                        weight: 1000,
+                        text: null,
                     },
                     layout: {
                         padding: {
-                            left: 0,
-                            right: 0,
-                            top: 0,
-                            bottom: 0
+                            left: 2,
+                            right: 2,
+                            top: 2,
+                            bottom: 2
                         }
                     },
                     scales: {
@@ -1360,7 +1393,7 @@ var exist = {
         maketest: function(b, isbool, g, r, date, len) {
             if(b == null || b.values == null) return false;
             if(b.value_type == 2 || (r > 0 && b.priority != r) || (!isbool && !b.minval && !b.maxval)) return false;
-            if(g != null && g[0] == '!disabled') return false;
+            if(g != null && g.label == '!disabled') return false;
             for(var x = 0; x < len; x++) {
                 var test = makedate(0-x, date);
                 if(b.values[test] != null && b.values[test].value != 0) return true;
@@ -1397,10 +1430,11 @@ var exist = {
                         }
                         var n = list[0] + '-' + j, o = b.value_type_description, t = b.label, minval = b.minval || 0, maxval = b.maxval || 0,
                             values = [exist.chart.values(b, date, len)], labels = [b.label], descs = [b.desc], extra = [];
-                        if(g != null && g.length > 0) {
+                        if(g != null) {
                             var k = j.split('_');
                             n = list[0] + '-' + (k.length >= 2 ? k[1] : k[0]);
-                            for(var x = 0; x < g.length; x++) extra[extra.length] = g[x];
+                            for(var x = 0; x < g.group.length; x++) extra[extra.length] = g.group[x];
+                            t = g.label;
                         }
                         if(extra.length > 0) {
                             for(var x = 0; x < extra.length; x++) {
@@ -1417,7 +1451,7 @@ var exist = {
                         if(isbool) {
                             var sq = 1920.0/exist.chart.width, range = exist.config('page.range');
                             if(sq > 1.0) sq = 1.0+(sq-1.0);
-                            sz = (exist.config('page.print') ? 16 : 15)*sq;
+                            sz = (exist.config('page.print') ? 8 : 7)*sq;
                             if(range > 31) sz += sz*((range-31)/31.0)*0.125;
                             t = a.label + ': ' + b.label;
                         }
@@ -1443,7 +1477,8 @@ var exist = {
                             }
                             if((maxval-minval) >= 10) sz = sz*7/4;
                         }
-                        head.innerHTML += '<div class="exist-chart-container"><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
+                        head.innerHTML += '';
+                        head.innerHTML += '<div class="exist-chart-container" style="page-break-inside: avoid; page-break-after: auto"><h5 style="text-align: left">' + t + '</h5><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
                             n, isbool ? 'bar' : 'line', t, o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, count
                         );
