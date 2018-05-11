@@ -155,7 +155,7 @@ function makeset() {
                 label: 'Productivity',
                 productive_min: { attribute: 'productive_min', label: 'Productive', value_type: 3, value_type_description: 'Period (min)' },
                 neutral_min: { attribute: 'neutral_min', label: 'Neutral', value_type: 3, value_type_description: 'Period (min)' },
-                distracting_min: { attribute: 'distracting_min', label: 'Distracting', value_type: 3, value_type_description: 'Period (min)' },
+                distracting_min: { attribute: 'distracting_min', label: 'Leisure', value_type: 3, value_type_description: 'Period (min)' },
                 commits: { attribute: 'commits', label: 'Source Code Checkins', value_type: 0, value_type_description: 'Count' },
                 tasks_completed: { attribute: 'tasks_completed', label: 'Tasks', value_type: 0, value_type_description: 'Count' },
                 words_written: { attribute: 'words_written', label: 'Words', value_type: 0, value_type_description: 'Count' },
@@ -383,6 +383,14 @@ var exist = {
             exist.makergba(64,  64,  255, a, v),
         ];
     },
+    makepcol: function(xa, xv, len) {
+        var a = xa || 1.0, v = xv || 1.0;
+        return [
+            exist.makergba(64,  64,  64,   a, v),
+            exist.makergba(148, 148, 148,  a, v),
+            exist.makergba(220, 220, 220,  a, v),
+        ];
+    },
     makescol: function(xr, xa, xv, invert) {
         var r = Math.min(Math.max(xr, 0), 5), a = xa || 1.0, v = xv || 1.0,
             data = [
@@ -396,10 +404,10 @@ var exist = {
         if(invert && r > 0) r = 6-r;
         return data[r];
     },
-    colour: function(iter, alpha, value) {
-        var colours = exist.makecol(alpha, value);
+    colour: function(iter, alpha, value, print) {
+        var colours = print ? exist.makepcol(alpha, value) : exist.makecol(alpha, value);
         if(colours != null) return colours[iter%colours.length];
-        return exist.makergba(128, 128, 128, alpha, value);
+        return exist.makergba(128, 128, 128, alpha);
     },
     fa: function(type, colour, size, margin) {
         var value = '<span class="exist-fa ' + (type ? type : 'fas fa-cog fa-spin') + ' fa-fw" style="margin: ' + (margin ? margin : '0px 0px 0px 0px') + ';';
@@ -428,9 +436,20 @@ var exist = {
         if(range == len) return ' | <span style="font-weight: 700;">' + len + '</span>'
         return ' | <a href="#" onclick="return exist.seturl(\'range\', ' + len + ');">' + len + '</a>';
     },
-    auth: function() {
+    bodyload: function(empty) {
         var head = document.getElementById('exist-body');
-        if(head) head.innerHTML = '';
+        if(head) {
+            head.innerHTML = '';
+            if(!empty) {
+                var hrow = head.makechild('tr', 'exist-title-row', 'exist-center'),
+                    hdr = hrow.makechild('td', 'exist-title-info', 'exist-center'),
+                    h5 = hdr.makechild('h5', 'exist-title-info', 'exist-center');
+                h5.innerHTML = 'Loading..';
+            }
+        }
+    },
+    auth: function() {
+        exist.bodyload();
         window.location = 'https://exist.io/oauth2/authorize?response_type=code&client_id=124d5b5764184a4d81c2&redirect_uri=https%3A%2F%2Fexist.redeclipse.net%2F&scope=read+write';
     },
     switch: function() {
@@ -484,8 +503,7 @@ var exist = {
             value = vars ? opts : hash[0];
         }
         if(!exist.config('ready') || exist.config('page.print') != print) {
-            var head = document.getElementById('exist-body');
-            if(head) head.innerHTML = '';
+            exist.bodyload();
             var hdr = document.getElementsByTagName('head');
             if(hdr) {
                 var ccss = document.getElementsByClassName('exist-css');
@@ -533,8 +551,7 @@ var exist = {
         }
     },
     start: function() {
-        var head = document.getElementById('exist-body');
-        if(head) head.innerHTML = '';
+        exist.bodyload();
         exist.makenav(['<li class="navitem"><a href="#" onclick="return exist.auth();" title="Login with Exist.io"><span class="fas fa-user-plus fa-fw" aria-hidden="true"></span><div class="navtext">Login</div></a></li>']);
         exist.settings.cookies = {};
         var cookies = decodeURIComponent(document.cookie).split(';');
@@ -946,17 +963,17 @@ var exist = {
             exist.request.start('attributes', 'GET', 'users/$self/attributes', {limit: 31, date_max: makedate()}, exist.load.attributes);
         },
         draw: function() {
-            var head = document.getElementById('exist-body');
             if(exist.info.id) {
                 var page = exist.config('page.id');
                 for (var i in Chart.instances) if(!isfunc(Chart.instances[i])) Chart.instances[i].destroy();
                 Chart.instances = {};
-                if(head) head.innerHTML = '';
+                exist.bodyload();
                 if(page == 'day') exist.day.display();
                 else if(page == 'chart') exist.chart.display();
                 else exist.day.display();
             }
             else {
+                var head = document.getElementById('exist-body');
                 if(head) {
                     head.innerHTML = '';
                     var hrow = head.makechild('tr', 'exist-title-row', 'exist-center'),
@@ -987,8 +1004,108 @@ var exist = {
             }
         },
     },
+    calendar: {
+        make: function(hdr) {
+            var inner = '<div id="calendar-display">';
+            inner += '<table id="calendar-table" align="center">';
+            inner += '<thead id="calendar-head">';
+            inner += '<tr><th><a href="#" class="arrow left"><span class="fas fa-arrow-circle-left fa-fw"></span></div></th><th colspan="5"><div id="calendar-data"></div></th><th><a href="#" class="arrow right"><span class="fas fa-arrow-circle-right fa-fw"></span></div></th></tr>'
+            inner += '<tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr>';
+            inner += '</thead>';
+            inner += '<tbody id="calendar-body">';
+            inner += '<tr class="r0"><td class="col0"><td class="col1"><td class="col2"><td class="col3"><td class="col4"><td class="col5"><td class="col6"></td></tr>';
+            inner += '<tr class="r1"><td class="col0"><td class="col1"><td class="col2"><td class="col3"><td class="col4"><td class="col5"><td class="col6"></td></tr>';
+            inner += '<tr class="r2"><td class="col0"><td class="col1"><td class="col2"><td class="col3"><td class="col4"><td class="col5"><td class="col6"></td></tr>';
+            inner += '<tr class="r3"><td class="col0"><td class="col1"><td class="col2"><td class="col3"><td class="col4"><td class="col5"><td class="col6"></td></tr>';
+            inner += '<tr class="r4"><td class="col0"><td class="col1"><td class="col2"><td class="col3"><td class="col4"><td class="col5"><td class="col6"></td></tr>';
+            inner += '<tr class="r5"><td class="col0"><td class="col1"><td class="col2"><td class="col3"><td class="col4"><td class="col5"><td class="col6"></td></tr>';
+            inner += '</tbody>';
+            inner += '</table>';
+            inner += '</div>';
+            return inner;
+        },
+        generatecalendar: function(d) {
+            var days = exist.calendar.howmanydays(d), shift = exist.calendar.getdayfirstdate(d), cur = new Date().getMonth() == d.getMonth(), today = makedate();
+            exist.calendar.clear();
+            for(var i = 0; i < days; i++) {
+                var row = Math.floor((i+shift)/7), col = Math.floor((i+shift)%7), c = i+1, t = cur && c == d.getDate(), e = makedate(0, d.getFullYear() + '-' + (d.getMonth()+1) + '-' + c),
+                    b = 'calendar-day' + (t ? ' calendar-cur' : ' calendar-not') + (e == today ? ' calendar-today' : '');
+                $('#calendar-display .r' + row).children('.col' + col).html('<div id="exist-day-' + e + '" class="' + b + '" onclick="return exist.seturl(\'date\', \'' + e + '\');">' + c + '</div>');
+            }
+        },
+        clear: function(){
+            $('#calendar-display tbody td').each(function(){
+                $(this).html('');
+            })
+        },
+        getdayfirstdate: function(d) {
+            var tempd = new Date();
+            tempd.setFullYear(d.getFullYear());
+            tempd.setMonth(d.getMonth());
+            tempd.setDate(1);
+            tempd.setHours(0);
+            tempd.setMinutes(0);
+            tempd.setSeconds(0);
+            return tempd.getDay();
+        },
+        howmanydays: function(d) {
+            var m = d.getMonth()+1 ;
+            if(m == 1 || m == 3 || m == 5 || m == 7 || m == 8 || m == 10 || m == 12) return 31;
+            if(m == 2) {
+                if(exist.calendar.isleapyear(d.getFullYear())) return 29;
+                else return 28;
+            }
+            return 30;
+        },
+        isleapyear: function(year) {
+            if(year%400 == 0) return true;
+            else if(year%100 == 0) return false;
+            else if(year%4 == 0) return true;
+            else return false;
+        },
+        updatedate: function(d, sign) {
+            var m = d.getMonth();
+            if(sign) {
+                if(m+1 > 11) {
+                    d.setFullYear(d.getFullYear()+1);
+                    d.setMonth(0);
+                }
+                else d.setMonth(m+1);
+
+            } else {
+                if(m-1 < 0) {
+                    d.setFullYear(d.getFullYear()-1);
+                    d.setMonth(11);
+                }
+                else d.setMonth(m-1);
+            }
+        },
+        header: function(d) {
+            var months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
+            return months[d.getMonth()] + ' ' + d.getFullYear();
+        },
+        generate: function(s, d) {
+            s.makechild('div', 'exist-calendar', 'calendar-container hide-print').innerHTML = exist.calendar.make();
+            var d = new Date(d);
+            $('#calendar-data').html(exist.calendar.header(d));
+            exist.calendar.generatecalendar(d);
+            $('.left').click(function() {
+                exist.calendar.updatedate(d, 0);
+                $('#calendar-data').html(exist.calendar.header(d));
+                exist.calendar.generatecalendar(d);
+                return false;
+            });
+            $('.right').click(function() {
+                exist.calendar.updatedate(d, 1);
+                $('#calendar-data').html(exist.calendar.header(d));
+                exist.calendar.generatecalendar(d);
+                return false;
+            });
+        }
+    },
     day: {
         submission: function() {
+            var submitted = {};
             return false;
         },
         maketest: function(b, isbool, r, date) {
@@ -1059,6 +1176,7 @@ var exist = {
                 var hrow = head.makechild('tr', 'exist-title-row', 'exist-center'),
                     hdr = hrow.makechild('td', 'exist-title-info', 'exist-center'),
                     span = hdr.makechild('span', 'exist-title-info', 'exist-center');
+                exist.calendar.generate(span, date);
                 span.makechild('h4', 'exist-title-info-welcome').innerHTML = 'Welcome ' + exist.info.first_name + ', here is your data for ' + day;
                 if(exist.value(exist.data.weather.weather_summary, date)) {
                     var weather = exist.data.weather, par = span.makechild('p', 'exist-title-info-weather');
@@ -1133,10 +1251,10 @@ var exist = {
             }
         },
         dataset: function(label, isbool, count, len) {
-            var print = exist.config('page.print'), alpha = isbool ? 0.35 : (len > 1 ? 1.0/len*0.35 : 0.35),
-                col = exist.colour(count.length, alpha), brcol = exist.colour(count.length, 1.0, (print ? 0.35 : 1.5));
+            var print = exist.config('page.print'), amt = print && !isbool ? 0.1 : 0.35, alpha = len > 1 ? 1.0/len*amt : amt,
+                col = exist.colour(count.length, alpha, 1.0, print), brcol = exist.colour(count.length, 1.0, print ? (isbool ? 0.5 : 0.75) : 1.5, print);
             var data = {
-                label: label,
+                label: label || ' ',
                 data: [],
                 spanGaps: true,
                 fontColor: col,
@@ -1153,7 +1271,7 @@ var exist = {
             var print = exist.config('page.print'),
                 bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0),
                 fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255),
-                brcol = print ? exist.makergba(32, 32, 32) : exist.makergba(64, 64, 64);
+                brcol = exist.makergba(64, 64, 64);
             var data = {
                 display: display || false,
                 position: 'left',
@@ -1214,11 +1332,11 @@ var exist = {
             var print = exist.config('page.print'),
                 bgcol = print ? exist.makergba(255, 255, 255) : exist.makergba(0, 0, 0),
                 fgcol = print ? exist.makergba(0, 0, 0) : exist.makergba(255, 255, 255),
-                brcol = print ? exist.makergba(32, 32, 32) : exist.makergba(64, 64, 64);
+                brcol = exist.makergba(64, 64, 64);
             var data = {
                 id: 'exist-chart-' + id,
                 type: type,
-                labels: name,
+                labels: name || ' ',
                 values: [],
                 data: {
                     labels: [],
@@ -1288,7 +1406,7 @@ var exist = {
                         bodyFontSize: isbool ? 0 : exist.chart.size(10),
                         bodyAlign: 'left',
                         footerFontStyle: 'bold',
-                        footerSpacing: 0,
+                        footerSpacing: 4,
                         footerMarginTop: 0,
                         footerFontColor: fgcol,
                         footerFontSize: 0,
@@ -1300,8 +1418,8 @@ var exist = {
                         cornerRadius: 4,
                         multiKeyBackground: bgcol,
                         displayColors: false,
-                        borderColor: brcol,
-                        borderWidth: 1.25,
+                        borderColor: fgcol,
+                        borderWidth: 1,
                         callbacks: {
                             label: function(item, data) {
                                 var label = item.yLabel;
@@ -1478,7 +1596,11 @@ var exist = {
                             if((maxval-minval) >= 10) sz = sz*7/4;
                         }
                         head.innerHTML += '';
-                        head.innerHTML += '<div class="exist-chart-container" style="page-break-inside: avoid; page-break-after: auto"><h5 style="text-align: left">' + t + '</h5><canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + sz + 'px"></canvas></div>';
+                        var div = head.makechild('div', 'exist-div-' + n, 'exist-chart-container');
+                        div.innerHTML = '<h5 style="float: left; text-align: left">' + t + '</h5>';
+                        div.innerHTML += '<h6 id="exist-tip-' + n + '" style="float: right; text-align: right">' + n + '</h6>';
+                        div.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (sz+(2-(sz%2))) + 'px"></canvas>';
+                        if(isbool) div.style.paddingBottom = '6px';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(
                             n, isbool ? 'bar' : 'line', t, o, isbool ? 0 : minval, isbool ? 1 : maxval, values, labels, b.desc, isbool, count
                         );

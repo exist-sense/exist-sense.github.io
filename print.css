@@ -91,9 +91,6 @@ canvas {
     color: rgb(0, 0, 0);
 }
 
-table {
-    border-collapse: collapse;
-}
 th, td {
     text-align: left;
     padding: 5px 10px;
@@ -127,8 +124,10 @@ dt, th {
     height: 0px;
 }
 .exist-chart-container {
-    border: 2px solid rgb(128, 128, 128);
+    border: 2px solid rgb(0, 0, 0);
     border-radius: 4px;
     padding: 1px 1px 1px 8px;
     margin: 4px 1px 1px 1px;
+    page-break-inside: avoid;
+    page-break-after: auto;
 }

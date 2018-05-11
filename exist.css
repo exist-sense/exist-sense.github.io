@@ -41,8 +41,7 @@ canvas {
 #exist-front, #exist-table, #exist-view, #exist-more {
     width: 100%;
     max-width: 100%;
-    border-collapse: separate;
-    border: 2px solid rgb(16, 16, 96);
+    border: 2px solid rgb(16, 16, 128);
     border-radius: 4px;
     vertical-align: middle;
     margin-bottom: 16px;
@@ -117,6 +116,18 @@ canvas {
 .exist-chart-container {
     border: 2px solid rgb(16, 16, 128);
     border-radius: 4px;
-    padding: 1px 1px 1px 8px;
-    margin: 4px 1px 1px 1px;
+    padding: 2px 8px 0px 8px;
+    margin: 6px 0px 0px 0px;
+    page-break-inside: avoid;
+    page-break-after: auto;
+}
+#exist-calendar {
+    float: right;
+    clear: both;
+}
+@media screen and (max-width: 800px) {
+    #exist-calendar {
+        float: none;
+        text-align: center;
+    }
 }

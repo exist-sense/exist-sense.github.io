@@ -136,6 +136,7 @@ a:hover, a:active {
     padding: 8px;
     background-color: rgb(8, 8, 8);
     line-height: 1.4em;
+    font-weight: 700;
 }
 .footer p {
     margin: 0;
@@ -343,47 +344,45 @@ input[type="radio"], input[type="checkbox"] {
     height: 20px;
     margin-right: 2px;
 }
-.priv-player {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(255, 128, 96);
+#calendar-display table {
+    width: 220px;
+    max-width: 220px;
+    height: 200px;
+    background: rgb(0, 0, 32);
+    border: 2px solid rgb(16, 16, 128);
+    border-radius: 4px;
 }
-.priv-supporter {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(255, 255, 128);
+#calendar-data, #calendar-display table tbody tr td, #calendar-display table thead tr th  {
+    text-align: center;
+    padding: 2px;
+    margin: 0px;
 }
-.priv-moderator {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(192, 255, 128);
+.calendar-day {
+    width: 32px;
+    cursor: pointer;
+    background: rgb(8, 8, 64);
+    border: 2px solid rgb(16, 16, 128);
+    border-radius: 4px;
 }
-.priv-operator {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(128, 255, 192);
+.calendar-today {
+    background: rgb(32, 32, 192);
+    border: 2px solid rgb(16, 16, 128);
 }
-.priv-administrator {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(128, 255, 255);
+.calendar-cur {
+    background: rgb(64, 64, 255);
+    border: 2px solid rgb(64, 64, 255);
+    font-weight: 700;
 }
-.priv-developer {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(128, 192, 255);
+.arrow {
+    cursor: pointer;
+    color: rgb(128, 128, 255);
+    -webkit-filter: drop-shadow( -1px -1px 5px rgb(0, 0, 255));
+    filter: drop-shadow(-1px -1px 5px rgb(0, 0, 255));
 }
-.priv-founder {
-    white-space: nowrap;
-    margin-right: 2px;
-    vertical-align: top;
-    color: rgb(224, 128, 224);
+.arrow:hover, .arrow:active {
+    color: rgb(240, 240, 255);
+    -webkit-filter: drop-shadow( -1px -1px 5px rgb(64, 64, 255));
+    filter: drop-shadow(-1px -1px 5px rgb(64, 64, 255));
 }
 @media screen and (max-width: 800px) {
     .hide-small {
