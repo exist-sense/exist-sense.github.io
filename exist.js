@@ -80,6 +80,7 @@ String.prototype.capital = function() {
 function makeset() {
     return {
         nologin: false, ready: false,
+        hide: [],
         access: {},
         cookies: {},
         moods: {
@@ -329,6 +330,7 @@ function makeset() {
             range: 31,
             values: null,
             print: false,
+            hide: null,
         }
     };
 }
@@ -387,8 +389,7 @@ var exist = {
         var a = xa || 1.0, v = xv || 1.0;
         return [
             exist.makergba(64,  64,  64,   a, v),
-            exist.makergba(148, 148, 148,  a, v),
-            exist.makergba(220, 220, 220,  a, v),
+            exist.makergba(168, 168, 168,  a, v),
         ];
     },
     makescol: function(xr, xa, xv, invert) {
@@ -404,10 +405,15 @@ var exist = {
         if(invert && r > 0) r = 6-r;
         return data[r];
     },
-    colour: function(iter, alpha, value, print) {
-        var colours = print ? exist.makepcol(alpha, value) : exist.makecol(alpha, value);
+    colour: function(iter, alpha, value, print, len) {
+        var colours = print ? exist.makepcol(alpha, value, len) : exist.makecol(alpha, value);
         if(colours != null) return colours[iter%colours.length];
         return exist.makergba(128, 128, 128, alpha);
+    },
+    hide: function(name) {
+        if(!exist.settings.hide || exist.settings.hide.length <= 0) return false;
+        for(var i = 0; i < exist.settings.hide.length; i++) if(name == exist.settings.hide[i]) return true;
+        return false;
     },
     fa: function(type, colour, size, margin) {
         var value = '<span class="exist-fa ' + (type ? type : 'fas fa-cog fa-spin') + ' fa-fw" style="margin: ' + (margin ? margin : '0px 0px 0px 0px') + ';';
@@ -462,6 +468,20 @@ var exist = {
         exist.start();
         return false;
     },
+    setup: function() {
+        if(exist.settings.cookies.hide) {
+            exist.settings.page.hide = exist.settings.cookies.hide;
+            exist.defaults.page.hide = exist.settings.cookies.hide;
+        }
+    },
+    checkopts: function() {
+        exist.settings.hide = exist.settings.page.hide ? exist.settings.page.hide.split(',') : [];
+        if(exist.settings.page.hide != exist.settings.cookies.hide) {
+            makecookie('hide', exist.settings.page.hide, 3650);
+            exist.settings.cookies.hide = exist.settings.page.hide;
+            exist.defaults.page.hide = exist.settings.cookies.hide;
+        }
+    },
     checkurl: function(values, chg) {
         var url = window.location.href, hash = url.split('#'), params = hash[0].split('?'), value = params[0], print = exist.config('page.print');
         if(params.length >= 2) {
@@ -484,6 +504,7 @@ var exist = {
                 }
             }
             for(var i in values) if(!isfunc(values[i])) exist.settings.page[i] = values[i];
+            exist.checkopts();
             var opts = hash[0] + '#', vars = 0;
             for(var i in exist.settings.page) {
                 if(isfunc(exist.settings.page[i])) continue;
@@ -502,6 +523,7 @@ var exist = {
             }
             value = vars ? opts : hash[0];
         }
+        else exist.checkopts();
         if(!exist.config('ready') || exist.config('page.print') != print) {
             exist.bodyload();
             var hdr = document.getElementsByTagName('head');
@@ -563,6 +585,7 @@ var exist = {
                 if(value.length >= 2) exist.settings.cookies[value[0]] = value[1];
             }
         }
+        exist.setup();
         exist.checkurl();
         if(!exist.config('nologin')) {
             if(exist.settings.cookies.access_token != null)
@@ -1031,12 +1054,14 @@ var exist = {
                 var row = Math.floor((i+shift)/7), col = Math.floor((i+shift)%7), c = i+1, t = cur && c == d.getDate(), e = makedate(0, d.getFullYear() + '-' + (d.getMonth()+1) + '-' + c),
                     b = 'calendar-day' + (t ? ' calendar-cur' : ' calendar-not') + (e == today ? ' calendar-today' : '');
                 $('#calendar-display .r' + row).children('.col' + col).html('<div id="exist-day-' + e + '" class="' + b + '" onclick="return exist.seturl(\'date\', \'' + e + '\');">' + c + '</div>');
+                $('#calendar-display .r' + row).css('display', 'table-row');
             }
         },
         clear: function(){
-            $('#calendar-display tbody td').each(function(){
-                $(this).html('');
-            })
+            for(var i = 0; i < 6; i++) $('#calendar-display .r' + i).css('display', 'none');
+            $('#calendar-display tbody td').each(function() {
+                $(this).html('<div class="calendar-day calendar-empty">&nbsp;</div>');
+            });
         },
         getdayfirstdate: function(d) {
             var tempd = new Date();
@@ -1251,8 +1276,8 @@ var exist = {
             }
         },
         dataset: function(label, isbool, count, len) {
-            var print = exist.config('page.print'), amt = print && !isbool ? 0.1 : 0.35, alpha = len > 1 ? 1.0/len*amt : amt,
-                col = exist.colour(count.length, alpha, 1.0, print), brcol = exist.colour(count.length, 1.0, print ? (isbool ? 0.5 : 0.75) : 1.5, print);
+            var print = exist.config('page.print'), amt = print && !isbool ? 0.1 : 0.35, alpha = (len > 1 ? 1.0/len*amt : amt)*(isbool ? 0.5 : 1.0),
+                col = exist.colour(count.length, alpha, 1.0, print, len), brcol = exist.colour(count.length, 1.0, print ? (isbool ? 0.5 : 0.75) : 1.5, print, len);
             var data = {
                 label: label || ' ',
                 data: [],
@@ -1296,7 +1321,7 @@ var exist = {
                     borderDashOffset: 0
                 },
                 scaleLabel: {
-                    display: min != null ? true : false,
+                    display: false,
                     fontColor: fgcol,
                     fontSize: exist.chart.size(10),
                     fontFamily: 'monospace',
@@ -1304,8 +1329,8 @@ var exist = {
                     labelString: isbool ? 'Bool' : label,
                     lineHeight: 1,
                     padding: {
-                        top: 1,
-                        bottom: 1
+                        top: 0,
+                        bottom: 0
                     }
                 },
                 ticks: {
@@ -1528,7 +1553,9 @@ var exist = {
             return values;
         },
         make: function(head, len, date, size, data, q, count) {
-            var list = data.split('-'), a = exist.data[list[0]];
+            var list = data.split('-');
+            if(q > 0 && exist.hide(list[0])) return;
+            var a = exist.data[list[0]];
             if(a && (q <= 0 || a.priority == q)) {
                 for(var r = 1; r <= 10; r++) {
                     for(var j in a) {
@@ -1554,8 +1581,10 @@ var exist = {
                             for(var x = 0; x < g.group.length; x++) extra[extra.length] = g.group[x];
                             t = g.label;
                         }
+                        if(q > 0 && exist.hide(n)) continue;
                         if(extra.length > 0) {
                             for(var x = 0; x < extra.length; x++) {
+                                if(q > 0 && exist.hide(list[0] + '-' + extra[x])) continue;
                                 var c = a[extra[x]], cbool = c.value_type_description == 'Boolean' ? true : false;
                                 if(!exist.chart.maketest(c, cbool, null, 0, date, len)) continue;
                                 values[values.length] = exist.chart.values(c, date, len);
@@ -1597,8 +1626,8 @@ var exist = {
                         }
                         head.innerHTML += '';
                         var div = head.makechild('div', 'exist-div-' + n, 'exist-chart-container');
-                        div.innerHTML = '<h5 style="float: left; text-align: left">' + t + '</h5>';
-                        div.innerHTML += '<h6 id="exist-tip-' + n + '" style="float: right; text-align: right">' + n + '</h6>';
+                        div.innerHTML = '<h5 class="exist-chart-header">' + t + '</h5>';
+                        div.innerHTML += '<span id="exist-scale-' + n + '" class="exist-chart-scale">' + o + '</span>';
                         div.innerHTML += '<canvas id="exist-chart-' + n + '" class="exist-chart" width="400px" height="' + (sz+(2-(sz%2))) + 'px"></canvas>';
                         if(isbool) div.style.paddingBottom = '6px';
                         exist.chart.data[exist.chart.data.length] = exist.chart.create(

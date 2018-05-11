@@ -346,8 +346,6 @@ input[type="radio"], input[type="checkbox"] {
 }
 #calendar-display table {
     width: 220px;
-    max-width: 220px;
-    height: 200px;
     background: rgb(0, 0, 32);
     border: 2px solid rgb(16, 16, 128);
     border-radius: 4px;
@@ -372,6 +370,11 @@ input[type="radio"], input[type="checkbox"] {
     background: rgb(64, 64, 255);
     border: 2px solid rgb(64, 64, 255);
     font-weight: 700;
+}
+.calendar-empty {
+    background: rgb(0, 0, 32);
+    border: 2px solid rgb(0, 0, 64);
+    cursor: arrow;
 }
 .arrow {
     cursor: pointer;

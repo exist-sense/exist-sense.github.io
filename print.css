@@ -123,11 +123,23 @@ dt, th {
     width: 0px;
     height: 0px;
 }
+.exist-chart-header {
+    float: left;
+    text-align: left;
+    margin: 6px 6px 12px 6px;
+}
+.exist-chart-scale {
+    float: right;
+    text-align: right;
+    margin: 8px 6px 2px 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
 .exist-chart-container {
     border: 2px solid rgb(0, 0, 0);
     border-radius: 4px;
-    padding: 1px 1px 1px 8px;
-    margin: 4px 1px 1px 1px;
+    padding: 2px 8px 0px 8px;
+    margin: 6px 0px 0px 0px;
     page-break-inside: avoid;
     page-break-after: auto;
 }
