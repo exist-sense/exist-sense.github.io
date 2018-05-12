@@ -136,7 +136,7 @@ canvas {
     float: right;
     clear: both;
 }
-@media screen and (max-width: 800px) {
+@media screen and (max-width: 1280px) {
     #exist-calendar {
         float: none;
         text-align: center;

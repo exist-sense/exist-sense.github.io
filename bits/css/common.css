@@ -395,6 +395,15 @@ input[type="radio"], input[type="checkbox"] {
     -webkit-filter: drop-shadow( -1px -1px 5px rgb(64, 64, 255));
     filter: drop-shadow(-1px -1px 5px rgb(64, 64, 255));
 }
+@media screen and (max-width: 1400px) {
+    .hide-medium {
+        border-collapse: collapse;
+        visibility: hidden;
+        display: none;
+        width: 0px;
+        height: 0px;
+    }
+}
 @media screen and (max-width: 800px) {
     .hide-small {
         border-collapse: collapse;

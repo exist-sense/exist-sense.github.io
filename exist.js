@@ -884,7 +884,7 @@ var exist = {
         },
         more: function(ready) {
             if(ready || exist.settings.ready) {
-                var date = exist.config('page.date'), len = exist.config('page.range'), first = makedate(1-len, date);
+                var date = exist.config('page.date'), id = exist.config('page.id'), len = id != 'chart' ? 1 : exist.config('page.range'), first = makedate(1-len, date);
                 if(exist.data.mood.mood.values && exist.data.mood.mood.values[first] == null) {
                     var start = date, retry = null;
                     for(var i = 1; i < len; i++) {
@@ -1177,7 +1177,7 @@ var exist = {
                                 if(z == 6) inputs += '<br />';
                                 inputs += '<label class="radiobox" title="' + desc + '"><input type="radio" id="exist-value-' + n + '" name="exist-value-' + n + '" ' + (value == z ? 'checked' : '') + ' /><span id="value-' + (b.invert && z > 0 ? 11-z : z) + '" class="radiomark"></span></label>';
                             }
-                            irow.innerHTML += '<td style="width: 200px; text-align: right">' + inputs + '</td>';
+                            irow.innerHTML += '<td style="text-align: right; break-inside: avoid">' + inputs + '</td>';
                         }
                         else irow.innerHTML += '<td style="width: 200px; text-align: right"><input type="text" autocomplete="off" id="exist-value-' + n + '" name="exist-value-' + n + '" value="' + (value || '') + '" style="width: 100%;" /></td>';
                         irow.innerHTML += '<td class="hide-small">' + (b.offset ? 'Last night' : 'Today') + '</td>';
@@ -1185,7 +1185,7 @@ var exist = {
                         irow.innerHTML += '<td style="text-align: right"><label class="checkbox" title="Owned by: ' + (b.service || 'none') + '">' +
                             '<input type="checkbox" id="exist-acquire-' + n + '" name="exist-acquire-' + n + '" ' + (acquired ? 'checked' : '') + ' />' + 
                             '<span class="checkmark"></span></label></td>';
-                        irow.innerHTML += '<td class="hide-small" style="text-align: right; vertical-align: middle"><tt style="font-size: 75%">' + n + '</tt></td>';
+                        irow.innerHTML += '<td class="hide-medium" style="text-align: right; vertical-align: middle"><tt style="font-size: 75%">' + n + '</tt></td>';
                     }
                 }
             }
