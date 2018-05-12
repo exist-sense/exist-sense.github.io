@@ -1032,7 +1032,8 @@ var exist = {
             var inner = '<div id="calendar-display">';
             inner += '<table id="calendar-table" align="center">';
             inner += '<thead id="calendar-head">';
-            inner += '<tr><th><a href="#" class="arrow left"><span class="fas fa-arrow-circle-left fa-fw"></span></div></th><th colspan="5"><div id="calendar-data"></div></th><th><a href="#" class="arrow right"><span class="fas fa-arrow-circle-right fa-fw"></span></div></th></tr>'
+            inner += '<tr><th><a href="#" class="arrow left"><span class="fas fa-arrow-alt-circle-left fa-fw"></span></div></th>';
+            inner += '<th colspan="5"><div id="calendar-data"></div></th><th><a href="#" class="arrow right"><span class="fas fa-arrow-alt-circle-right fa-fw"></span></div></th></tr>'
             inner += '<tr><th>S</th><th>M</th><th>T</th><th>W</th><th>T</th><th>F</th><th>S</th></tr>';
             inner += '</thead>';
             inner += '<tbody id="calendar-body">';
@@ -1047,13 +1048,19 @@ var exist = {
             inner += '</div>';
             return inner;
         },
-        generatecalendar: function(d) {
-            var days = exist.calendar.howmanydays(d), shift = exist.calendar.getdayfirstdate(d), cur = new Date().getMonth() == d.getMonth(), today = makedate();
+        generatecalendar: function(d, e) {
+            var days = exist.calendar.howmanydays(d), shift = exist.calendar.getdayfirstdate(d), cur = d.getMonth() == e.getMonth() && d.getFullYear() == e.getFullYear(),
+                today = makedate(), q = new Date(today);
             exist.calendar.clear();
             for(var i = 0; i < days; i++) {
-                var row = Math.floor((i+shift)/7), col = Math.floor((i+shift)%7), c = i+1, t = cur && c == d.getDate(), e = makedate(0, d.getFullYear() + '-' + (d.getMonth()+1) + '-' + c),
-                    b = 'calendar-day' + (t ? ' calendar-cur' : ' calendar-not') + (e == today ? ' calendar-today' : '');
-                $('#calendar-display .r' + row).children('.col' + col).html('<div id="exist-day-' + e + '" class="' + b + '" onclick="return exist.seturl(\'date\', \'' + e + '\');">' + c + '</div>');
+                var row = Math.floor((i+shift)/7), col = Math.floor((i+shift)%7), c = i+1, t = cur && c == d.getDate(), f = makedate(0, d.getFullYear() + '-' + (d.getMonth()+1) + '-' + c);
+                if(d.getFullYear() > q.getFullYear() || (d.getFullYear() == q.getFullYear() && (d.getMonth() > q.getMonth() || (d.getMonth() == q.getMonth() && c > q.getDate())))) {
+                    $('#calendar-display .r' + row).children('.col' + col).html('<div id="exist-day-' + e + '" class="calendar-day calendar-dis">' + c + '</div>');
+                }
+                else {
+                    var b = 'calendar-day' + (t ? ' calendar-cur' : ' calendar-not') + (f == today ? ' calendar-today' : '');
+                    $('#calendar-display .r' + row).children('.col' + col).html('<div id="exist-day-' + e + '" class="' + b + '" onclick="return exist.seturl(\'date\', \'' + f + '\');">' + c + '</div>');
+                }
                 $('#calendar-display .r' + row).css('display', 'table-row');
             }
         },
@@ -1109,21 +1116,21 @@ var exist = {
             var months = [ 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December' ];
             return months[d.getMonth()] + ' ' + d.getFullYear();
         },
-        generate: function(s, d) {
+        generate: function(s, t) {
             s.makechild('div', 'exist-calendar', 'calendar-container hide-print').innerHTML = exist.calendar.make();
-            var d = new Date(d);
+            var d = new Date(t), e = new Date(t);
             $('#calendar-data').html(exist.calendar.header(d));
-            exist.calendar.generatecalendar(d);
+            exist.calendar.generatecalendar(d, e);
             $('.left').click(function() {
                 exist.calendar.updatedate(d, 0);
                 $('#calendar-data').html(exist.calendar.header(d));
-                exist.calendar.generatecalendar(d);
+                exist.calendar.generatecalendar(d, e);
                 return false;
             });
             $('.right').click(function() {
                 exist.calendar.updatedate(d, 1);
                 $('#calendar-data').html(exist.calendar.header(d));
-                exist.calendar.generatecalendar(d);
+                exist.calendar.generatecalendar(d, e);
                 return false;
             });
         }

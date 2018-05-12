@@ -8,7 +8,7 @@ h1, h2, h3, h4, h5, h6 {
 .exist-bg1, #exist-h-row, #exist-title-row {
     background-color: rgba(255, 255, 255, 0.25);
 }
-.exist-bg2, #exist-data-info, #exist-attr-row, #exist-l-row, #exist-h-load, #exist-t-load, #exist-h-more, #exist-data-xtra {
+.exist-bg2, #exist-data-info, #exist-title-row, #exist-chart-info, #exist-attr-row, #exist-l-row, #exist-h-load, #exist-t-load, #exist-h-more, #exist-data-xtra {
     background-color: rgba(255, 255, 255, 0.75);
 }
 .exist-center {
@@ -83,8 +83,8 @@ canvas {
 .exist-nomargins p {
     margin: 0px;
 }
-#exist-h-row, #exist-data-info, #exist-data-row, #exist-data-xtra,
-  #exist-data-info, #exist-data-avatar, #exist-data-span {
+#exist-h-row, #exist-data-info, #exist-data-row, #exist-chart-row, #exist-data-xtra,
+#exist-data-info, #exist-data-avatar, #exist-data-span {
     vertical-align: middle;
 }
 #exist-status {

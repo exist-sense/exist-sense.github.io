@@ -371,12 +371,20 @@ input[type="radio"], input[type="checkbox"] {
     border: 2px solid rgb(64, 64, 255);
     font-weight: 700;
 }
+.calendar-empty, .calendar-dis {
+    cursor: default;
+}
 .calendar-empty {
     background: rgb(0, 0, 32);
     border: 2px solid rgb(0, 0, 64);
-    cursor: arrow;
+}
+.calendar-dis {
+    background: rgb(0, 0, 0);
+    color: rgb(178, 178, 178);
+    border: 2px solid rgb(6, 6, 100);
 }
 .arrow {
+    font-size: 16px;
     cursor: pointer;
     color: rgb(128, 128, 255);
     -webkit-filter: drop-shadow( -1px -1px 5px rgb(0, 0, 255));
