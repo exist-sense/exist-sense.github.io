@@ -560,8 +560,8 @@ var exist = {
         if(nav) {
             nav.innerHTML = '';
             var ul = nav.makechild('ul', 'navbar-list', 'nav navbar-nav navbar-right');
-            ul.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/core" title="GitHub Page"><span class="fab fa-github fa-fw" aria-hidden="true"></span><div class="navtext">GitHub Page</div></a></li>';
-            ul.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/core/issues/new" title="Submit a Feature Request or Bug Report"><span class="fas fa-list-alt fa-fw" aria-hidden="true"></span><div class="navtext">Requests &amp; Bugs</div></a></li>';
+            ul.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/exist-sense.github.io" title="GitHub Page"><span class="fab fa-github fa-fw" aria-hidden="true"></span><div class="navtext">GitHub Page</div></a></li>';
+            ul.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/exist-sense.github.io/issues/new" title="Submit a Feature Request or Bug Report"><span class="fas fa-list-alt fa-fw" aria-hidden="true"></span><div class="navtext">Requests &amp; Bugs</div></a></li>';
             ul.innerHTML += '<li class="navitem"><a href="mailto:exist-sense@redeclipse.net" title="Contact"><span class="fas fa-at fa-fw" aria-hidden="true"></span><div class="navtext">Contact</div></a></li>';
             if(data != null && data.length > 0) {
                 var ul2 = nav.makechild('ul', 'navbar-list', 'nav navbar-nav navbar-right');
@@ -1019,7 +1019,7 @@ var exist = {
                         span.innerHTML += '<p>At the moment, I’m just using the Exist app to update my tags according to this format, though once I get to writing the editor there will be a proper interface to rate a day in a more traditional fashion. Feel free to play around with it, watch the repo for updates, or submit an issue on GitHub to make feature requests. If there’s enough interest I’ll look at expanding this further as needed.</p>';
                         span.innerHTML += '<p>Links:<ul>';
                         span.innerHTML += '<li>Custom tracking: <a href="https://exist.io/blog/custom-tracking/">https://exist.io/blog/custom-tracking/</a></li>';
-                        span.innerHTML += '<li>GitHub: <a href="https://github.com/exist-sense/core">https://github.com/exist-sense/core</a></li>';
+                        span.innerHTML += '<li>GitHub: <a href="https://github.com/exist-sense/exist-sense.github.io">https://github.com/exist-sense/exist-sense.github.io</a></li>';
                         span.innerHTML += '</ul></p>';
                         span.innerHTML += '<p>Please <b><a href="#" onclick="return exist.auth();">Login with Exist.io</a></b> to continue.</p>';
                 }
