@@ -562,7 +562,6 @@ var exist = {
             var ul = nav.makechild('ul', 'navbar-list', 'nav navbar-nav navbar-right');
             ul.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/exist-sense.github.io" title="GitHub Page"><span class="fab fa-github fa-fw" aria-hidden="true"></span><div class="navtext">GitHub Page</div></a></li>';
             ul.innerHTML += '<li class="navitem"><a href="https://github.com/exist-sense/exist-sense.github.io/issues/new" title="Submit a Feature Request or Bug Report"><span class="fas fa-list-alt fa-fw" aria-hidden="true"></span><div class="navtext">Requests &amp; Bugs</div></a></li>';
-            ul.innerHTML += '<li class="navitem"><a href="mailto:exist-sense@redeclipse.net" title="Contact"><span class="fas fa-at fa-fw" aria-hidden="true"></span><div class="navtext">Contact</div></a></li>';
             if(data != null && data.length > 0) {
                 var ul2 = nav.makechild('ul', 'navbar-list', 'nav navbar-nav navbar-right');
                 for(var i = 0; i < data.length; i++) {
